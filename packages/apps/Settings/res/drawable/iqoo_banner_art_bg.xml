@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2026 Wowo OS / Shinkai Project
+  Wowo OS 19jt - Merah Putih Edition
+  -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Layer 1: Frame / Border Merah Putih (Gradient: Merah di atas, Putih di bawah) -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="270"
+                android:startColor="#E53935"
+                android:centerColor="#FF5252"
+                android:endColor="#FFFFFF" />
+            <corners android:radius="24dp" />
+        </shape>
+    </item>
+
+    <!-- Layer 2: Inner Background Card (Inset 3.5dp menghasilkan border Merah-Putih setebal 3.5dp) -->
+    <item
+        android:top="3.5dp"
+        android:bottom="3.5dp"
+        android:left="3.5dp"
+        android:right="3.5dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="135"
+                android:startColor="#B71C1C"
+                android:centerColor="#C62828"
+                android:endColor="#4A0007" />
+            <corners android:radius="20.5dp" />
+        </shape>
+    </item>
+</layer-list>

@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (c) 2025 MicaOS
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+          
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <!-- Additional Settings -->
+    <string name="additional_settings_title">Additional Settings</string>
+
+    <!-- Shinkai Maintainer -->
+    <string name="shinkai_maintainer">Maintainer Device</string>
+    <string name="shinkai_maintainer_purpose">Shows the device maintainer for this Shinkai build</string>
+    <string name="shinkai_maintainer_source">Maintainer Source</string>
+
+    <!-- Game Space -->
+    <string name="game_space_title">Game Space</string>
+    <string name="game_space_summary">Enhance your gaming experience</string>
+
+    <!-- Force LTE_CA -->
+    <string name="force_lte_ca_title">LTE carrier aggregation</string>
+    <string name="force_lte_ca_summary">Enhances LTE bandwidth by aggregating supported bands</string>
+
+    <!-- Wowo OS Version & Branding -->
+    <string name="wowo_os_title">Wowo OS</string>
+    <string name="wowo_edition_badge_text">Kopdes Edition</string>
+    <string name="wowo_version_edition">Version Kopdes Edition</string>
+    <string name="wowo_official_badge">Official</string>
+    <string name="wowo_stat_os_label">Android</string>
+    <string name="wowo_stat_edition_label">Edition</string>
+    <string name="wowo_stat_device_label">Device</string>
+    <string name="shinkai_version">Shinkai version</string>
+    <string name="shinkai_version_purpose">Shows the installed Shinkai build version</string>
+    <string name="shinkai_logo_purpose">Displays the Wowo OS hero banner</string>
+    <string name="wowo_system_specs_title">System Specifications</string>
+    <string name="wowo_copied_toast">%1$s copied to clipboard</string>
+    <string name="wowo_based_shinkai_project">Based by Shinkai Project</string>
+    <string name="wowo_shinkai_hashtag">#ShinkaiProjectOnTop!</string>
+
+    <!-- Redesigned About Phone Dashboard -->
+    <string name="about_device_name_label">Device Name</string>
+    <string name="about_code_name_label">Code Name</string>
+    <string name="about_rom_version_label">ROM Version</string>
+    <string name="about_card_device_title">Device</string>
+    <string name="about_card_storage_title">Storage</string>
+    <string name="about_specs_model_title">Model</string>
+    <string name="about_specs_battery_title">Battery capacity</string>
+    <string name="about_specs_processor_title">Processor</string>
+    <string name="about_specs_platform_title">Platform</string>
+    <string name="about_phone_dashboard_purpose">Displays the redesigned About Phone hero dashboard</string>
+    <string name="about_copied_to_clipboard">%1$s copied to clipboard</string>
+
+    <!-- Override Mock Location restriction -->
+    <string name="override_mock_location_title">Override MockLocation restriction</string>
+    <string name="override_mock_location_summary">When enabled, apps cannot detect mock locations</string>
+
+    <!-- click to take partial screenshot -->
+    <string name="click_partial_screenshot_title">Click to partial screenshot</string>
+    <string name="click_partial_screenshot_summary">Short click Volume Down and Power to take partial screenshot</string>
+
+    <!-- Lockscreen battery info indicator -->
+    <string name="lockscreen_battery_info_title">Charging Info on Lock Screen</string>
+    <string name="lockscreen_battery_info_summary">Show current, voltage, wattage, and temperature while charging</string>
+
+    <!-- Per-app volume -->
+    <string name="app_volume">App volume</string>
+    <string name="app_volume_title">Per-app volume control</string>
+    <string name="app_volume_summary">Show per-app volume button into volume dialog</string>
+
+    <!-- Adaptive Playback -->
+    <string name="adaptive_playback_screen_title">Smart Pause</string>
+    <string name="adaptive_playback_enabled">Use smart pause</string>
+    <string name="adaptive_playback_disabled_summary">Off</string>
+    <string name="adaptive_playback_intro_text">Automatically pauses media when the volume is muted and will resume automatically when volume is restored within the set time.</string>
+    <string name="adaptive_playback_timeout_title">Use a timeout of</string>
+    <string name="adaptive_playback_timeout_none">No timeout</string>
+    <string name="adaptive_playback_timeout_none_summary">On (no timeout)</string>
+    <string name="adaptive_playback_timeout_30_secs">30 seconds</string>
+    <string name="adaptive_playback_timeout_30_secs_summary">On (30 seconds)</string>
+    <string name="adaptive_playback_timeout_1_min">1 minute</string>
+    <string name="adaptive_playback_timeout_1_min_summary">On (1 minute)</string>
+    <string name="adaptive_playback_timeout_2_min">2 minutes</string>
+    <string name="adaptive_playback_timeout_2_min_summary">On (2 minutes)</string>
+    <string name="adaptive_playback_timeout_5_min">5 minutes</string>
+    <string name="adaptive_playback_timeout_5_min_summary">On (5 minutes)</string>
+    <string name="adaptive_playback_timeout_10_min">10 minutes</string>
+    <string name="adaptive_playback_timeout_10_min_summary">On (10 minutes)</string>
+
+    <!-- Allow application downgrade -->
+    <string name="allow_downgrade_title">Allow application downgrade</string>
+    <string name="allow_downgrade_summary">Allow downgrading system applications, which may result in crashes and data loss</string>
+
+    <!-- backup -->
+    <string name="local_app_backup_restore_title">Local app backup and restore</string>
+    <string name="local_app_backup_restore_summary">Save APKs and app data as normal tar archives in internal storage</string>
+
+    <!-- Hide developer status -->
+    <string name="search">Search</string>
+    <string name="search_apps">Search apps</string>
+    <string name="hide_developer_status_title">Hide developer status</string>
+    <string name="hide_developer_status_summary">Hide developer status from apps</string>
+
+    <!-- Multi Audio Focus -->
+    <string name="multi_audio_focus_title">Multi audio focus</string>
+    <string name="multi_audio_focus_summary">Allow multiple apps to play audio simultaneously</string>
+
+    <!-- Floating rotation button -->
+    <string name="floating_rotation_button_title">Floating rotate button</string>
+    <string name="floating_rotation_button_summary">Show a floating rotate button when device is rotated</string>
+
+    <!-- Flash SMS -->
+    <string name="disable_flash_sms_title">Disable Flash SMS</string>
+    <string name="disable_flash_sms_summary">Converts full-screen flash messages into standard text SMS.</string>
+
+    <!-- iQOO Style About Phone Dashboard -->
+    <string name="iqoo_spec_device_name_label">Device name</string>
+    <string name="iqoo_spec_processor_label">Processor</string>
+    <string name="iqoo_spec_storage_label">Phone storage</string>
+    <string name="iqoo_spec_ram_label">RAM</string>
+    <string name="iqoo_spec_battery_label">Battery capacity</string>
+    <string name="iqoo_menu_version_title">Version info</string>
+    <string name="iqoo_menu_version_summary">Model, software version, etc.</string>
+    <string name="iqoo_menu_status_title">Device details</string>
+    <string name="iqoo_menu_status_summary">SIM card status, IMEI, radio info, etc.</string>
+    <string name="iqoo_menu_legal_title">Legal information</string>
+    <string name="iqoo_menu_legal_summary">Privacy Statement, etc.</string>
+    <string name="iqoo_menu_customer_title">Customer service</string>
+    <string name="iqoo_menu_customer_summary">User guide, electronic warranty card, etc.</string>
+
+    <!-- Homepage Header & At a Glance Card -->
+    <string name="home_glance_greeting">Hi, User! 👋</string>
+    <string name="home_glance_shinkai_top">Shinkai Project On Top 🚀</string>
+    <string name="home_glance_karya_bangsa">Proudly Made in Indonesia 🇮🇩</string>
+    <string name="home_glance_wowo_edition">Wowo OS • Kopdes Edition ⚡</string>
+    <string name="home_glance_smooth_perf">Smooth &amp; Pure Performance 🔥</string>
+
+    <!-- Homepage Quick Dashboard: Device & Stats -->
+    <string name="home_device_subtitle">Your device • Security active</string>
+    <string name="home_stat_os_version">OS VERSION</string>
+    <string name="home_stat_updates">UPDATE</string>
+    <string name="home_stat_latest">Latest</string>
+    <string name="home_stat_ram_cpu">RAM &amp; CPU</string>
+
+    <!-- Homepage Quick Dashboard: Battery -->
+    <string name="home_battery_badge_charging">Charging</string>
+    <string name="home_battery_badge_normal">Normal</string>
+    <string name="home_battery_estimate_charging">Charging battery</string>
+    <string name="home_battery_estimate_normal">~1 day 4 hrs left</string>
+    <string name="home_battery_left">left</string>
+    <string name="home_battery_normal">Normal</string>
+
+    <!-- Homepage Quick Dashboard: Storage -->
+    <string name="home_storage_used">used</string>
+    <string name="home_storage_free_format">%1$s free</string>
+    <string name="home_storage_free_fallback">Available space</string>
+
+    <!-- Homepage Quick Dashboard: Network -->
+    <string name="home_section_network">NETWORK &amp; CONNECTIVITY</string>
+    <string name="home_status_connected">Connected</string>
+    <string name="home_status_active">Active</string>
+    <string name="home_status_inactive">Inactive</string>
+    <string name="home_mobile_data">Mobile Data</string>
+    <string name="home_sim_active">Active SIM</string>
+    <string name="home_hotspot">Hotspot</string>
+    <string name="home_hotspot_sub">Tethering • DNS</string>
+
+    <!-- Homepage Quick Dashboard: Display & Sound -->
+    <string name="home_display_title">Display</string>
+    <string name="home_display_sub">Theme • Refresh Rate</string>
+    <string name="home_theme_dark">Dark theme</string>
+    <string name="home_theme_light">Light theme</string>
+    <string name="home_sound_title">Sound &amp; Vibration</string>
+    <string name="home_sound_sub">Media • Calls</string>
+    <string name="home_ringer_silent">Silent</string>
+    <string name="home_ringer_vibrate">Vibrate</string>
+    <string name="home_ringer_normal">Active</string>
+    <string name="home_sound_status_format">Media %1$d%% • %2$s</string>
+
+    <!-- Homepage Quick Dashboard: Accessibility & System -->
+    <string name="home_accessibility_sub">Tools • Gestures</string>
+    <string name="home_system_sub">Languages • Gestures • Time</string>
+
+    <!-- Storage Card Hero Breakdown & Badges -->
+    <string name="storage_badge_used_format">%1$d%% USED</string>
+    <string name="storage_badge_used_default">12% USED</string>
+    <string name="storage_available_format">%1$s Available</string>
+    <string name="storage_available_default">Available</string>
+    <string name="storage_spec_ufs_format">/ %1$s • Internal UFS 3.1</string>
+    <string name="storage_spec_default">/ 256 GB • Internal UFS 3.1</string>
+    <string name="storage_health_excellent">EXCELLENT</string>
+    <string name="storage_status_optimal">Optimal status</string>
+    <string name="storage_pill_system_format">System  %1$s</string>
+    <string name="storage_pill_system_default">System</string>
+    <string name="storage_pill_apps_format">Apps  %1$s</string>
+    <string name="storage_pill_apps_default">Apps</string>
+    <string name="storage_pill_other_format">Other  %1$s</string>
+    <string name="storage_pill_other_default">Other</string>
+    <string name="storage_pill_free_format">Free  %1$s</string>
+    <string name="storage_pill_free_default">Free</string>
+
+    <!-- Wowo OS Category Titles -->
+    <string name="wowo_chunk_system_title">System &amp; Security</string>
+    <string name="wowo_chunk_hardware_title">Kernel &amp; Radio</string>
+
+    <!-- RAM Expansion Strings -->
+    <string name="ram_expansion_title">RAM Expansion</string>
+    <string name="ram_expansion_summary">Expand memory using virtual RAM</string>
+    <string name="ram_expansion_desc">Use internal storage as virtual RAM (zRAM) to improve multitasking performance and keep apps active in the background.</string>
+    <string name="ram_expansion_physical_label">Physical</string>
+    <string name="ram_expansion_expanded_label">Expanded</string>
+    <string name="ram_expansion_total_label">Total RAM</string>
+    <string name="ram_expansion_used_label">Used</string>
+    <string name="ram_expansion_avail_label">Available</string>
+    <string name="ram_badge_used_format">%1$d%% USED</string>
+    <string name="ram_badge_avail_format">%1$s Available</string>
+    <string name="ram_stat_of_total_format">of %1$d GB Total RAM</string>
+    <string name="ram_tag_default">Default</string>
+    <string name="ram_tag_max">Maximum</string>
+    <string name="ram_expansion_off">Off</string>
+    <string name="ram_expansion_2gb">+2 GB</string>
+    <string name="ram_expansion_4gb">+4 GB</string>
+    <string name="ram_expansion_8gb">+8 GB</string>
+    <string name="ram_expansion_16gb">+16 GB</string>
+    <string name="ram_expansion_reboot_dialog_title">Restart Device?</string>
+    <string name="ram_expansion_reboot_dialog_msg">The new RAM expansion size will take effect after restarting your device.</string>
+    <string name="ram_expansion_reboot_now">Restart now</string>
+    <string name="ram_expansion_reboot_later">Later</string>
+    <string name="ram_expansion_status_active">+%1$d GB (Active)</string>
+    <string name="ram_expansion_status_off">Off</string>
+
+    <!-- Gesture Navigation Tweaks -->
+    <string name="gesture_navigation_tweaks_title">Gesture tweaks</string>
+    <string name="gesture_hide_bottom_navbar_title">Hide navigation bar</string>
+    <string name="gesture_hide_bottom_navbar_summary">Hide the gesture navigation bar pill at the bottom of the screen</string>
+    <string name="gesture_hide_ime_space_title">Hide keyboard IME space</string>
+    <string name="gesture_hide_ime_space_summary">Remove the bottom gap and down arrow below the keyboard to make it full screen</string>
+
+    <!-- One UI Control Center Style -->
+    <string name="qs_oneui_style_title">One UI Control Center</string>
+    <string name="qs_oneui_style_summary">Use One UI 9 style Control Center with segregated cards and sliders</string>
+</resources>
+

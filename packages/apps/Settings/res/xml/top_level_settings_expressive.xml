@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2025 The Android Open Source Project
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:settings="http://schemas.android.com/apk/res-auto"
+    android:key="top_level_settings">
+
+    <com.android.settingslib.widget.LayoutPreference
+        android:key="homepage_quick_dashboard"
+        android:order="-200"
+        android:layout="@layout/homepage_quick_dashboard"
+        settings:controller="com.android.settings.homepage.HomepageQuickDashboardPreferenceController"/>
+
+    <com.android.settingslib.widget.UntitledPreferenceCategory
+        android:order="-140"
+        android:key="top_level_account_category"/>
+
+    <com.android.settingslib.widget.UntitledPreferenceCategory
+        android:order="-120"
+        android:key="top_level_personalize_category">
+        <com.android.settings.widget.HomepagePreference
+            android:fragment="com.android.settings.applications.AppDashboardFragment"
+            android:icon="@drawable/ic_homepage_apps"
+            android:key="top_level_apps"
+            android:order="-60"
+            android:title="@string/apps_dashboard_title"
+            android:summary="@string/app_and_notification_dashboard_summary"
+            settings:highlightableMenuKey="@string/menu_key_apps"/>
+
+        <com.android.settings.widget.HomepagePreference
+            android:fragment="com.android.settings.communal.CommunalDashboardFragment"
+            android:icon="@drawable/ic_homepage_hub_mode"
+            android:key="top_level_communal"
+            android:order="-30"
+            android:title="@string/communal_settings_title"
+            android:summary="@string/communal_settings_summary"
+            settings:highlightableMenuKey="@string/menu_key_communal"
+            settings:controller="com.android.settings.communal.CommunalPreferenceController"/>
+
+        <com.android.settings.widget.RestrictedHomepagePreference
+            android:icon="@drawable/ic_homepage_wallpaper"
+            android:key="top_level_wallpaper"
+            android:order="-10"
+            android:title="@string/wallpaper_settings_title"
+            android:summary="@string/wallpaper_dashboard_summary"
+            settings:highlightableMenuKey="@string/menu_key_wallpaper"
+            settings:controller="com.android.settings.display.TopLevelWallpaperPreferenceController"/>
+    </com.android.settingslib.widget.UntitledPreferenceCategory>
+
+
+    <com.android.settingslib.widget.UntitledPreferenceCategory
+        android:order="-100"
+        android:key="top_level_security_privacy_category"
+        android:layout="@layout/settingslib_expressive_untitled_preference_category">
+        <com.android.settings.widget.HomepagePreference
+            android:icon="@drawable/ic_homepage_safety_center"
+            android:key="top_level_safety_center"
+            android:order="-50"
+            android:title="@string/safety_center_title"
+            android:summary="@string/safety_center_summary"
+            settings:highlightableMenuKey="@string/menu_key_safety_center"
+            settings:controller="com.android.settings.safetycenter.TopLevelSafetyCenterEntryPreferenceController"/>
+
+        <com.android.settings.widget.HomepagePreference
+            android:fragment="com.android.settings.security.SecuritySettings"
+            android:icon="@drawable/ic_homepage_security"
+            android:key="top_level_security"
+            android:order="-40"
+            android:title="@string/security_settings_title"
+            android:summary="@string/security_dashboard_summary"
+            settings:highlightableMenuKey="@string/menu_key_security"
+            settings:controller="com.android.settings.security.TopLevelSecurityEntryPreferenceController"/>
+
+        <com.android.settings.widget.HomepagePreference
+            android:fragment="com.android.settings.privacy.PrivacyDashboardFragment"
+            android:icon="@drawable/ic_homepage_privacy"
+            android:key="top_level_privacy"
+            android:order="-30"
+            android:title="@string/privacy_dashboard_title"
+            android:summary="@string/privacy_dashboard_summary"
+            settings:highlightableMenuKey="@string/menu_key_privacy"
+            settings:controller="com.android.settings.privacy.TopLevelPrivacyEntryPreferenceController"/>
+
+        <com.android.settings.widget.HomepagePreference
+            android:fragment="com.android.settings.location.LocationSettings"
+            android:icon="@drawable/ic_homepage_location"
+            android:key="top_level_location"
+            android:order="-20"
+            android:title="@string/location_settings_title"
+            android:summary="@string/location_settings_loading_app_permission_stats"
+            settings:highlightableMenuKey="@string/menu_key_location"
+            settings:controller="com.android.settings.location.TopLevelLocationPreferenceController"/>
+
+        <com.android.settings.widget.HomepagePreference
+            android:fragment="com.android.settings.accounts.AccountDashboardFragment"
+            android:icon="@drawable/ic_homepage_accounts"
+            android:key="top_level_accounts"
+            android:order="-10"
+            android:summary="@string/summary_placeholder"
+            settings:highlightableMenuKey="@string/menu_key_accounts"
+            settings:controller="com.android.settings.accounts.TopLevelAccountEntryPreferenceController"/>
+
+        <!-- TODO(b/460772532): Set highlightableMenuKey to menu_key_accounts once this screen
+                is ready to display user's accounts instead of AccountDashboardFragment. -->
+        <com.android.settings.widget.HomepagePreference
+            android:fragment="com.android.settings.backup.AccountsAndBackupDashboardFragment"
+            android:icon="@drawable/ic_homepage_accounts_and_backup"
+            android:key="top_level_accounts_and_backup"
+            android:order="-5"
+            android:title="@string/accounts_and_backup_title"
+            android:summary="@string/accounts_and_backup_summary"
+            settings:highlightableMenuKey="@string/menu_key_accounts_and_backup"
+            settings:controller="com.android.settings.backup.TopLevelAccountsAndBackupEntryPreferenceController"/>
+
+        <com.android.settings.widget.HomepagePreference
+            android:key="top_level_supervision"
+            android:title="@string/supervision_settings_title"
+            android:summary="@string/supervision_settings_summary"
+            android:icon="@drawable/ic_homepage_supervision"
+            android:order="5"
+            settings:highlightableMenuKey="@string/menu_key_supervision"
+            settings:controller="com.android.settings.supervision.TopLevelSupervisionPreferenceController"/>
+
+        <com.android.settings.widget.HomepagePreference
+            android:key="top_level_emergency"
+            android:title="@string/emergency_settings_preference_title"
+            android:summary="@string/emergency_dashboard_summary"
+            android:icon="@drawable/ic_homepage_emergency"
+            android:order="10"
+            android:fragment="com.android.settings.emergency.EmergencyDashboardFragment"
+            settings:isPreferenceVisible="@bool/config_show_emergency_settings"
+            settings:highlightableMenuKey="@string/menu_key_emergency"/>
+    </com.android.settingslib.widget.UntitledPreferenceCategory>
+
+    <com.android.settingslib.widget.UntitledPreferenceCategory
+        android:order="100"
+        android:key="top_level_support_category"
+        android:layout="@layout/settingslib_expressive_untitled_preference_category">
+
+
+        <com.android.settings.widget.HomepagePreference
+            android:icon="@drawable/ic_homepage_support"
+            android:key="top_level_support"
+            android:order="-10"
+            android:title="@string/page_tab_title_support"
+            android:summary="@string/support_summary"
+            settings:highlightableMenuKey="@string/menu_key_support"
+            settings:controller="com.android.settings.support.SupportPreferenceController"/>
+    </com.android.settingslib.widget.UntitledPreferenceCategory>
+</PreferenceScreen>
+

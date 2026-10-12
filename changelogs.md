@@ -1,0 +1,158 @@
+# System Update Changelog: WowoOS19Jt-BasedShinkaiProject (marble)
+
+Build Artifact: WowoOS19Jt-BasedShinkaiProject-marble-17.zip  
+Package Size: 2.9 GB  
+Target Device: POCO F5 (marble)  
+Platform Base: Android 17 (CP2A Release Target)  
+Build Status: Completed Successfully (Exit Code 0)  
+
+---
+
+## Section I: Meeting Minutes & Executive Summary Version
+
+### 1. Initial Problems & Requirements Discussed
+During testing and review sessions, several core interface discrepancies and subsystem regressions were identified and corrected:
+
+1. **Quick Settings (QS) Behavioral Inconsistencies & Visual Bugs**:
+   - Media playback cards lacked preview integration during partial shade expansion.
+   - Quick settings toggles (such as Flashlight) experienced two-way state synchronization failure (turning on was functional, but clicking again failed to turn off).
+   - The brightness slider retained the stock Pixel layout, and dragging the slider caused the entire QS panel UI to disappear until touch release. Additionally, releasing the brightness slider caused a momentary visual flicker/glitch due to an asynchronous value race.
+   - The power menu toggle was non-functional, and tapping the Settings shortcut opened Settings without automatically collapsing the notification shade.
+   - Header indicators (clock, date, and battery percentage) exhibited duplicate rendering across status bar layers.
+
+2. **One UI 9 Visual Language & Usability Requirements**:
+   - Distinct separation of form factors: Pill-shaped toggles (2x1) must sit outside the primary card container.
+   - Single-pull Quick Quick Settings (QQS) must display the top configured pill toggles (2x1 side-by-side) instead of an incongruous row of small circular buttons.
+   - Smooth transition during double-pull (QQS to QS expanded) without leaving any stuck or lingering frosted card artifact above the header clock.
+   - A dedicated frosted glass container must house circular toggles (1x1) arranged in a 4-column grid (holding up to 8 toggles in collapsed mode).
+   - An interactive center strip indicator must be present at the bottom of the grid card to expand and reveal additional rows when more than 8 toggles are placed.
+   - Introduction of a media volume slider alongside a circular sound mode toggle (Ring, Vibrate, Silent) directly beneath the brightness control.
+   - Implementation of an intuitive Edit Mode allowing users to resize toggles between Pill and Circular formats, freely drag-and-drop toggles to any position via long-press gestures, and add or remove items without cluttered arrow buttons.
+
+3. **RAM Expansion (zRAM) Malfunction**:
+   - Altering RAM Expansion values in device settings (Off/0GB, 2GB, 8GB, 16GB) had zero effect on the Linux kernel. The kernel zRAM remained permanently locked at 4GB (4.29 GB reported in DevCheck and About Phone), ignoring user preferences across runtime sessions and reboots.
+
+---
+
+### 2. Agreed Architectural Decisions
+1. **Hybrid One UI 9 Layout & Fluid Transitions**:
+   - Single-pull QQS renders the top 2 pill toggles (Internet and Bluetooth by default) matching the top section of full QS.
+   - Eliminate fixed background boxes from QQS so that double-pull expansion transitions cleanly without visual hitching.
+   - Partition full quick tiles dynamically into separate layout zones: Top Pill Zone, Center Frosted Card Zone (1x1 quick toggles with expandable strip), Slider & Audio Controls Zone, and Bottom Pill Zone.
+   - Provide an in-place Edit Mode engine with visual badges for instant form factor switching and long-press drag-to-reorder gesture support.
+   - Integrate native Android AudioManager streams directly into the Quick Settings Compose tree.
+   - Suppress duplicate clock and date views across all MotionLayout constraint sets (QQS, QS, and LargeScreen).
+
+2. **Treble-Compliant SELinux Bridging & Persistent Swap Management**:
+   - Bridge Android system properties to persistent vendor storage (`persist.vendor.ram_expansion`) at root init level, ensuring values survive reboots and are immediately readable by vendor services.
+   - Grant necessary SELinux access (`sysfs_zram`, `swap_block_device`, and `sys_admin` capability) to the vendor execution context.
+   - Execute an atomic swap cycle (swapoff, reset, disksize configuration, mkswap, and swapon) to prevent kernel write rejections, with full deactivation when set to 0GB (Off).
+
+---
+
+### 3. Implementation Outcomes
+1. The Quick Settings panel now adheres strictly to the One UI 9 visual aesthetics:
+   - Single-pull displays the top 2 pill toggles cleanly.
+   - Double-pull expands smoothly without stuck cards or flickering.
+   - The brightness slider updates with zero hitching or release flicker.
+   - Duplicate header dates and times are completely removed from the top status bar.
+2. Edit Mode allows fluid long-press drag-to-reorder movements with elevation feedback and instant Pill vs 1x1 size toggles.
+3. Media volume and ringer profiles can be controlled directly from the QS panel without entering Settings.
+4. RAM Expansion is fully dynamic: selecting +8 GB (or any other size) immediately updates `/sys/block/zram0/disksize` at kernel level, reflects accurately in DevCheck and About Phone (e.g. 8 GB + 8 GB), and persists across reboots.
+5. Full system compilation finished cleanly without compiler warnings, syntax errors, or SELinux violations.
+
+---
+
+## Section II: Technical & Architectural Changelog (Developer Version)
+
+### 1. SystemUI & Jetpack Compose Architecture
+
+#### Affected Components:
+- `OneUIQuickSettingsLayout.kt`
+- `QSFragmentCompose.kt`
+- `ShadeHeaderController.kt`
+
+#### Technical Implementation Details:
+1. **Dynamic Tile Partitioning & State Persistence**:
+   - Integrated `rememberPillTileSpecs()` and `setTilePillMode()` backed by `Settings.System.putString(..., "qs_oneui_pill_tiles", ...)`.
+   - Incoming tile streams are dynamically partitioned into:
+     - `pillTiles`: Tile specifications designated as 2x1 pills (`it.spec.spec`).
+     - `gridTiles`: Tile specifications designated as 1x1 circular buttons.
+2. **Compact Quick Quick Settings (QQS - Single Pull)**:
+   - Replaced the legacy 6-tile circular card with `OneUIBigPillTile` rendering the top 2 configured pill tiles side-by-side.
+   - Removed static background wrappers to prevent visual clipping during scene transitions to expanded QS.
+3. **Hybrid Layout Hierarchy (Full QS - Double Pull)**:
+   - **Top Pill Section**: Houses the first two pill toggles outside the card container using `Row(horizontalArrangement = Arrangement.spacedBy(10.dp))`.
+   - **Center Frosted Card (`OneUITileGridCard`)**:
+     - Displays `gridTiles` in `GridCells.Fixed(4)` with circular backgrounds (`CircleShape`).
+     - Implements collapsed state slicing: displays a maximum of 8 tiles when collapsed (`!isExpanded && gridTiles.size > 8`).
+     - Houses an interactive horizontal indicator strip (`Box(40.dp x 4.dp)` with `RoundedCornerShape(2.dp)`) triggering `onClick = { isExpanded = !isExpanded }`, accompanied by `animateContentSize()`.
+   - **Audio & Brightness Sliders**:
+     - Resolved release glitch in `OneUIBrightnessSlider` by latching `sliderProgress` on `onDragEnd` and avoiding intermediate reverts to previous asynchronous framework values.
+     - Integrated `OneUIVolumeSlider` bound to `AudioManager.STREAM_MUSIC`, with volume step tracking and mute toggling.
+     - Integrated `OneUISoundModeButton` cycling sequentially through `RINGER_MODE_NORMAL` -> `RINGER_MODE_VIBRATE` -> `RINGER_MODE_SILENT`.
+   - **Bottom Pill Section**: Renders remaining pill toggles positioned beneath the Media Player Card.
+4. **Intuitive Drag-to-Reorder Edit Mode (`OneUIEditMode`)**:
+   - Embedded `detectDragGesturesAfterLongPress` into active tile items with dynamic index displacement calculation (`dx`, `dy` thresholds).
+   - Added visual lifting effects (`graphicsLayer { scaleX = 1.18f; scaleY = 1.18f; shadowElevation = 12f }`).
+   - Cleaned up obsolete reordering arrow buttons `<` and `>`, leaving a minimal, modern interface with interactive size and removal badges.
+5. **Header De-duplication**:
+   - Updated `loadConstraints()` in `ShadeHeaderController.kt` to apply `applyOneUiConstraints()` across all three MotionLayout states: `QQS_HEADER_CONSTRAINT`, `QS_HEADER_CONSTRAINT`, and `LARGE_SCREEN_HEADER_CONSTRAINT`.
+   - Suppressed stock Pixel `clock` and `date` views (`GONE`, `alpha = 0f`) and aligned `carrier_group` to parent start.
+
+---
+
+### 2. RAM Expansion Subsystem (Kernel, Init, SELinux, & Android Treble)
+
+#### Affected Components:
+- `ram_expansion.sh`
+- `init.kernel.post_boot.sh`
+- `init.marble.rc`
+- `device.mk`
+- `property.te`
+- `property_contexts`
+- `vendor_qti_init_shell.te`
+- `RamExpansionSettings.kt`
+- `RamExpansionPreferenceController.kt`
+
+#### Root Cause Analysis:
+1. **Property Volatility & Isolation**: `vendor.ram_expansion` was non-persistent and erased upon reboot. Vendor shell processes were blocked by SELinux from reading `persist.sys.*`. Post-boot scripts defaulted to `4096MB`.
+2. **Missing SELinux Capabilities**: `vendor_qti_init_shell` lacked `sysfs_zram` read/write permissions and `CAP_SYS_ADMIN`, causing `swapoff`, `reset`, and `swapon` invocations to fail silently with permission denied errors.
+
+#### Architectural Resolution:
+1. **Persistent Vendor Property Registration**:
+   - Declared `vendor_public_prop(vendor_ram_expansion_prop)` in `property.te`.
+   - Mapped `persist.vendor.ram_expansion` and `vendor.ram_expansion` to `vendor_ram_expansion_prop:s0` in `property_contexts`.
+2. **Init Root Synchronization**:
+   - Added triggers in `init.marble.rc` on `persist.sys.ram_expansion=*`, `sys.boot_completed=1`, and `post-fs-data` to synchronize values to `persist.vendor.ram_expansion`.
+   - Registered `/vendor/bin/ram_expansion.sh` under `vendor.ram_expansion` service with `seclabel u:r:vendor_qti_init_shell:s0`.
+3. **SELinux Policy Access**:
+   - Labeled `ram_expansion.sh` as `vendor_qti_init_shell_exec:s0` in `file_contexts`.
+   - Granted `sysfs_zram:dir`, `sysfs_zram:file`, `swap_block_device:blk_file`, and `self:capability sys_admin` to `vendor_qti_init_shell`.
+4. **Settings App Integration**:
+   - Updated `RamExpansionSettings.kt` and `RamExpansionPreferenceController.kt` to read and synchronize directly with `persist.vendor.ram_expansion`.
+5. **Atomic Swap Reset Routine**:
+   - In `ram_expansion.sh` and `init.kernel.post_boot.sh`:
+     - Reads `persist.vendor.ram_expansion` with unit normalization.
+     - When set to `0` or `off`: executes `swapoff /dev/block/zram0` and writes `1` to `/sys/block/zram0/reset`.
+     - When set to `> 0`: executes `swapoff` -> `reset` -> writes byte size to `/sys/block/zram0/disksize` -> `mkswap` -> `swapon /dev/block/zram0 -p 32758`.
+
+---
+
+### 3. Component Modification Summary
+
+| Component Name | Scope | Summary of Modifications |
+|---|---|---|
+| `OneUIQuickSettingsLayout.kt` | UI / Feature | 2-pill QQS layout, flicker-free brightness slider, drag-to-reorder edit mode |
+| `QSFragmentCompose.kt` | Architecture | One UI compose fragment bridge and view model integration |
+| `ShadeHeaderController.kt` | Bugfix | Eliminated duplicate clock/date across QQS, QS, and LargeScreen constraint sets |
+| `RamExpansionSettings.kt` | Settings / UI | Persistent vendor property write and state tracking |
+| `RamExpansionPreferenceController.kt` | Settings / Core | Preference summary binding to persistent property |
+| `ram_expansion.sh` | Daemon / Subsystem | Runtime swapoff, zRAM reset, and dynamic disksize allocation script |
+| `init.kernel.post_boot.sh` | Kernel / Boot | Post-boot zRAM configuration utilizing persistent vendor property |
+| `init.marble.rc` | Init / Triggers | Property synchronization triggers, service registration, and seclabel mapping |
+| `device.mk` | Build Rules | Registered `ram_expansion.sh` into vendor `PRODUCT_COPY_FILES` |
+| `file_contexts` | SELinux Context | Context mapping for `ram_expansion.sh` |
+| `property.te` | SELinux Policy | Declared `vendor_ram_expansion_prop` public vendor property |
+| `property_contexts` | SELinux Context | Context mapping for `persist.vendor.ram_expansion` |
+| `vendor_qti_init_shell.te` | Security Access | Granted zram, swap block device, and sys_admin capability |

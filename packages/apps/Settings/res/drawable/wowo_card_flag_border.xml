@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2026 Wowo OS / Shinkai Project
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer layer: Red to White gradient border (Bendera Indonesia Merah Putih) -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="#E52329"
+                android:centerColor="#FFA4A4"
+                android:endColor="#FFFFFF"
+                android:type="linear" />
+            <corners android:radius="26dp" />
+        </shape>
+    </item>
+
+    <!-- Inner layer: Inset by 1.5dp to form the stroke -->
+    <item
+        android:top="1.5dp"
+        android:bottom="1.5dp"
+        android:left="1.5dp"
+        android:right="1.5dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/wowo_banner_bg" />
+            <corners android:radius="24.5dp" />
+        </shape>
+    </item>
+</layer-list>

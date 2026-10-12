@@ -1,0 +1,1124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2026 Wowo OS / Shinkai Project
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="10dp"
+    android:clipToPadding="false">
+
+    <!-- 1. Top Device Summary Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/home_card_device"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp"
+        app:strokeColor="@android:color/transparent"
+        app:cardBackgroundColor="@color/settingslib_materialColorSurfaceBright"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Device Header: Phone Icon Box + Name/Version + Chevron -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/home_icon_box_green"
+                    android:padding="10dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_settings_about_device_filled"
+                        app:tint="#34D399"
+                        android:contentDescription="@null"
+                        android:scaleType="fitCenter" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/home_device_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="POCO F5"
+                            android:textSize="17sp"
+                            android:fontFamily="@font/product_sans_bold"
+                            android:textColor="?android:attr/textColorPrimary"
+                            android:includeFontPadding="false" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/home_device_subtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="@string/home_device_subtitle"
+                        android:textSize="12sp"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:includeFontPadding="false" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_chevron_right_24dp"
+                    app:tint="?android:attr/textColorSecondary"
+                    android:contentDescription="@null" />
+            </LinearLayout>
+
+            <!-- 3 Mini Stats: GARANSI | PEMBARUAN | RAM & CPU -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal">
+
+                <!-- Box 1: Versi OS -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/home_stat_box_bg"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/home_stat_os_version"
+                        android:textSize="9.5sp"
+                        android:fontFamily="@font/product_sans_bold"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:includeFontPadding="false" />
+
+                    <TextView
+                        android:id="@+id/home_val_warranty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="Android 17"
+                        android:textSize="12sp"
+                        android:fontFamily="@font/product_sans_bold"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:includeFontPadding="false" />
+                </LinearLayout>
+
+                <!-- Box 2: Pembaruan -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/home_stat_box_bg"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/home_stat_updates"
+                        android:textSize="9.5sp"
+                        android:fontFamily="@font/product_sans_bold"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:includeFontPadding="false" />
+
+                    <TextView
+                        android:id="@+id/home_val_update"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="@string/home_stat_latest"
+                        android:textSize="12sp"
+                        android:fontFamily="@font/product_sans_bold"
+                        android:textColor="#34D399"
+                        android:includeFontPadding="false" />
+                </LinearLayout>
+
+                <!-- Box 3: RAM & CPU -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:background="@drawable/home_stat_box_bg"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/home_stat_ram_cpu"
+                        android:textSize="9.5sp"
+                        android:fontFamily="@font/product_sans_bold"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:includeFontPadding="false" />
+
+                    <TextView
+                        android:id="@+id/home_val_ram_cpu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="8GB • 7+ Gen2"
+                        android:textSize="12sp"
+                        android:fontFamily="@font/product_sans_bold"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:includeFontPadding="false" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- 1b. Redesigned Modern Search Bar (Positioned Below About Phone Card) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/home_search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:cardCornerRadius="26dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp"
+        app:strokeColor="@android:color/transparent"
+        app:cardBackgroundColor="@color/settingslib_materialColorSurfaceBright"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="18dp"
+            android:paddingEnd="16dp">
+
+            <!-- Magnifier Search Icon -->
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_homepage_search"
+                app:tint="?android:attr/textColorPrimary"
+                android:contentDescription="@null" />
+
+            <!-- Search Hint Text -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="14dp"
+                android:text="@string/homepage_search"
+                android:textSize="14.5sp"
+                android:textColor="?android:attr/textColorSecondary"
+                android:fontFamily="sans-serif"
+                android:includeFontPadding="false" />
+
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- 2. Row of 2 Quick Cards: Baterai & Penyimpanan -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <!-- Card Baterai -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/home_card_battery"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:strokeColor="@android:color/transparent"
+            app:cardBackgroundColor="@color/settingslib_materialColorSurfaceBright"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Header: Icon Circle + Badge -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <FrameLayout
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/home_circle_green"
+                        android:padding="8dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_homepage_battery"
+                            app:tint="#34D399"
+                            android:contentDescription="@null" />
+                    </FrameLayout>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/home_battery_badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/home_badge_pill_green"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp"
+                        android:text="@string/home_battery_normal"
+                        android:textSize="11sp"
+                        android:fontFamily="@font/product_sans_bold"
+                        android:textColor="#34D399" />
+                </LinearLayout>
+
+                <!-- Value: 78% tersisa -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal"
+                    android:gravity="bottom">
+
+                    <TextView
+                        android:id="@+id/home_battery_percent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="78%"
+                        android:textSize="25sp"
+                        android:fontFamily="@font/product_sans_bold"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:includeFontPadding="false" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginBottom="2dp"
+                        android:text="@string/home_battery_left"
+                        android:textSize="12sp"
+                        android:textColor="?android:attr/textColorSecondary" />
+                </LinearLayout>
+
+                <!-- Progress Bar -->
+                <ProgressBar
+                    android:id="@+id/home_battery_progress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_marginTop="8dp"
+                    android:max="100"
+                    android:progress="78"
+                    android:progressDrawable="@drawable/home_battery_progress_bar" />
+
+                <!-- Footer: Estimated remaining -->
+                <TextView
+                    android:id="@+id/home_battery_estimate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/home_battery_estimate_normal"
+                    android:textSize="11.5sp"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:includeFontPadding="false" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Card Penyimpanan -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/home_card_storage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:strokeColor="@android:color/transparent"
+            app:cardBackgroundColor="@color/settingslib_materialColorSurfaceBright"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Header: Icon Circle + Badge -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <FrameLayout
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/home_circle_yellow"
+                        android:padding="8dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_homepage_storage"
+                            app:tint="#FBBF24"
+                            android:contentDescription="@null" />
+                    </FrameLayout>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/home_storage_badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/home_badge_pill_yellow"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp"
+                        android:text="30 / 256 GB"
+                        android:textSize="10.5sp"
+                        android:fontFamily="@font/product_sans_bold"
+                        android:textColor="#FBBF24" />
+                </LinearLayout>
+
+                <!-- Value: 12% terpakai -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal"
+                    android:gravity="bottom">
+
+                    <TextView
+                        android:id="@+id/home_storage_percent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12%"
+                        android:textSize="25sp"
+                        android:fontFamily="@font/product_sans_bold"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:includeFontPadding="false" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginBottom="2dp"
+                        android:text="@string/home_storage_used"
+                        android:textSize="12sp"
+                        android:textColor="?android:attr/textColorSecondary" />
+                </LinearLayout>
+
+                <!-- Progress Bar -->
+                <ProgressBar
+                    android:id="@+id/home_storage_progress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_marginTop="8dp"
+                    android:max="100"
+                    android:progress="12"
+                    android:progressDrawable="@drawable/home_storage_progress_bar" />
+
+                <!-- Footer: Free Storage -->
+                <TextView
+                    android:id="@+id/home_storage_free"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/home_storage_free_fallback"
+                    android:textSize="11.5sp"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:includeFontPadding="false" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+    <!-- 3. Jaringan & Konektivitas Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/home_card_network_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:cardCornerRadius="22dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp"
+        app:strokeColor="@android:color/transparent"
+        app:cardBackgroundColor="@color/settingslib_materialColorSurfaceBright"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Section Title + Chevron (Clickable to open Jaringan & internet) -->
+            <LinearLayout
+                android:id="@+id/home_network_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingTop="2dp"
+                android:paddingBottom="6dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/home_section_network"
+                    android:textSize="11sp"
+                    android:fontFamily="@font/product_sans_bold"
+                    android:letterSpacing="0.04"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:includeFontPadding="false" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_chevron_right_24dp"
+                    app:tint="?android:attr/textColorSecondary"
+                    android:contentDescription="@null" />
+            </LinearLayout>
+
+            <!-- 2 Horizontal Pill Buttons: Wi-Fi & Bluetooth -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <!-- Wi-Fi Pill -->
+                <LinearLayout
+                    android:id="@+id/home_btn_wifi"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="5dp"
+                    android:background="@drawable/home_pill_button_bg"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground">
+
+                    <FrameLayout
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
+                        android:background="@drawable/home_circle_blue"
+                        android:padding="7dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_homepage_network"
+                            app:tint="#60A5FA"
+                            android:contentDescription="@null" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/home_wifi_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pixel_5GHz"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/product_sans_bold"
+                            android:textColor="?android:attr/textColorPrimary"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:includeFontPadding="false" />
+
+                        <TextView
+                            android:id="@+id/home_wifi_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:text="@string/home_status_connected"
+                            android:textSize="11sp"
+                            android:textColor="#60A5FA"
+                            android:includeFontPadding="false" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Bluetooth Pill -->
+                <LinearLayout
+                    android:id="@+id/home_btn_bluetooth"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="5dp"
+                    android:background="@drawable/home_pill_button_bg"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground">
+
+                    <FrameLayout
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
+                        android:background="@drawable/home_circle_cyan"
+                        android:padding="7dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_homepage_connected_device"
+                            app:tint="#2DD4BF"
+                            android:contentDescription="@null" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/home_bt_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pixel Buds Pro"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/product_sans_bold"
+                            android:textColor="?android:attr/textColorPrimary"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:includeFontPadding="false" />
+
+                        <TextView
+                            android:id="@+id/home_bt_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:text="@string/home_status_active"
+                            android:textSize="11sp"
+                            android:textColor="#2DD4BF"
+                            android:includeFontPadding="false" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Row 2: Data Seluler / SIM & Hotspot / Tethering -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <!-- Pill 3: Data Seluler / SIM -->
+                <LinearLayout
+                    android:id="@+id/home_btn_cellular"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="5dp"
+                    android:background="@drawable/home_pill_button_bg"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground">
+
+                    <FrameLayout
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
+                        android:background="@drawable/home_circle_blue"
+                        android:padding="7dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_network_cell"
+                            app:tint="#60A5FA"
+                            android:contentDescription="@null" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/home_cellular_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/home_mobile_data"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/product_sans_bold"
+                            android:textColor="?android:attr/textColorPrimary"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:includeFontPadding="false" />
+
+                        <TextView
+                            android:id="@+id/home_cellular_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:text="@string/home_sim_active"
+                            android:textSize="11sp"
+                            android:textColor="#60A5FA"
+                            android:includeFontPadding="false" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Pill 4: Hotspot & Tethering -->
+                <LinearLayout
+                    android:id="@+id/home_btn_hotspot"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="5dp"
+                    android:background="@drawable/home_pill_button_bg"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground">
+
+                    <FrameLayout
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
+                        android:background="@drawable/home_circle_orange"
+                        android:padding="7dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_hotspot"
+                            app:tint="#FB923C"
+                            android:contentDescription="@null" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/home_hotspot_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/home_hotspot"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/product_sans_bold"
+                            android:textColor="?android:attr/textColorPrimary"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:includeFontPadding="false" />
+
+                        <TextView
+                            android:id="@+id/home_hotspot_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:text="@string/home_hotspot_sub"
+                            android:textSize="11sp"
+                            android:textColor="?android:attr/textColorSecondary"
+                            android:includeFontPadding="false" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- 4. Row of 2 Cards: Layar (Display) & Suara & Getar (Sound) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <!-- Card Layar -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/home_card_display"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:strokeColor="@android:color/transparent"
+            app:cardBackgroundColor="@color/settingslib_materialColorSurfaceBright"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Header Icon Circle -->
+                <FrameLayout
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:background="@drawable/home_circle_orange"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_homepage_display"
+                        app:tint="#FB923C"
+                        android:contentDescription="@null" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/home_display_title"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/product_sans_bold"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:includeFontPadding="false" />
+
+                <TextView
+                    android:id="@+id/home_display_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/home_display_sub"
+                    android:textSize="11.5sp"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:includeFontPadding="false" />
+
+                <!-- Orange Accent Line -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/home_accent_line_orange" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Card Suara & Getar -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/home_card_sound"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:strokeColor="@android:color/transparent"
+            app:cardBackgroundColor="@color/settingslib_materialColorSurfaceBright"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Header Icon Circle -->
+                <FrameLayout
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:background="@drawable/home_circle_pink"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_homepage_sound"
+                        app:tint="#F472B6"
+                        android:contentDescription="@null" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/home_sound_title"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/product_sans_bold"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:includeFontPadding="false" />
+
+                <TextView
+                    android:id="@+id/home_sound_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/home_sound_sub"
+                    android:textSize="11.5sp"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:includeFontPadding="false" />
+
+                <!-- Pink Accent Line -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/home_accent_line_pink" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+    <!-- 5. Row of 2 Pills: Aksesibilitas & Sistem -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="4dp"
+        android:orientation="horizontal">
+
+        <!-- Pill Aksesibilitas -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/home_card_accessibility"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:strokeColor="@android:color/transparent"
+            app:cardBackgroundColor="@color/settingslib_materialColorSurfaceBright"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="12dp">
+
+                <FrameLayout
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/home_circle_cyan"
+                    android:padding="7dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_settings_accessibility_filled"
+                        app:tint="#2DD4BF"
+                        android:contentDescription="@null" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/accessibility_settings"
+                        android:textSize="13.5sp"
+                        android:fontFamily="@font/product_sans_bold"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:includeFontPadding="false" />
+
+                    <TextView
+                        android:id="@+id/home_accessibility_subtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:text="@string/home_accessibility_sub"
+                        android:textSize="11sp"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:includeFontPadding="false" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Pill Sistem -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/home_card_system"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:strokeColor="@android:color/transparent"
+            app:cardBackgroundColor="@color/settingslib_materialColorSurfaceBright"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="12dp">
+
+                <FrameLayout
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/home_circle_green"
+                    android:padding="7dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_settings_system_dashboard_filled"
+                        app:tint="#34D399"
+                        android:contentDescription="@null" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/header_category_system"
+                        android:textSize="13.5sp"
+                        android:fontFamily="@font/product_sans_bold"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:includeFontPadding="false" />
+
+                    <TextView
+                        android:id="@+id/home_system_subtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:text="@string/home_system_sub"
+                        android:textSize="11sp"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:includeFontPadding="false" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+</LinearLayout>

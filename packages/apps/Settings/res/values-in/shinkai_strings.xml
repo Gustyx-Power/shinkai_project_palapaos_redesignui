@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (c) 2026 Shinkai Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- Redesigned About Phone Dashboard -->
+    <string name="about_device_name_label">Nama Perangkat</string>
+    <string name="about_code_name_label">Nama Kode</string>
+    <string name="about_rom_version_label">Versi ROM</string>
+    <string name="about_card_device_title">Perangkat</string>
+    <string name="about_card_storage_title">Penyimpanan</string>
+    <string name="about_specs_model_title">Model</string>
+    <string name="about_specs_battery_title">Kapasitas baterai</string>
+    <string name="about_specs_processor_title">Prosesor</string>
+    <string name="about_specs_platform_title">Platform</string>
+    <string name="about_phone_dashboard_purpose">Menampilkan dashboard info perangkat Tentang Ponsel</string>
+    <string name="about_copied_to_clipboard">%1$s disalin ke papan klip</string>
+    <string name="shinkai_version">Versi Shinkai</string>
+    <string name="shinkai_version_purpose">Menampilkan versi build Shinkai yang terpasang</string>
+    <string name="shinkai_maintainer">Maintainer Device</string>
+    <string name="shinkai_maintainer_source">Maintainer Source</string>
+    <string name="disable_flash_sms_title">Nonaktifkan Flash SMS</string>
+    <string name="disable_flash_sms_summary">Ubah pesan flash layar penuh menjadi pesan teks SMS biasa.</string>
+    <!-- iQOO Style About Phone Dashboard -->
+    <string name="iqoo_spec_device_name_label">Nama perangkat</string>
+    <string name="iqoo_spec_processor_label">Prosesor</string>
+    <string name="iqoo_spec_storage_label">Penyimpanan telepon</string>
+    <string name="iqoo_spec_ram_label">RAM</string>
+    <string name="iqoo_spec_battery_label">Kapasitas baterai</string>
+    <string name="iqoo_menu_version_title">Info versi</string>
+    <string name="iqoo_menu_version_summary">Model, versi perangkat lunak, dll.</string>
+    <string name="iqoo_menu_status_title">Detail perangkat</string>
+    <string name="iqoo_menu_status_summary">Info radio, status SIM, IMEI, model, dsb.</string>
+    <string name="iqoo_menu_legal_title">Informasi hukum</string>
+    <string name="iqoo_menu_legal_summary">Pernyataan Privasi, dll.</string>
+    <string name="iqoo_menu_customer_title">Layanan pelanggan</string>
+    <string name="iqoo_menu_customer_summary">Buku Panduan, Kartu garansi elektronik, dll.</string>
+    <!-- Rooted debugging -->
+    <string name="adb_enable_root">Debugging dengan akses root</string>
+    <string name="adb_enable_summary_root">Izinkan menjalankan proses debug Android sebagai root</string>
+    <string name="keywords_adb_root">adb, root, debugging root, akses root, debugging dengan akses root, rooted debugging</string>
+
+    <!-- Homepage Header & At a Glance Card -->
+    <string name="home_glance_greeting">Hai, User! 👋</string>
+    <string name="home_glance_shinkai_top">Shinkai Project On Top 🚀</string>
+    <string name="home_glance_karya_bangsa">Karya Anak Bangsa Indonesia 🇮🇩</string>
+    <string name="home_glance_wowo_edition">Wowo OS • Kopdes Edition ⚡</string>
+    <string name="home_glance_smooth_perf">Performa Halus &amp; Murni 🔥</string>
+
+    <!-- Homepage Quick Dashboard: Device & Stats -->
+    <string name="home_device_subtitle">Ponsel Anda • Keamanan Aktif</string>
+    <string name="home_stat_os_version">VERSI OS</string>
+    <string name="home_stat_updates">PEMBARUAN</string>
+    <string name="home_stat_latest">Terbaru</string>
+    <string name="home_stat_ram_cpu">RAM &amp; CPU</string>
+
+    <!-- Homepage Quick Dashboard: Battery -->
+    <string name="home_battery_badge_charging">Mengisi</string>
+    <string name="home_battery_badge_normal">Normal</string>
+    <string name="home_battery_estimate_charging">Sedang mengisi daya</string>
+    <string name="home_battery_estimate_normal">~1 hari 4 jam tersisa</string>
+    <string name="home_battery_left">tersisa</string>
+    <string name="home_battery_normal">Normal</string>
+
+    <!-- Homepage Quick Dashboard: Storage -->
+    <string name="home_storage_used">terpakai</string>
+    <string name="home_storage_free_format">%1$s kosong</string>
+    <string name="home_storage_free_fallback">Ruang kosong</string>
+
+    <!-- Homepage Quick Dashboard: Network -->
+    <string name="home_section_network">JARINGAN &amp; KONEKTIVITAS</string>
+    <string name="home_status_connected">Terhubung</string>
+    <string name="home_status_active">Aktif</string>
+    <string name="home_status_inactive">Nonaktif</string>
+    <string name="home_mobile_data">Data Seluler</string>
+    <string name="home_sim_active">SIM Aktif</string>
+    <string name="home_hotspot">Hotspot</string>
+    <string name="home_hotspot_sub">Penambatan • DNS</string>
+
+    <!-- Homepage Quick Dashboard: Display & Sound -->
+    <string name="home_display_title">Layar</string>
+    <string name="home_display_sub">Tema • Kecepatan Layar</string>
+    <string name="home_theme_dark">Tema Gelap</string>
+    <string name="home_theme_light">Tema Terang</string>
+    <string name="home_sound_title">Suara &amp; Getar</string>
+    <string name="home_sound_sub">Media • Panggilan</string>
+    <string name="home_ringer_silent">Hening</string>
+    <string name="home_ringer_vibrate">Getar</string>
+    <string name="home_ringer_normal">Aktif</string>
+    <string name="home_sound_status_format">Media %1$d%% • %2$s</string>
+
+    <!-- Homepage Quick Dashboard: Accessibility & System -->
+    <string name="home_accessibility_sub">Alat bantu • Gestur</string>
+    <string name="home_system_sub">Bahasa • Gestur • Waktu</string>
+
+    <!-- Storage Card Hero Breakdown & Badges -->
+    <string name="storage_badge_used_format">%1$d%% DIGUNAKAN</string>
+    <string name="storage_badge_used_default">12% DIGUNAKAN</string>
+    <string name="storage_available_format">%1$s Tersedia</string>
+    <string name="storage_available_default">Tersedia</string>
+    <string name="storage_spec_ufs_format">/ %1$s • Internal UFS 3.1</string>
+    <string name="storage_spec_default">/ 256 GB • Internal UFS 3.1</string>
+    <string name="storage_health_excellent">SANGAT BAIK</string>
+    <string name="storage_status_optimal">Status Prima</string>
+    <string name="storage_pill_system_format">Sistem  %1$s</string>
+    <string name="storage_pill_system_default">Sistem</string>
+    <string name="storage_pill_apps_format">Aplikasi  %1$s</string>
+    <string name="storage_pill_apps_default">Aplikasi</string>
+    <string name="storage_pill_other_format">Lainnya  %1$s</string>
+    <string name="storage_pill_other_default">Lainnya</string>
+    <string name="storage_pill_free_format">Kosong  %1$s</string>
+    <string name="storage_pill_free_default">Kosong</string>
+
+    <!-- Wowo OS Category Titles -->
+    <string name="wowo_chunk_system_title">Sistem &amp; Keamanan</string>
+    <string name="wowo_chunk_hardware_title">Kernel &amp; Radio</string>
+
+    <!-- RAM Expansion Strings -->
+    <string name="ram_expansion_title">RAM Diperluas</string>
+    <string name="ram_expansion_summary">Tingkatkan memori dengan RAM virtual</string>
+    <string name="ram_expansion_desc">Gunakan sebagian penyimpanan internal sebagai RAM virtual (zRAM) untuk menjaga performa multitasking saat membuka banyak aplikasi.</string>
+    <string name="ram_expansion_physical_label">Fisik</string>
+    <string name="ram_expansion_expanded_label">Diperluas</string>
+    <string name="ram_expansion_total_label">Total RAM</string>
+    <string name="ram_expansion_used_label">Terpakai</string>
+    <string name="ram_expansion_avail_label">Tersedia</string>
+    <string name="ram_badge_used_format">%1$d%% DIGUNAKAN</string>
+    <string name="ram_badge_avail_format">%1$s Tersedia</string>
+    <string name="ram_stat_of_total_format">dari %1$d GB Total RAM</string>
+    <string name="ram_tag_default">Bawaan</string>
+    <string name="ram_tag_max">Maksimal</string>
+    <string name="ram_expansion_off">Nonaktif (Off)</string>
+    <string name="ram_expansion_2gb">+2 GB</string>
+    <string name="ram_expansion_4gb">+4 GB</string>
+    <string name="ram_expansion_8gb">+8 GB</string>
+    <string name="ram_expansion_16gb">+16 GB</string>
+    <string name="ram_expansion_reboot_dialog_title">Mulai Ulang Perangkat?</string>
+    <string name="ram_expansion_reboot_dialog_msg">Pengaturan ukuran RAM diperluas akan diterapkan sepenuhnya setelah perangkat dimulai ulang.</string>
+    <string name="ram_expansion_reboot_now">Mulai ulang sekarang</string>
+    <string name="ram_expansion_reboot_later">Nanti</string>
+    <string name="ram_expansion_status_active">+%1$d GB (Aktif)</string>
+    <string name="ram_expansion_status_off">Nonaktif</string>
+
+    <!-- Gesture Navigation Tweaks -->
+    <string name="gesture_navigation_tweaks_title">Kustomisasi gestur</string>
+    <string name="gesture_hide_bottom_navbar_title">Sembunyikan bilah navigasi</string>
+    <string name="gesture_hide_bottom_navbar_summary">Sembunyikan garis (pill) navigasi gestur di bagian bawah layar</string>
+    <string name="gesture_hide_ime_space_title">Sembunyikan ruang IME keyboard</string>
+    <string name="gesture_hide_ime_space_summary">Hilangkan tombol panah ke bawah dan ruang kosong di bawah keyboard agar keyboard penuh di bawah</string>
+
+    <!-- One UI Control Center Style -->
+    <string name="qs_oneui_style_title">Control Center One UI</string>
+    <string name="qs_oneui_style_summary">Gunakan tampilan Control Center bergaya One UI 9 dengan kartu dan slider terpisah</string>
+</resources>
+
