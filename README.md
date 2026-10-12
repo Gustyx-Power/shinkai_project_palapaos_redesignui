@@ -64,6 +64,7 @@ This repository contains the full source files (XML layouts, drawables, assets, 
 .
 |-- README.md
 |-- changelogs.md
+|-- apply.sh
 |-- temp.sh
 |-- build/
 |   `-- blueprint/bootstrap/
@@ -100,17 +101,88 @@ This repository contains the full source files (XML layouts, drawables, assets, 
 
 ---
 
-## How to Apply to Source Tree
+## Cara Penggunaan (Installation Guide)
 
-Copy the full directories directly into your ROM source tree root:
+### Metode 1: Otomatis via Shell Script (`apply.sh`) [Direkomendasikan]
 
+Repositori ini menyertakan skrip otomatis [`apply.sh`](apply.sh) yang cerdas dan fleksibel:
+
+1. **Clone repositori ini**:
+   ```bash
+   git clone https://github.com/Gustyx-Power/shinkai_project_wowoos_redesignui.git
+   cd shinkai_project_wowoos_redesignui
+   chmod +x apply.sh
+   ```
+
+2. **Jalankan sesuai kebutuhan**:
+
+   - **A. Untuk Perangkat Lain (Hanya Tampilan UI Saja)**:  
+     Jika Anda mem-porting tampilan OneUI Settings & SystemUI ke ponsel selain POCO F5 (misal: Xiaomi lain, Pixel, Realme, dsb) tanpa mengubah/merusak device tree ponsel Anda:
+     ```bash
+     ./apply.sh /path/to/rom --ui-only
+     ```
+
+   - **B. Untuk POCO F5 (marble) Lengkap**:  
+     Menerapkan UI Redesign + Device Tree Marble + Perbaikan Kernel zRAM + Build Fixes:
+     ```bash
+     ./apply.sh /path/to/rom --all
+     ```
+
+   - **C. Mode Interaktif**:  
+     Cukup jalankan tanpa argumen, script akan menanyakan path ROM dan opsi yang diinginkan:
+     ```bash
+     ./apply.sh
+     ```
+
+---
+
+### Metode 2: Manual (Copy File Sendiri)
+
+Jika Anda ingin menyalin file secara manual:
+
+#### A. Hanya UI Redesign (Cocok Untuk Device Apa Pun):
 ```bash
-# Dari root repositori ini:
+# Dari root folder repositori ini:
 cp -rf packages/apps/Settings/* /path/to/rom/packages/apps/Settings/
 cp -rf frameworks/base/packages/* /path/to/rom/frameworks/base/packages/
+```
+*(Device tree Anda tetap bersih dan tidak disentuh).*
+
+#### B. Lengkap Khusus POCO F5 / marble:
+```bash
+# Dari root folder repositori ini:
+# 1. UI Redesign
+cp -rf packages/apps/Settings/* /path/to/rom/packages/apps/Settings/
+cp -rf frameworks/base/packages/* /path/to/rom/frameworks/base/packages/
+
+# 2. Device Tree Marble (Fix RAM Expansion zRAM & SELinux)
 cp -rf device/xiaomi/marble/* /path/to/rom/device/xiaomi/marble/
+
+# 3. Build Memory Fix (Cegah OOM Killer di server) & Skrip Build
 cp -rf build/blueprint/* /path/to/rom/build/blueprint/
 cp -f temp.sh /path/to/rom/
+```
+
+---
+
+## Cara Kompilasi (Build)
+
+Setelah file diterapkan ke source ROM Anda:
+
+```bash
+cd /path/to/rom
+
+# Setup environment
+source build/envsetup.sh
+
+# Pilih target device
+breakfast marble # atau lunch target device Anda
+
+# Kompilasi ROM penuh
+./temp.sh # atau m shinkai -j32
+
+# Atau jika hanya ingin menguji SystemUI saja dengan cepat:
+m SystemUI -j32
 ```
 
 ---
