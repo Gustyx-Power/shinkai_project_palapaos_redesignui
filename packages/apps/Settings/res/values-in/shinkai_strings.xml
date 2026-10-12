@@ -161,7 +161,16 @@
     <string name="gesture_hide_ime_space_title">Sembunyikan ruang IME keyboard</string>
     <string name="gesture_hide_ime_space_summary">Hilangkan tombol panah ke bawah dan ruang kosong di bawah keyboard agar keyboard penuh di bawah</string>
 
-    <!-- One UI Control Center Style -->
+    <!-- Control Center Style Page -->
+    <string name="control_center_title">Pusat kontrol</string>
+    <string name="control_center_summary">Pilih antara Pusat kontrol One UI atau Quick Settings default Pixel</string>
+    <string name="control_center_style_oneui_title">Terpisah</string>
+    <string name="control_center_style_oneui_name">One UI</string>
+    <string name="control_center_style_pixel_title">Gabungkan</string>
+    <string name="control_center_style_pixel_name">Pixel (Default)</string>
+    <string name="control_center_desc_oneui">Tampilkan Pusat kontrol dan Pusat notifikasi secara terpisah. Gesek ke bawah dari kanan atas layar untuk membuka Pusat kontrol.</string>
+    <string name="control_center_desc_pixel">Tampilkan Quick Settings dan Pusat notifikasi secara digabung dalam tata letak bawaan Google Pixel.</string>
+
     <string name="qs_oneui_style_title">Control Center One UI</string>
     <string name="qs_oneui_style_summary">Gunakan tampilan Control Center bergaya One UI 9 dengan kartu dan slider terpisah</string>
 </resources>

@@ -1,0 +1,88 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="240dp"
+    android:viewportWidth="120"
+    android:viewportHeight="240">
+
+    <!-- Phone Outer Body -->
+    <path
+        android:fillColor="#1E2025"
+        android:strokeColor="#3F424C"
+        android:strokeWidth="2.5"
+        android:pathData="M 28,6 H 92 A 22,22 0 0 1 114,28 V 212 A 22,22 0 0 1 92,234 H 28 A 22,22 0 0 1 6,212 V 28 A 22,22 0 0 1 28,6 Z" />
+
+    <!-- Camera Punch Hole -->
+    <path
+        android:fillColor="#3F424C"
+        android:pathData="M 60,13 A 2.5,2.5 0 1 0 60,18 A 2.5,2.5 0 1 0 60,13 Z" />
+
+    <!-- Status Bar Indicators -->
+    <path
+        android:fillColor="#4F535E"
+        android:pathData="M 16,24 H 28 V 26 H 16 Z" />
+    <path
+        android:fillColor="#4F535E"
+        android:pathData="M 94,24 H 104 V 26 H 94 Z" />
+
+    <!-- Pixel: 4 QS Pill Tiles (2 rows x 2 columns) -->
+    <!-- Pill 1 (Top Left) -->
+    <path
+        android:fillColor="#32353D"
+        android:pathData="M 22,34 H 47 A 8,8 0 0 1 55,42 V 42 A 8,8 0 0 1 47,50 H 22 A 8,8 0 0 1 14,42 V 42 A 8,8 0 0 1 22,34 Z" />
+    <!-- Pill 2 (Top Right) -->
+    <path
+        android:fillColor="#32353D"
+        android:pathData="M 73,34 H 98 A 8,8 0 0 1 106,42 V 42 A 8,8 0 0 1 98,50 H 73 A 8,8 0 0 1 65,42 V 42 A 8,8 0 0 1 73,34 Z" />
+    <!-- Pill 3 (Bottom Left) -->
+    <path
+        android:fillColor="#32353D"
+        android:pathData="M 22,54 H 47 A 8,8 0 0 1 55,62 V 62 A 8,8 0 0 1 47,70 H 22 A 8,8 0 0 1 14,62 V 62 A 8,8 0 0 1 22,54 Z" />
+    <!-- Pill 4 (Bottom Right) -->
+    <path
+        android:fillColor="#32353D"
+        android:pathData="M 73,54 H 98 A 8,8 0 0 1 106,62 V 62 A 8,8 0 0 1 98,70 H 73 A 8,8 0 0 1 65,62 V 62 A 8,8 0 0 1 73,54 Z" />
+
+    <!-- Mini Indicator Row (5 tiny pills) -->
+    <path
+        android:fillColor="#32353D"
+        android:pathData="M 18,76 H 26 A 4,4 0 0 1 30,80 V 80 A 4,4 0 0 1 26,84 H 18 A 4,4 0 0 1 14,80 V 80 A 4,4 0 0 1 18,76 Z" />
+    <path
+        android:fillColor="#32353D"
+        android:pathData="M 37,76 H 45 A 4,4 0 0 1 49,80 V 80 A 4,4 0 0 1 45,84 H 37 A 4,4 0 0 1 33,80 V 80 A 4,4 0 0 1 37,76 Z" />
+    <path
+        android:fillColor="#32353D"
+        android:pathData="M 56,76 H 64 A 4,4 0 0 1 68,80 V 80 A 4,4 0 0 1 64,84 H 56 A 4,4 0 0 1 52,80 V 80 A 4,4 0 0 1 56,76 Z" />
+    <path
+        android:fillColor="#32353D"
+        android:pathData="M 75,76 H 83 A 4,4 0 0 1 87,80 V 80 A 4,4 0 0 1 83,84 H 75 A 4,4 0 0 1 71,80 V 80 A 4,4 0 0 1 75,76 Z" />
+    <path
+        android:fillColor="#32353D"
+        android:pathData="M 94,76 H 102 A 4,4 0 0 1 106,80 V 80 A 4,4 0 0 1 102,84 H 94 A 4,4 0 0 1 90,80 V 80 A 4,4 0 0 1 94,76 Z" />
+
+    <!-- Brightness Slider -->
+    <path
+        android:fillColor="#32353D"
+        android:pathData="M 20,91 H 100 A 6,6 0 0 1 106,97 V 99 A 6,6 0 0 1 100,105 H 20 A 6,6 0 0 1 14,99 V 97 A 6,6 0 0 1 20,91 Z" />
+
+    <!-- Merged Notification Card 1 -->
+    <path
+        android:fillColor="#32353D"
+        android:pathData="M 24,115 H 96 A 10,10 0 0 1 106,125 V 148 A 10,10 0 0 1 96,158 H 24 A 10,10 0 0 1 14,148 V 125 A 10,10 0 0 1 24,115 Z" />
+    <path
+        android:fillColor="#4F535E"
+        android:pathData="M 22,126 H 55 V 131 H 22 Z" />
+    <path
+        android:fillColor="#3E424C"
+        android:pathData="M 22,136 H 85 V 140 H 22 Z" />
+
+    <!-- Merged Notification Card 2 -->
+    <path
+        android:fillColor="#32353D"
+        android:pathData="M 24,166 H 96 A 10,10 0 0 1 106,176 V 199 A 10,10 0 0 1 96,209 H 24 A 10,10 0 0 1 14,199 V 176 A 10,10 0 0 1 24,166 Z" />
+    <path
+        android:fillColor="#4F535E"
+        android:pathData="M 22,177 H 45 V 182 H 22 Z" />
+    <path
+        android:fillColor="#3E424C"
+        android:pathData="M 22,187 H 75 V 191 H 22 Z" />
+</vector>

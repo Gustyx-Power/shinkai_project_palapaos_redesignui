@@ -233,3 +233,27 @@ During testing and review sessions, several core interface discrepancies and sub
 - Full build check passed with exit code 0 (`#### build completed successfully ####`).
 
 
+
+---
+
+## Section VI: Dedicated Control Center Subpage & Visual Style Selector (Pusat Kontrol)
+
+### 1. Requirements & Overview
+- **Replaced Inline Toggle**: Previously, switching between One UI Control Center and stock Pixel Quick Settings was managed via a single inline switch toggle in Display Settings (`qs_oneui_style`).
+- **Dedicated Subpage Experience**: Elevated the selection experience into a dedicated subpage entitled **Pusat kontrol** (Indonesian) / **Control Center** (English), featuring side-by-side visual smartphone mockup previews inspired by modern HyperOS / One UI layouts.
+
+### 2. Implementation Details
+1. **Frontend Preference Architecture (`packages/apps/Settings`)**:
+   - `display_settings.xml`: Replaced the legacy `SystemSettingSwitchPreference` with a navigation `Preference` (`control_center_settings`) pointing to `com.android.settings.display.ControlCenterSettings`.
+   - `ControlCenterPreferenceController.java`: Provides dynamic subtitle summaries on the Display settings menu (displaying `One UI` or `Pixel (Default)` depending on current selection).
+   - `SettingsGateway.java`: Registered `ControlCenterSettings` into `ENTRY_FRAGMENTS` to ensure secure SubSettingLauncher fragment navigation without runtime intent violations.
+2. **Visual Selector & Interactive Hero Card**:
+   - `control_center_settings.xml` & `control_center_layout.xml`: Premium rounded card (24dp radius, `@color/settingslib_materialColorSurfaceBright`) housing two interactive phone mockups side-by-side:
+     * **Option 1 (One UI / Terpisah)**: Custom vector illustration (`ic_cc_preview_oneui.xml`) displaying split Control Center layout with large connectivity cards (Wi-Fi/Bluetooth), dual brightness/volume sliders, and small tile grid, labeled "Terpisah / One UI" with a radio button.
+     * **Option 2 (Pixel / Gabungkan)**: Custom vector illustration (`ic_cc_preview_pixel.xml`) displaying stock merged Quick Settings layout with 2x2 pill buttons, brightness slider, and notification cards, labeled "Gabungkan / Pixel (Default)" with a radio button.
+   - **Dynamic Description**: Contextual description text updating instantly upon selection:
+     * *One UI*: "Tampilkan Pusat kontrol dan Pusat notifikasi secara terpisah. Gesek ke bawah dari kanan atas layar untuk membuka Pusat kontrol."
+     * *Pixel*: "Tampilkan Quick Settings dan Pusat notifikasi secara digabung dalam tata letak bawaan Google Pixel."
+   - **Seamless SystemUI Refresh**: Tapping either option updates `Settings.System ("qs_oneui_style")` and automatically restarts SystemUI for an instantaneous UI transition.
+3. **Localization**:
+   - Comprehensive string resources added to `shinkai_strings.xml` (EN) and `values-in/shinkai_strings.xml` (ID) for native Indonesian and English experiences.

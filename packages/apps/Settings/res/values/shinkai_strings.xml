@@ -247,7 +247,16 @@
     <string name="gesture_hide_ime_space_title">Hide keyboard IME space</string>
     <string name="gesture_hide_ime_space_summary">Remove the bottom gap and down arrow below the keyboard to make it full screen</string>
 
-    <!-- One UI Control Center Style -->
+    <!-- Control Center Style Page -->
+    <string name="control_center_title">Control Center</string>
+    <string name="control_center_summary">Choose between One UI Control Center or Default Pixel Quick Settings</string>
+    <string name="control_center_style_oneui_title">Separate</string>
+    <string name="control_center_style_oneui_name">One UI</string>
+    <string name="control_center_style_pixel_title">Merged</string>
+    <string name="control_center_style_pixel_name">Pixel (Default)</string>
+    <string name="control_center_desc_oneui">Display Control Center and Notification Center separately. Swipe down from the top right of the screen to open Control Center.</string>
+    <string name="control_center_desc_pixel">Display Quick Settings and Notification Center merged together in the default Google Pixel layout.</string>
+
     <string name="qs_oneui_style_title">One UI Control Center</string>
     <string name="qs_oneui_style_summary">Use One UI 9 style Control Center with segregated cards and sliders</string>
 </resources>

@@ -115,12 +115,12 @@
             android:fragment="com.android.settings.gestures.SystemNavigationGestureSettings"
             settings:controller="com.android.settings.gestures.SystemNavigationPreferenceController"/>
 
-        <com.custom.settings.preferences.SystemSettingSwitchPreference
-            android:key="qs_oneui_style"
-            android:title="@string/qs_oneui_style_title"
-            android:summary="@string/qs_oneui_style_summary"
-            android:defaultValue="false"
-            settings:controller="com.android.settings.display.OneUIQSStylePreferenceController" />
+        <Preference
+            android:key="control_center_settings"
+            android:title="@string/control_center_title"
+            android:fragment="com.android.settings.display.ControlCenterSettings"
+            settings:controller="com.android.settings.display.ControlCenterPreferenceController" />
+
 
     </PreferenceCategory>
 

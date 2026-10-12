@@ -265,6 +265,7 @@ public class SettingsGateway {
             com.android.settings.deviceinfo.aboutphone.DeviceStatusDashboardFragment.class.getName(),
             com.android.settings.deviceinfo.hardwareinfo.HardwareInfoFragment.class.getName(),
             com.android.settings.system.RamExpansionSettings.class.getName(),
+            com.android.settings.display.ControlCenterSettings.class.getName(),
             com.android.settings.LegalSettings.class.getName(),
             ModuleLicensesDashboard.class.getName(),
             ManageApplications.class.getName(),
