@@ -123,7 +123,12 @@ case "$MODE" in
     --ui-only)
         apply_ui
         echo -e "\n${GREEN}${BOLD}=== SUCCESS: UI Redesign Applied Successfully to Your Source Tree! ===${NC}"
-        echo -e "Notice: Device tree was left untouched. Perfectly safe for any device."
+        echo -e "${YELLOW}${BOLD}[IMPORTANT for Non-Shinkai ROMs & Generic Devices]:${NC}"
+        echo -e "  1. Device tree was untouched (100% safe for your device)."
+        echo -e "  2. If using another ROM (LineageOS, PixelOS, crDroid, etc.), build via your ROM's"
+        echo -e "     standard command (e.g. 'm bacon' or test 'm SystemUI -j\$(nproc)'). Do NOT use 'm shinkai'."
+        echo -e "  3. If your ROM has a custom settings dashboard, check 'top_level_settings.xml' and"
+        echo -e "     'SettingsGateway.java' to preserve custom preference categories."
         ;;
     --device-only)
         apply_device

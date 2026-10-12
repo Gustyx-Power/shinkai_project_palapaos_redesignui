@@ -103,6 +103,13 @@ This repository contains the complete source code, XML layouts, drawables, asset
 
 ## Installation Guide
 
+> [!IMPORTANT]
+> ### Guidelines for Non-Shinkai ROMs & Other Devices
+> - **Always use `--ui-only` for other devices**: Never apply `--all` or copy `device/xiaomi/marble/` to other devices. The marble tree is tailored specifically to POCO F5 (Qualcomm SM7475 / marble).
+> - **Custom ROM Dashboard Conflicts**: If your ROM base already has an existing customization hub (e.g., LineageParts, crDroid Settings, Evolution X The Evolver), inspect `res/xml/top_level_settings.xml` and `src/.../SettingsGateway.java` to ensure your ROM's existing custom menu entries are preserved alongside the new One UI Homepage dashboard.
+> - **Build Commands on Non-Shinkai ROMs**: The provided `temp.sh` script uses `m shinkai`. If you are building LineageOS, PixelOS, or AOSP, use your ROM's native target (e.g. `brunch <device>`, `m bacon`, or `m SystemUI` to compile SystemUI independently).
+> - **Android Version Compatibility**: Tailored for Android 15, 16, and 17 (supporting Jetpack Compose SystemUI and SceneContainer architecture).
+
 ### Method 1: Automated Script (`apply.sh`) [Recommended]
 
 This repository includes a smart, flexible automated setup script [`apply.sh`](apply.sh):
