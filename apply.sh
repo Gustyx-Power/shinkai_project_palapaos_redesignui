@@ -95,10 +95,16 @@ apply_ui() {
 }
 
 apply_device() {
-    echo -e "\n${BLUE}[+] Applying Marble Device Tree (RAM Expansion kernel fix, SELinux, Init RC)...${NC}"
+    echo -e "\n${BLUE}[+] Applying Marble Device Tree & System Init (RAM Expansion FurLC fix, SELinux, Init RC)...${NC}"
     mkdir -p "$TARGET_DIR/device/xiaomi/marble"
     cp -rf "$SCRIPT_DIR/device/xiaomi/marble/"* "$TARGET_DIR/device/xiaomi/marble/"
     echo -e "  ${GREEN}✓ device/xiaomi/marble/ successfully copied!${NC}"
+
+    if [ -f "$SCRIPT_DIR/system/core/rootdir/init.rc" ]; then
+        mkdir -p "$TARGET_DIR/system/core/rootdir"
+        cp -f "$SCRIPT_DIR/system/core/rootdir/init.rc" "$TARGET_DIR/system/core/rootdir/init.rc"
+        echo -e "  ${GREEN}✓ system/core/rootdir/init.rc successfully updated!${NC}"
+    fi
 }
 
 apply_build_fixes() {

@@ -52,12 +52,23 @@ During testing and review sessions, several core interface discrepancies and sub
 
 ### 3. Implementation Outcomes
 1. The Quick Settings panel now adheres strictly to the One UI 9 visual aesthetics:
-   - Single-pull displays the top 2 pill toggles cleanly.
-   - Double-pull expands smoothly without stuck cards or flickering.
+   - Single-pull (QQS) renders:
+     * Header Clock and Date with action shortcuts (Edit, Power, Settings) seamlessly aligned with QS.
+     * Row 1: 1x6 circular quick toggle buttons (1x1 format).
+     * Row 2: Custom One UI pill brightness slider (matching QS slider exactly, eliminating Pixel slider).
+     * Row 3: 2x1 large pill buttons (Wi-Fi and Bluetooth side-by-side).
+   - Double-pull expands smoothly into full QS without stuck cards or flickering.
    - The brightness slider updates with zero hitching or release flicker.
-   - Duplicate header dates and times are completely removed from the top status bar.
-2. Edit Mode allows fluid long-press drag-to-reorder movements with elevation feedback and instant Pill vs 1x1 size toggles.
-3. Media volume and ringer profiles can be controlled directly from the QS panel without entering Settings.
+   - Instant SystemUI restart upon toggling QS style (Stock Pixel vs OneUI) in Settings.
+2. Edit Mode allows fluid 2D drag-and-drop movements anywhere (even spinning in circles and dragging to the top edge) with elevation feedback, zero drop bugs, and instant Pill vs 1x1 size toggles.
+3. RAM Expansion (zRAM) now incorporates the FurLC ZRAM method:
+   - Sets exact byte sizes (`8589934592` for 8GB, `2147483648` for 2GB, `17179869184` for 16GB, 0 for Off).
+   - Graceful `swapoff`, 5-iteration retry reset loop on `/sys/block/zram0/reset` to eliminate `-EBUSY` kernel denials.
+   - Sets 8 multi-streams and `lz4` compression algorithm, followed by `mkswap`, `swapon`, and swappiness 100.
+   - Immediately verifiable in `/proc/swaps`, DevCheck, and Kernel Manager.
+4. About Phone / Firmware Version:
+   - Dedicated row for **Versi Shinkai** (`ro.shinkai.version`).
+   - Dedicated row for **Versi Wowo OS** with value **Embegeh-1T**.
 4. RAM Expansion is fully dynamic: selecting +8 GB (or any other size) immediately updates `/sys/block/zram0/disksize` at kernel level, reflects accurately in DevCheck and About Phone (e.g. 8 GB + 8 GB), and persists across reboots.
 5. Full system compilation finished cleanly without compiler warnings, syntax errors, or SELinux violations.
 

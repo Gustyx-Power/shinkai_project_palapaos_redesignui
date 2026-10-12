@@ -34,6 +34,7 @@
 
     <!-- Wowo OS Version & Branding -->
     <string name="wowo_os_title">Wowo OS</string>
+    <string name="wowo_os_version">Wowo OS version</string>
     <string name="wowo_edition_badge_text">Kopdes Edition</string>
     <string name="wowo_version_edition">Version Kopdes Edition</string>
     <string name="wowo_official_badge">Official</string>

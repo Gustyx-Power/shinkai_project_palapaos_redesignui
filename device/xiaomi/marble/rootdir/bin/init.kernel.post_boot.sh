@@ -31,56 +31,80 @@
 #=============================================================================
 
 function configure_zram_parameters() {
-	MemTotalStr=`cat /proc/meminfo | grep MemTotal`
-	MemTotal=${MemTotalStr:16:8}
-
-	# Check user RAM expansion setting (persist.vendor.ram_expansion, vendor.ram_expansion, or persist.sys.ram_expansion)
-	ramExpansion=`getprop persist.vendor.ram_expansion`
+	# Check user RAM expansion setting (persist.sys.ram_expansion, persist.vendor.ram_expansion, vendor.ram_expansion)
+	ramExpansion=`getprop persist.sys.ram_expansion`
+	if [ -z "$ramExpansion" ]; then
+		ramExpansion=`getprop persist.vendor.ram_expansion`
+	fi
 	if [ -z "$ramExpansion" ]; then
 		ramExpansion=`getprop vendor.ram_expansion`
 	fi
-	if [ -z "$ramExpansion" ]; then
-		ramExpansion=`getprop persist.sys.ram_expansion`
-	fi
-	diskSizeUnit=M
 
 	if [ "$ramExpansion" = "0" ] || [ "$ramExpansion" = "off" ]; then
-		zRamSizeMB=0
+		targetBytes=0
+	elif [ "$ramExpansion" = "2" ]; then
+		targetBytes=2147483648
+	elif [ "$ramExpansion" = "4" ]; then
+		targetBytes=4294967296
+	elif [ "$ramExpansion" = "8" ]; then
+		targetBytes=8589934592
+	elif [ "$ramExpansion" = "16" ]; then
+		targetBytes=17179869184
 	elif [ -n "$ramExpansion" ] && [ "$ramExpansion" -gt 0 ] 2>/dev/null; then
-		zRamSizeMB=$((ramExpansion * 1024))
+		targetBytes=$((ramExpansion * 1024 * 1024 * 1024))
 	else
-		# Default 4GB (4096MB)
-		zRamSizeMB=4096
+		# Default 4GB (4294967296 bytes)
+		targetBytes=4294967296
 	fi
 
-	# Always swapoff and reset zram0 first to free active memory and allow re-sizing
-	swapoff /dev/block/zram0 2>/dev/null
-	echo 1 > /sys/block/zram0/reset 2>/dev/null
+	# 1. Swapoff zram0 if active
+	if grep -q zram0 /proc/swaps 2>/dev/null; then
+		swapoff /dev/block/zram0 2>/dev/null
+		sleep 1
+	fi
 
-	if [ "$zRamSizeMB" -eq 0 ]; then
+	# 2. If off (0), reset and disable swappiness
+	if [ "$targetBytes" -eq 0 ]; then
+		echo 1 > /sys/block/zram0/reset 2>/dev/null
+		echo 0 > /proc/sys/vm/swappiness 2>/dev/null
 		return 0
 	fi
 
-	echo lz4 > /sys/block/zram0/comp_algorithm
+	# 3. Reset zram0 with retry loop (FurLC method)
+	for i in 1 2 3 4 5; do
+		echo 1 > /sys/block/zram0/reset 2>/dev/null && break
+		sleep 1
+	done
 
+	# 4. Multi-stream and compression algorithm
+	if [ -f /sys/block/zram0/max_comp_streams ]; then
+		echo 8 > /sys/block/zram0/max_comp_streams 2>/dev/null
+	fi
+	if [ -f /sys/block/zram0/comp_algorithm ]; then
+		echo lz4 > /sys/block/zram0/comp_algorithm 2>/dev/null
+	fi
+
+	# 5. Set disksize in exact bytes
 	if [ -f /sys/block/zram0/disksize ]; then
 		if [ -f /sys/block/zram0/use_dedup ]; then
-			echo 1 > /sys/block/zram0/use_dedup
+			echo 1 > /sys/block/zram0/use_dedup 2>/dev/null
 		fi
-		echo "$zRamSizeMB""$diskSizeUnit" > /sys/block/zram0/disksize
+		echo "$targetBytes" > /sys/block/zram0/disksize 2>/dev/null
 
 		# ZRAM may use more memory than it saves if SLAB_STORE_USER
 		# debug option is enabled.
 		if [ -e /sys/kernel/slab/zs_handle ]; then
-			echo 0 > /sys/kernel/slab/zs_handle/store_user
+			echo 0 > /sys/kernel/slab/zs_handle/store_user 2>/dev/null
 		fi
 		if [ -e /sys/kernel/slab/zspage ]; then
-			echo 0 > /sys/kernel/slab/zspage/store_user
+			echo 0 > /sys/kernel/slab/zspage/store_user 2>/dev/null
 		fi
 
-		mkswap /dev/block/zram0
-		swapon /dev/block/zram0 -p 32758
+		mkswap /dev/block/zram0 2>/dev/null
+		swapon /dev/block/zram0 -p 32758 2>/dev/null
 	fi
+
+	echo 100 > /proc/sys/vm/swappiness 2>/dev/null
 }
 
 function configure_read_ahead_kb_values() {

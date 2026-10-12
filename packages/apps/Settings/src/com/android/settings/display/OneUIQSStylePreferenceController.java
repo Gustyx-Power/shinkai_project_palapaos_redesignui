@@ -16,13 +16,19 @@
 
 package com.android.settings.display;
 
+import android.app.ActivityManager;
 import android.content.Context;
+import android.os.Process;
 import android.provider.Settings;
+import android.util.Log;
 
 import com.android.settings.core.TogglePreferenceController;
 
+import java.util.List;
+
 public class OneUIQSStylePreferenceController extends TogglePreferenceController {
 
+    private static final String TAG = "OneUIQSStyle";
     public static final String SETTING_KEY = "qs_oneui_style";
 
     public OneUIQSStylePreferenceController(Context context, String key) {
@@ -41,7 +47,36 @@ public class OneUIQSStylePreferenceController extends TogglePreferenceController
 
     @Override
     public boolean setChecked(boolean isChecked) {
-        return Settings.System.putInt(mContext.getContentResolver(), SETTING_KEY, isChecked ? 1 : 0);
+        boolean success = Settings.System.putInt(mContext.getContentResolver(), SETTING_KEY, isChecked ? 1 : 0);
+        restartSystemUI(mContext);
+        return success;
+    }
+
+    public static void restartSystemUI(Context context) {
+        try {
+            ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            if (am != null) {
+                List<ActivityManager.RunningAppProcessInfo> processes = am.getRunningAppProcesses();
+                if (processes != null) {
+                    for (ActivityManager.RunningAppProcessInfo proc : processes) {
+                        if ("com.android.systemui".equals(proc.processName)) {
+                            Process.killProcess(proc.pid);
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            Log.e(TAG, "Failed to kill systemui via ActivityManager", t);
+        }
+
+        try {
+            ActivityManager.getService().killApplicationProcess("com.android.systemui", -1);
+        } catch (Throwable ignored) {}
+
+        try {
+            Runtime.getRuntime().exec(new String[]{"pkill", "-f", "com.android.systemui"});
+        } catch (Throwable ignored) {}
     }
 
     @Override
@@ -49,3 +84,4 @@ public class OneUIQSStylePreferenceController extends TogglePreferenceController
         return 0;
     }
 }
+

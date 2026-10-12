@@ -127,9 +127,16 @@ class ShinkaiLogoPreference : PreferenceMetadata, PreferenceBinding {
         } else {
             "heptakaideka-marble-20260921-2138"
         }
-        layoutPreference.findViewById<TextView>(R.id.wowo_val_wowo_version)?.text = shinkaiVerDisplay
-        layoutPreference.findViewById<View>(R.id.wowo_row_wowo_version)?.setOnClickListener { v ->
+        layoutPreference.findViewById<TextView>(R.id.wowo_val_shinkai_version)?.text = shinkaiVerDisplay
+        layoutPreference.findViewById<View>(R.id.wowo_row_shinkai_version)?.setOnClickListener { v ->
             copyToClipboard(v.context, context.getString(R.string.shinkai_version), shinkaiVerDisplay)
+        }
+
+        // 3. Versi Wowo OS Row (Embegeh-1T)
+        val wowoVerDisplay = SystemProperties.get("ro.wowo.os.version", "Embegeh-1T")
+        layoutPreference.findViewById<TextView>(R.id.wowo_val_wowo_version)?.text = wowoVerDisplay
+        layoutPreference.findViewById<View>(R.id.wowo_row_wowo_version)?.setOnClickListener { v ->
+            copyToClipboard(v.context, context.getString(R.string.wowo_os_version), wowoVerDisplay)
         }
 
         // 3. Update Keamanan Android Row

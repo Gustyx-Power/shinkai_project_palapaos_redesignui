@@ -71,6 +71,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -1188,10 +1189,38 @@ fun ContentScope.OneUIQuickQuickSettingsLayout(
     val btTile = allTiles.firstOrNull { it.spec.spec == "bt" || it.spec.spec == "bluetooth" }
     val roundTiles = allTiles.filter { it != wifiTile && it != btTile }.take(6)
 
+    val context = LocalContext.current
+
     Column(
         modifier = modifier.fillMaxWidth(),
     ) {
         GridAnchor()
+
+        // 0. Jam & Tanggal dan Quick Actions seperti di QS
+        OneUIHeaderClockRow(
+            textPrimary = textPrimary,
+            textSecondary = textSecondary,
+            onEditClick = {
+                try {
+                    qsContainerViewModel.editModeViewModel.startEditing()
+                } catch (_: Exception) {}
+            },
+            onPowerClick = {
+                try {
+                    val intent = Intent("android.intent.action.ACTION_REQUEST_SHUTDOWN")
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    context.startActivity(intent)
+                } catch (_: Exception) {}
+            },
+            onSettingsClick = {
+                try {
+                    val intent = Intent(Settings.ACTION_SETTINGS)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    context.startActivity(intent)
+                } catch (_: Exception) {}
+            },
+        )
+        Spacer(Modifier.height(10.dp))
 
         // 1. Paling atas: 1x6 icon bulat (bukan pill)
         Row(
@@ -1212,34 +1241,14 @@ fun ContentScope.OneUIQuickQuickSettingsLayout(
             }
         }
 
-        // 2. Di bawahnya: slidebar brightness
+        // 2. Di bawahnya: slider brightness custom OneUI (matching QS)
         if (qsContainerViewModel.isBrightnessSliderVisible) {
             Spacer(Modifier.height(10.dp))
-            Box(
-                Modifier.systemGestureExclusionInShade(
-                    enabled = {
-                        runCatching {
-                            layoutState.transitionState is TransitionState.Idle
-                        }.getOrDefault(true)
-                    }
-                )
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(22.dp))
-                ) {
-                    BrightnessSliderContainer(
-                        viewModel = qsContainerViewModel.brightnessSliderViewModel,
-                        containerColors =
-                            ContainerColors(
-                                idleColor = Color.Transparent,
-                                mirrorColor = ContainerColors.defaultContainerColor,
-                            ),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-            }
+            OneUIBrightnessSlider(
+                viewModel = qsContainerViewModel.brightnessSliderViewModel,
+                isDark = isDark,
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
 
         // 3. Di bawahnya: 2x1 pill besar (Wi-Fi & Bluetooth)
@@ -1504,9 +1513,8 @@ fun OneUIEditMode(
                         val isPill = pillSpecs.contains(tile.tileSpec.spec)
                         setTilePillMode(context, tile.tileSpec.spec, !isPill)
                     },
-                    onMove = { tile, targetIndex ->
-                        val safeIndex = targetIndex.coerceIn(0, activeTiles.size - 1)
-                        viewModel.addTile(tile.tileSpec, safeIndex)
+                    onReorderComplete = { newTiles ->
+                        viewModel.setTiles(newTiles.map { it.tileSpec })
                     },
                 )
 
@@ -1535,7 +1543,7 @@ fun OneUIEditMode(
                         viewModel.addTile(tile.tileSpec)
                     },
                     onTogglePill = {},
-                    onMove = { _, _ -> },
+                    onReorderComplete = { _ -> },
                 )
 
                 Spacer(Modifier.height(90.dp))
@@ -1575,8 +1583,17 @@ private fun OneUIEditTilesCard(
     onDraggingStateChange: (Boolean) -> Unit,
     onAction: (EditTileViewModel) -> Unit,
     onTogglePill: (EditTileViewModel) -> Unit,
-    onMove: (EditTileViewModel, Int) -> Unit,
+    onReorderComplete: (List<EditTileViewModel>) -> Unit,
 ) {
+    var currentTilesList by remember(tiles) { mutableStateOf(tiles) }
+    var draggingTileSpec by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(tiles) {
+        if (draggingTileSpec == null) {
+            currentTilesList = tiles
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -1585,7 +1602,7 @@ private fun OneUIEditTilesCard(
             .border(1.dp, cardBorder, RoundedCornerShape(24.dp))
             .padding(14.dp),
     ) {
-        if (tiles.isEmpty()) {
+        if (currentTilesList.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -1600,7 +1617,7 @@ private fun OneUIEditTilesCard(
             }
         } else {
             val columns = 4
-            val rows = (tiles.size + columns - 1) / columns
+            val rows = (currentTilesList.size + columns - 1) / columns
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -1612,21 +1629,42 @@ private fun OneUIEditTilesCard(
                     ) {
                         for (colIndex in 0 until columns) {
                             val index = rowIndex * columns + colIndex
-                            val tile = tiles.getOrNull(index)
+                            val tile = currentTilesList.getOrNull(index)
                             if (tile != null) {
-                                OneUIEditTileItem(
-                                    tile = tile,
-                                    currentIndex = index,
-                                    totalTilesCount = tiles.size,
-                                    isCurrent = isCurrent,
-                                    isDark = isDark,
-                                    isPill = pillSpecs.contains(tile.tileSpec.spec),
-                                    textPrimary = textPrimary,
-                                    onDraggingStateChange = onDraggingStateChange,
-                                    onAction = { onAction(tile) },
-                                    onTogglePill = { onTogglePill(tile) },
-                                    onMove = { t, targetIdx -> onMove(t, targetIdx) },
-                                )
+                                key(tile.tileSpec.spec) {
+                                    OneUIEditTileItem(
+                                        tile = tile,
+                                        currentIndex = index,
+                                        totalTilesCount = currentTilesList.size,
+                                        isCurrent = isCurrent,
+                                        isDark = isDark,
+                                        isPill = pillSpecs.contains(tile.tileSpec.spec),
+                                        textPrimary = textPrimary,
+                                        onDragStart = {
+                                            draggingTileSpec = tile.tileSpec.spec
+                                            onDraggingStateChange(true)
+                                        },
+                                        onDragMove = { colDelta, rowDelta ->
+                                            val fromIdx = currentTilesList.indexOfFirst { it.tileSpec.spec == tile.tileSpec.spec }
+                                            if (fromIdx != -1) {
+                                                val toIdx = (fromIdx + rowDelta * columns + colDelta).coerceIn(0, currentTilesList.size - 1)
+                                                if (toIdx != fromIdx) {
+                                                    val updated = currentTilesList.toMutableList()
+                                                    val movedItem = updated.removeAt(fromIdx)
+                                                    updated.add(toIdx, movedItem)
+                                                    currentTilesList = updated
+                                                }
+                                            }
+                                        },
+                                        onDragEnd = {
+                                            draggingTileSpec = null
+                                            onDraggingStateChange(false)
+                                            onReorderComplete(currentTilesList)
+                                        },
+                                        onAction = { onAction(tile) },
+                                        onTogglePill = { onTogglePill(tile) },
+                                    )
+                                }
                             } else {
                                 Spacer(Modifier.width(74.dp))
                             }
@@ -1647,10 +1685,11 @@ private fun OneUIEditTileItem(
     isDark: Boolean,
     isPill: Boolean,
     textPrimary: Color,
-    onDraggingStateChange: (Boolean) -> Unit,
+    onDragStart: () -> Unit,
+    onDragMove: (Int, Int) -> Unit,
+    onDragEnd: () -> Unit,
     onAction: () -> Unit,
     onTogglePill: () -> Unit,
-    onMove: (EditTileViewModel, Int) -> Unit,
 ) {
     val buttonBg = if (isDark) {
         if (isCurrent) Color(0x40FFFFFF) else Color(0x20FFFFFF)
@@ -1662,48 +1701,49 @@ private fun OneUIEditTileItem(
 
     var isTileDragging by remember { mutableStateOf(false) }
     var dragOffset by remember { mutableStateOf(Offset.Zero) }
+    var accumulatedDelta by remember { mutableStateOf(Offset.Zero) }
     var cellWidthPx by remember { mutableFloatStateOf(0f) }
     var cellHeightPx by remember { mutableFloatStateOf(0f) }
 
     val dragModifier = if (isCurrent) {
-        Modifier.pointerInput(tile.tileSpec) {
+        Modifier.pointerInput(tile.tileSpec.spec) {
             detectDragGesturesAfterLongPress(
                 onDragStart = {
                     isTileDragging = true
                     dragOffset = Offset.Zero
-                    onDraggingStateChange(true)
+                    accumulatedDelta = Offset.Zero
+                    onDragStart()
                 },
                 onDrag = { change, dragAmount ->
                     change.consume()
                     dragOffset += dragAmount
+                    accumulatedDelta += dragAmount
 
                     val stepX = if (cellWidthPx > 0f) cellWidthPx else 190f
                     val stepY = if (cellHeightPx > 0f) cellHeightPx else 220f
 
-                    val colDelta = (dragOffset.x / stepX).roundToInt()
-                    val rowDelta = (dragOffset.y / stepY).roundToInt()
+                    val colDelta = (accumulatedDelta.x / stepX).roundToInt()
+                    val rowDelta = (accumulatedDelta.y / stepY).roundToInt()
 
                     if (colDelta != 0 || rowDelta != 0) {
-                        val targetIndex = (currentIndex + rowDelta * 4 + colDelta)
-                            .coerceIn(0, totalTilesCount - 1)
-                        if (targetIndex != currentIndex) {
-                            onMove(tile, targetIndex)
-                            dragOffset = Offset(
-                                dragOffset.x - colDelta * stepX,
-                                dragOffset.y - rowDelta * stepY,
-                            )
-                        }
+                        onDragMove(colDelta, rowDelta)
+                        accumulatedDelta = Offset(
+                            accumulatedDelta.x - colDelta * stepX,
+                            accumulatedDelta.y - rowDelta * stepY,
+                        )
                     }
                 },
                 onDragEnd = {
                     isTileDragging = false
                     dragOffset = Offset.Zero
-                    onDraggingStateChange(false)
+                    accumulatedDelta = Offset.Zero
+                    onDragEnd()
                 },
                 onDragCancel = {
                     isTileDragging = false
                     dragOffset = Offset.Zero
-                    onDraggingStateChange(false)
+                    accumulatedDelta = Offset.Zero
+                    onDragEnd()
                 }
             )
         }
