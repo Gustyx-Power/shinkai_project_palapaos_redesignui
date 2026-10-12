@@ -32,12 +32,12 @@
 
 function configure_zram_parameters() {
 	# Check user RAM expansion setting (persist.sys.ram_expansion, persist.vendor.ram_expansion, vendor.ram_expansion)
-	ramExpansion=`getprop persist.sys.ram_expansion`
-	if [ -z "$ramExpansion" ]; then
-		ramExpansion=`getprop persist.vendor.ram_expansion`
-	fi
+	ramExpansion=`getprop persist.vendor.ram_expansion`
 	if [ -z "$ramExpansion" ]; then
 		ramExpansion=`getprop vendor.ram_expansion`
+	fi
+	if [ -z "$ramExpansion" ]; then
+		ramExpansion=`getprop persist.sys.ram_expansion 2>/dev/null`
 	fi
 
 	if [ "$ramExpansion" = "0" ] || [ "$ramExpansion" = "off" ]; then
