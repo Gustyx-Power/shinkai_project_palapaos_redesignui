@@ -1,0 +1,14 @@
+<!--
+/**
+ * Copyright (C) 2026 Shinkai Project / Wowo OS
+ */
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+        package="com.android.internal.systemui.navbar.gestural.hidden_bar"
+        android:versionCode="1"
+        android:versionName="1.0">
+    <overlay android:targetPackage="android"
+        android:priority="2"/>
+
+    <application android:label="Hide gesture navigation bar" android:hasCode="false"/>
+</manifest>

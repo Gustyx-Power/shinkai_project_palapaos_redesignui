@@ -156,3 +156,26 @@ During testing and review sessions, several core interface discrepancies and sub
 | `property.te` | SELinux Policy | Declared `vendor_ram_expansion_prop` public vendor property |
 | `property_contexts` | SELinux Context | Context mapping for `persist.vendor.ram_expansion` |
 | `vendor_qti_init_shell.te` | Security Access | Granted zram, swap block device, and sys_admin capability |
+
+---
+
+## Section IV: Latest Refinements & User Feedback Additions
+
+### 1. OneUI QQS 1-Tarikan Layout Overhaul
+- **Row 1 (Top)**: 1x6 circular quick setting buttons (`OneUIQQSCircularTileItem`), distinct from pill buttons, complete with active/inactive state animations and click/long-click interactions.
+- **Row 2 (Middle)**: Responsively integrated brightness slider wrapped in `systemGestureExclusionInShade`.
+- **Row 3 (Bottom)**: 2x1 large pill buttons (`OneUIBigPillTile`) for Wi-Fi and Bluetooth.
+- Live media player integration in single-pull shade when audio is active.
+- Symmetrical reverse scene transitions (`quickQuickSettingsToQuickSettings` and symmetrical `toEditMode`) ensuring fluid morphing between 1-pull and 2-pull shades.
+
+### 2. Edit Quick Settings OneUI Experience
+- **Sticky Done Controls**: Dual Done buttons—one fixed in the top sticky header bar (prevents scrolling offscreen) and an ergonomic floating Done pill at the bottom center of the screen for one-handed operation.
+- **Free 2D Drag & Drop**: Removed `currentIndex` key dependency from `pointerInput` to ensure continuous gesture tracking without resets upon item reordering. Calculates relative 2D column delta (X axis) and row delta (Y axis) dynamically based on rendered tile boundaries.
+- **Visual Feedback**: Elevated tile scale (1.15x), shadow elevation (16dp), zIndex layering (100f), and automatic disablement of page scrolling during drag gestures.
+- **Action Badges**: Quick tap actions on badges (`-` to remove active tiles, `+` to add from available pool).
+
+### 3. POSIX-Compliant zRAM Expansion Controller
+- Replaced bash-only `let` commands with POSIX standard arithmetic `$((ramExpansion * 1024))` in `/vendor/bin/sh` (toybox ash).
+- Full support for `0` and `off` modes with proper `swapoff` execution and zRAM device resets.
+- Multi-stage property synchronization in `init.marble.rc` on `boot`, `post-fs-data`, and property change triggers to guarantee persistence across reboots.
+

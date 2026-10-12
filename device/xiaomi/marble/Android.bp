@@ -1,0 +1,40 @@
+//
+// Copyright (C) 2022 The LineageOS Project
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+soong_namespace {
+    imports: [
+        "hardware/xiaomi",
+        "vendor/qcom/opensource/commonsys-intf/display",
+    ],
+}
+
+install_symlink {
+    name: "firmware_aw_cali.bin_symlink",
+    vendor: true,
+    installed_location: "firmware/aw_cali.bin",
+    symlink_target: "/mnt/vendor/persist/audio/aw_calr.bin",
+}
+
+install_symlink {
+    name: "firmware_WCNSS_qcom_cfg.ini_symlink",
+    vendor: true,
+    installed_location: "firmware/wlan/qca_cld/WCNSS_qcom_cfg.ini",
+    symlink_target: "/vendor/etc/wifi/WCNSS_qcom_cfg.ini",
+}
+
+install_symlink {
+    name: "firmware_qca6490_WCNSS_qcom_cfg.ini_symlink",
+    vendor: true,
+    installed_location: "firmware/wlan/qca_cld/qca6490/WCNSS_qcom_cfg.ini",
+    symlink_target: "/vendor/etc/wifi/qca6490/WCNSS_qcom_cfg.ini",
+}
+
+install_symlink {
+    name: "firmware_qca6490_wlan_mac.bin_symlink",
+    vendor: true,
+    installed_location: "firmware/wlan/qca_cld/qca6490/wlan_mac.bin",
+    symlink_target: "/mnt/vendor/persist/qca6490/wlan_mac.bin",
+}

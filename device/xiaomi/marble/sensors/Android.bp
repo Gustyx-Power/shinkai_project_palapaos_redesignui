@@ -1,0 +1,40 @@
+//
+// Copyright (C) 2024 The LineageOS Project
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+cc_library_headers {
+    name: "marble_sensor_notifier_headers",
+    export_include_dirs: ["include"],
+    vendor: true,
+}
+
+cc_binary {
+    name: "sensor-notifier",
+    vendor: true,
+
+    init_rc: ["sensor-notifier.rc"],
+
+    srcs: [
+        "main.cpp",
+        "notifiers/AodNotifier.cpp",
+        "notifiers/NonUiNotifier.cpp",
+        "notifiers/RawLightNotifier.cpp",
+        "SensorNotifier.cpp",
+        "utils/SensorNotifierUtils.cpp",
+        "utils/SscCalApiWrapper.cpp",
+    ],
+
+    shared_libs: [
+        "libbase",
+        "libhidlbase",
+        "libutils",
+        "android.frameworks.sensorservice@1.0",
+    ],
+
+    header_libs: [
+        "generated_kernel_headers",
+        "marble_sensor_notifier_headers",
+    ],
+}

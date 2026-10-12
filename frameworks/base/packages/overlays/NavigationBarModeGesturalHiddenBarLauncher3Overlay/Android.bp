@@ -1,0 +1,9 @@
+package {
+    default_applicable_licenses: ["frameworks_base_license"],
+}
+
+runtime_resource_overlay {
+    name: "NavigationBarModeGesturalHiddenBarLauncher3Overlay",
+    theme: "NavigationBarModeGesturalHiddenBarLauncher3",
+    product_specific: true,
+}

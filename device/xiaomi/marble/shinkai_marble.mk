@@ -1,0 +1,28 @@
+#
+# Copyright (C) 2022-2024 The LineageOS Project
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+# Inherit from marble device
+$(call inherit-product, device/xiaomi/marble/device.mk)
+
+# Inherit from common shinkai configuration
+$(call inherit-product, vendor/custom/config/common_full_phone.mk)
+
+TARGET_SCREEN_WIDTH := 1080
+SHINKAI_MAINTAINER := Gustyx_Anti_Baper
+
+PRODUCT_NAME := shinkai_marble
+PRODUCT_DEVICE := marble
+PRODUCT_MANUFACTURER := Xiaomi
+PRODUCT_BRAND := POCO
+PRODUCT_MODEL := 23049PCD8G
+
+PRODUCT_BUILD_PROP_OVERRIDES += \
+    BuildDesc="marble_global-user 15 AQ3A.250226.002 OS3.0.4.0.VMRMIXM release-keys" \
+    BuildFingerprint=POCO/marble_global/marble:15/AQ3A.250226.002/OS3.0.4.0.VMRMIXM:user/release-keys \
+    DeviceProduct=marble \
+    SystemName=marble_global
+
+PRODUCT_GMS_CLIENTID_BASE := android-xiaomi

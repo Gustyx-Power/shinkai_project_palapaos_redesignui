@@ -1,0 +1,5 @@
+allow system_app hal_mlipay_hwservice:hwservice_manager find;
+
+binder_call(system_app, hal_mlipay_default)
+
+set_prop(system_app, vendor_ram_expansion_prop)

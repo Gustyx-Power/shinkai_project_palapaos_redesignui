@@ -1,0 +1,11 @@
+# Display
+type vendor_displayfeature_device, dev_type;
+
+# Fingerprint
+type vendor_fingerprint_device, dev_type;
+
+# Modem
+type vendor_radio_smd_device, dev_type;
+
+# Touchscreen
+type touchfeature_device, dev_type;

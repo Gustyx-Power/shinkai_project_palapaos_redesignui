@@ -1,0 +1,14 @@
+<!--
+/**
+ * Copyright (C) 2026 Shinkai Project / Wowo OS
+ */
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+        package="com.google.android.apps.nexuslauncher.navbar.gestural.hidden_bar"
+        android:versionCode="1"
+        android:versionName="1.0">
+    <overlay android:targetPackage="com.google.android.apps.nexuslauncher"
+        android:priority="2"/>
+
+    <application android:label="Hide launcher navigation bar handle" android:hasCode="false"/>
+</manifest>

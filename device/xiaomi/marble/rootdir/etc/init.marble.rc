@@ -1,0 +1,189 @@
+#
+# Copyright (C) 2024 The LineageOS Project
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+import /vendor/etc/init/hw/init.mi_thermald.rc
+import /vendor/etc/init/hw/init.batterysecret.rc
+
+on fs
+    mkdir /mnt/vendor/persist/haptics 0755 system system
+    mkdir /mnt/vendor/persist/audio 0755 system system
+    mkdir /mnt/vendor/persist/qca6490/ 0700 system system
+
+on boot
+    # modem
+    chmod 0777 /dev/smd8
+    chown radio radio /dev/smd8
+    mkdir /data/vendor/modem 0777 radio radio
+
+    chown system system /sys/class/thermal/thermal_message/sconfig
+    chown system system /sys/class/thermal/thermal_message/charger_temp
+    chown system system /sys/class/thermal/thermal_message/board_sensor_temp_comp
+    chown system system /sys/class/thermal/thermal_message/cpu_nolimit_temp
+    chown system system /sys/class/thermal/thermal_message/balance_mode
+    chown cameraserver cameraserver /sys/class/thermal/thermal_message/flash_state
+    chown system system /sys/module/perf_helper/mimd/mimdtrigger
+
+    # Workarround for cache
+     rm /data/resource-cache
+     rm /data/system/package_cache
+
+    # Create persist for camera calibration data
+    mkdir /mnt/vendor/persist/camera 0755 system cameraserver
+
+    # Set fingerprint related permissions
+    chmod 0660 /dev/goodix_fp
+    chown system system /dev/goodix_fp
+    chown system system /sys/bus/platform/devices/soc:fingerprint_fpc/irq
+    chown system system /sys/bus/platform/devices/soc:fingerprint_fpc/irq_enable
+    chown system system /sys/bus/platform/devices/soc:fingerprint_fpc/wakeup_enable
+    chown system system /sys/bus/platform/devices/soc:fingerprint_fpc/hw_reset
+    chown system system /sys/bus/platform/devices/soc:fingerprint_fpc/device_prepare
+    chown system system /sys/bus/platform/devices/soc:fingerprint_fpc/fingerdown_wait
+    chown system system /sys/bus/platform/devices/soc:fingerprint_fpc/vendor
+    chown system system /sys/bus/platform/devices/soc:fingerprint_fpc/request_vreg
+    chown system system /sys/bus/platform/devices/soc:fingerprint_fpc/simulate_irq
+    chown system system /sys/bus/platform/devices/soc:fingerprint_fpc/finger_irq
+    chown system system /sys/bus/platform/devices/soc:fingerprint_fpc/power_cfg
+
+    # Xiaomi touch
+    chown system system /dev/xiaomi-touch
+    chmod 0660 /dev/xiaomi-touch
+
+    # Touchscreen sensors
+    chown system system /sys/class/touch/touch_dev/gesture_single_tap_enabled
+    chown system system /sys/class/touch/touch_dev/gesture_single_tap_state
+    chmod 0660 /sys/class/touch/touch_dev/gesture_single_tap_enabled
+    chmod 0660 /sys/class/touch/touch_dev/gesture_single_tap_state
+
+    chown system system /sys/class/touch/touch_dev/gesture_double_tap_enabled
+    chown system system /sys/class/touch/touch_dev/gesture_double_tap_state
+    chmod 0660 /sys/class/touch/touch_dev/gesture_double_tap_enabled
+    chmod 0660 /sys/class/touch/touch_dev/gesture_double_tap_state
+
+    # High touch polling rate
+    chown system system /sys/devices/virtual/touch/touch_dev/bump_sample_rate
+    chmod 0660 /sys/devices/virtual/touch/touch_dev/bump_sample_rate
+
+on post-fs-data
+    # Create folder of camera
+    mkdir /data/vendor/camera/offlinelog 0777 cameraserver audio
+    chmod 0666 /dev/camlog
+
+    # Create the directories used by the Wireless subsystem
+    mkdir /data/vendor/mac_addr 0770 system wifi
+
+    mkdir /data/vendor/thermal 0771 root system
+    mkdir /data/vendor/thermal/config 0771 root system
+    mkdir /data/vendor/perfspy 0775 camera camera
+    chmod 0660 /dev/ir_spi
+    chown system system /dev/ir_spi
+
+    # Display feature sysfs node
+    chown system system /sys/class/mi_display/disp-DSI-0/disp_param
+    chmod 0664 /sys/class/mi_display/disp-DSI-0/disp_param
+    chown system system /sys/class/mi_display/disp-DSI-0/mipi_rw
+    chmod 0664 /sys/class/mi_display/disp-DSI-0/mipi_rw
+    chown system system /sys/class/mi_display/disp-DSI-0/panel_info
+    chmod 0444 /sys/class/mi_display/disp-DSI-0/panel_info
+    chown system system /sys/class/mi_display/disp-DSI-0/wp_info
+    chmod 0444 /sys/class/mi_display/disp-DSI-0/wp_info
+    chown system system /sys/class/mi_display/disp-DSI-0/dynamic_fps
+    chmod 0444 /sys/class/mi_display/disp-DSI-0/dynamic_fps
+    chown system system /sys/class/mi_display/disp-DSI-0/doze_brightness
+    chmod 0664 /sys/class/mi_display/disp-DSI-0/doze_brightness
+    chown system system /sys/class/mi_display/disp-DSI-0/brightness_clone
+    chmod 0664 /sys/class/mi_display/disp-DSI-0/brightness_clone
+    chown system system /sys/class/mi_display/disp-DSI-0/max_brightness_clone
+    chmod 0664 /sys/class/mi_display/disp-DSI-0/max_brightness_clone
+
+    # Create fingerprint related directories
+    mkdir /data/vendor/fpc 0770 system system
+    mkdir /data/vendor/fpdump 0770 system system
+    mkdir /data/vendor/goodix 0770 system system
+    mkdir /mnt/vendor/persist/fpc 0770 system system
+    mkdir /mnt/vendor/persist/goodix 0770 system system
+
+on boot
+    setprop persist.vendor.ram_expansion ${persist.sys.ram_expansion}
+    setprop vendor.ram_expansion ${persist.sys.ram_expansion}
+
+on post-fs-data
+    setprop persist.vendor.ram_expansion ${persist.sys.ram_expansion}
+    setprop vendor.ram_expansion ${persist.sys.ram_expansion}
+
+on property:sys.boot_completed=1
+    # Set thermal mode to mgame
+    write /sys/devices/virtual/thermal/thermal_message/sconfig 20
+    setprop persist.vendor.ram_expansion ${persist.sys.ram_expansion}
+    setprop vendor.ram_expansion ${persist.sys.ram_expansion}
+    start vendor.ram_expansion
+
+on property:persist.sys.ram_expansion=*
+    setprop persist.vendor.ram_expansion ${persist.sys.ram_expansion}
+    setprop vendor.ram_expansion ${persist.sys.ram_expansion}
+    start vendor.ram_expansion
+
+on property:persist.vendor.ram_expansion=*
+    start vendor.ram_expansion
+
+service vendor.ram_expansion /vendor/bin/ram_expansion.sh
+    class core
+    user root
+    group root system
+    disabled
+    oneshot
+    seclabel u:r:vendor_qti_init_shell:s0
+
+on property:persist.sys.xtra-daemon.enabled=*
+    restart loc_launcher
+
+service vendor.nv_mac /vendor/bin/nv_mac
+    class late_start
+    user system
+    group system inet net_admin wifi net_raw
+    oneshot
+
+service vendor.audio-hal /vendor/bin/hw/android.hardware.audio.service
+    override
+    class hal
+    user audioserver
+    # media gid needed for /dev/fm (radio) and for /data/misc/media (tee)
+    group audio camera drmrpc inet media mediadrm net_bt net_bt_admin net_bw_acct oem_2901 wakelock context_hub system
+    capabilities BLOCK_SUSPEND SYS_NICE
+    # setting RLIMIT_RTPRIO allows binder RT priority inheritance
+    rlimit rtprio 10 10
+    ioprio rt 4
+    task_profiles ProcessCapacityHigh HighPerformance
+    onrestart restart audioserver
+
+on property:ro.boot.product.hardware.sku=marble
+    enable vendor.nfc_hal_service
+    enable secureelement-hal_1_2
+
+service vendor.nfc_hal_service /vendor/bin/hw/android.hardware.nfc-service.nxp
+    override
+    class early_hal
+    user nfc
+    group nfc drmrpc system
+    disabled
+
+service secureelement-hal_1_2 /vendor/bin/hw/vendor.qti.secure_element@1.2-service
+    override
+    class early_hal
+    user system
+    group system
+    disabled
+
+on property:ro.boot.hwversion=*
+    setprop ro.boot.hardware.revision ${ro.boot.hwc}_${ro.boot.hwlevel}_${ro.boot.hwversion}
+
+# Enable WLAN SSR recovery
+on property:persist.vendor.ssr.restart_level=ALL_ENABLE
+    write /sys/kernel/cnss/recovery 1
+
+# Disable WLAN SSR recovery
+on property:persist.vendor.ssr.restart_level=ALL_DISABLE
+    write /sys/kernel/cnss/recovery 0

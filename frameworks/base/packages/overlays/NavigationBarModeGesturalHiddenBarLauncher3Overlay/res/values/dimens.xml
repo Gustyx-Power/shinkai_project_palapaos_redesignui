@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * Copyright (C) 2026 Shinkai Project / Wowo OS
+ */
+-->
+<resources>
+    <dimen name="taskbar_stashed_small_screen">0dp</dimen>
+    <dimen name="taskbar_stashed_handle_height">0dp</dimen>
+    <dimen name="taskbar_stashed_handle_width">0dp</dimen>
+    <dimen name="navigation_home_handle_width">0dp</dimen>
+</resources>
