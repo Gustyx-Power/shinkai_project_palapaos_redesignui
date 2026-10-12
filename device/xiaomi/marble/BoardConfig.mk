@@ -207,7 +207,6 @@ DEVICE_MANIFEST_UKEE_FILES := \
     $(DEVICE_PATH)/vintf/manifest_ukee.xml \
     $(DEVICE_PATH)/vintf/manifest_marble.xml \
     $(DEVICE_PATH)/vintf/manifest_no_nfc.xml \
-    $(DEVICE_PATH)/vintf/vendor.dolby.media.c2.xml \
     $(DEVICE_PATH)/vintf/vendor.dolby.hardware.dms@2.0-service.xml
 
 ODM_MANIFEST_SKUS += marble

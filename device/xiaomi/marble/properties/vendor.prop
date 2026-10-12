@@ -233,6 +233,7 @@ persist.vendor.ssr.restart_level=ALL_ENABLE
 ro.product.property_source_order=odm,vendor,product,system_ext,system
 
 # USB
+persist.sys.usb.config=adb
 sys.usb.mtp.batchcancel=1
 vendor.usb.diag.func.name=ffs
 vendor.usb.dpl.inst.name=dpl

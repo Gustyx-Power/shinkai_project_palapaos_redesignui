@@ -18,3 +18,7 @@ persist.debug.wfd.enable=1
 
 # Xiaomi
 ro.product.mod_device=marble_global
+
+# Debug & Early USB ADB
+persist.sys.usb.config=adb
+ro.adb.secure=0

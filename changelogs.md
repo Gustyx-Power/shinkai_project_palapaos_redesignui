@@ -232,6 +232,12 @@ During testing and review sessions, several core interface discrepancies and sub
 - Target `vendor.dolby.hardware.dms@2.0-service`: Linked, verified against ELF rules, and installed cleanly into `/vendor/bin/hw/`.
 - Full build check passed with exit code 0 (`#### build completed successfully ####`).
 
+### 4. Bootloop Root-Cause Analysis & Fix
+- **Codec2 / Dolby Vision Conflicts Decoupled**: Removed conflicting `vendor.dolby.media.c2@1.0-service` and `dolbycodec2` video/audio services and deactivated `vendor.audio.c2.preferred=true`, deferring media decoding directly to Qualcomm native C2 HALs while reserving Dolby strictly for audio post-processing.
+- **Removed Missing Sensor Constraints**: Deactivated `ro.audio.headtracking_enabled=true` and excluded `android.hardware.sensor.dynamic.head_tracker.xml` to avoid AudioService initialization deadlocks on devices without dynamic head trackers.
+- **Shifted Init Triggers to post-fs-data**: Moved Dolby data directory creation from `early-boot` to `post-fs-data` in `init.dolby.rc` to support clean flashing with encrypted/formatted `/data`.
+- **Early-Boot Persistent ADB Debugging**: Enabled `persist.sys.usb.config=adb` and `ro.adb.secure=0` in `system.prop` and `vendor.prop` to ensure instant USB enumeration and live logcat tracing from the very first seconds of boot.
+
 
 
 ---
