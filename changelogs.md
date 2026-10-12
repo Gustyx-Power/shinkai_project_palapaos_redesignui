@@ -167,6 +167,10 @@ During testing and review sessions, several core interface discrepancies and sub
 | `property.te` | SELinux Policy | Declared `vendor_ram_expansion_prop` public vendor property |
 | `property_contexts` | SELinux Context | Context mapping for `persist.vendor.ram_expansion` |
 | `vendor_qti_init_shell.te` | Security Access | Granted zram, swap block device, and sys_admin capability |
+| `device.mk` (dolby) | Device Tree / Config | Enabled `hardware/dolby/dolby.mk` product inheritance |
+| `BoardConfig.mk` (dolby) | VINTF / Build | Restored Dolby HAL & C2 manifests and framework matrix |
+| `vendor.dolby.hardware.dms@2.0-service` | Vendor HAL | Native DMS HIDL daemon for Dolby effect management |
+| `MarbleDolby` | UI / Application | Compose-based Dolby Atmos control app with AutoEQ & QS tile |
 
 ---
 
@@ -189,4 +193,43 @@ During testing and review sessions, several core interface discrepancies and sub
 - Replaced bash-only `let` commands with POSIX standard arithmetic `$((ramExpansion * 1024))` in `/vendor/bin/sh` (toybox ash).
 - Full support for `0` and `off` modes with proper `swapoff` execution and zRAM device resets.
 - Multi-stage property synchronization in `init.marble.rc` on `boot`, `post-fs-data`, and property change triggers to guarantee persistence across reboots.
+
+---
+
+## Section V: Native Hardware Dolby Atmos & MarbleDolby Integration
+
+### 1. Requirements & System Overview
+- **Hardware Dolby Support Verification**: Confirmed that POCO F5 (`marble`) hardware (Snapdragon 7+ Gen 2 / SM7475) natively supports Qualcomm Hexagon DSP hardware offload for Dolby Audio Processing (DAP).
+- **Decoupling from Third-Party Root Modules**: Replaced the previous reliance on external KernelSU/Magisk modules (OnePlus 9 Pro Dolby Atmos + OPlus Core), which required intrusive overlayfs modules (`mountify`), non-native ColorOS frameworks (`oplus-framework-res`), and aggressive runtime daemon killing (`killall audioserver`/camera services) on AOSP systems.
+- **Full In-Tree Integration**: Integrated the complete hardware Dolby Atmos subsystem directly into the ROM build tree via `hardware/dolby` (marble-indonesia `audio-fixed` branch).
+
+### 2. Architectural & Build Implementation Details
+1. **Device Tree Integration (`device/xiaomi/marble`)**:
+   - `device.mk`: Re-enabled inheritance for `hardware/dolby/dolby.mk` (`$(call inherit-product, hardware/dolby/dolby.mk)`).
+   - `BoardConfig.mk`: Restored VINTF HAL manifests (`vendor.dolby.hardware.dms@2.0-service.xml`, `vendor.dolby.media.c2.xml`) and the framework compatibility matrix (`dolby_framework_matrix.xml`).
+   - `PRODUCT_SOONG_NAMESPACES`: Registered `hardware/dolby` into Soong namespaces cleanly.
+2. **HAL Daemon & Hardware Offload (`hardware/dolby`)**:
+   - `vendor.dolby.hardware.dms@2.0-service`: Dolby Mobile Service HIDL HAL running as a native vendor daemon with dedicated `init.dolby.rc`.
+   - SoundFX & DSP Offload Libraries:
+     - `libhwdap.so`: Hardware DAP effect library registered in `audio_effects.xml` under UUID `9d4921da-8225-4f29-aefa-39537a04bcaa`.
+     - `libdlbvol.so`: Dolby Volume Listener (DVL) for music, ring, alarm, notification, and voice call streams.
+     - `libswspatializer.so`: Dolby Spatial Audio processing.
+     - `libswgamedap.so` & `libswvqe.so`: Dolby Game DAP and Voice Quality Enhancement.
+   - Codec 2.0 decoders: AC4 (`libcodec2_soft_ac4dec`) and DDP (`libcodec2_soft_ddpdec`) alongside `c2.dolby.*`.
+   - Compatibility shim: `libstagefright_foundation-v33.so` provided via `hardware/lineage/compat`.
+3. **Frontend Application (`MarbleDolby`)**:
+   - Modern Material 3 UI built with Jetpack Compose (`org.lunaris.dolby`), installed directly as a privileged system app at `system_ext/priv-app/MarbleDolby`.
+   - Key Features:
+     - 10-band interactive graphical equalizer with live frequency response curve.
+     - AutoEQ database integration (hundreds of pre-calibrated headphone/earphone models).
+     - Dolby profiles (Dynamic, Movie, Music, Custom).
+     - Bass Boost, Dialogue Enhancer, Stereo Widening, and Volume Leveler controls.
+     - Quick Settings tile service (`DolbyTileService`) for instant toggle access.
+     - Per-app audio profile automation.
+
+### 3. Verification & Compilation Status
+- Target `MarbleDolby`: Successfully compiled, DEX-preopted, and verified cleanly (`out/target/product/marble/system_ext/priv-app/MarbleDolby/MarbleDolby.apk`).
+- Target `vendor.dolby.hardware.dms@2.0-service`: Linked, verified against ELF rules, and installed cleanly into `/vendor/bin/hw/`.
+- Full build check passed with exit code 0 (`#### build completed successfully ####`).
+
 

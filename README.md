@@ -46,11 +46,12 @@ This repository contains the complete source code, XML layouts, drawables, asset
   - Smooth visual feedback during drag: Scale 1.15x, shadow elevation 16dp, elevated zIndex, and automatic disablement of page scrolling during drag gestures.
   - Quick tap actions on badges (`-` to remove active tiles, `+` to add from available pool).
 
-### 3. Device Tree & RAM Expansion Fix (`device/xiaomi/marble`)
+### 3. Device Tree, RAM Expansion & Hardware Dolby (`device/xiaomi/marble`)
 - POSIX-compliant arithmetic `$((ramExpansion * 1024))` in `/vendor/bin/ram_expansion.sh` and `/vendor/bin/init.kernel.post_boot.sh` (resolving toybox `/vendor/bin/sh` syntax errors).
 - Clean handling of `0` / `off` modes by executing `swapoff /dev/block/zram0` and resetting the zRAM node.
 - Dedicated `vendor.ram_expansion` service in `init.marble.rc` triggered automatically upon property changes (`persist.vendor.ram_expansion` or `persist.sys.ram_expansion`).
 - Complete SELinux policies (`system_app.te`, `vendor_qti_init_shell.te`, `property.te`, `property_contexts`, `file_contexts`) granting unblocked permission to configure zRAM.
+- **Native Hardware Dolby Atmos**: Enabled `hardware/dolby/dolby.mk` and restored VINTF manifests in `BoardConfig.mk`, providing hardware DSP DAP offload (`libhwdap.so`), Codec 2.0 AC4/DDP decoders, and the Material 3 `MarbleDolby` control application (AutoEQ, 10-band EQ, QS tile) natively without root/KernelSU/Mountify.
 
 ### 4. Build Scripts & Environment (`build/`, `temp.sh`)
 - `temp.sh`: Non-trunking build script (release target `cp2a`) with memory-safe limits (`GOMEMLIMIT=10GiB`, `GOMAXPROCS=8`, and `-j32`).
