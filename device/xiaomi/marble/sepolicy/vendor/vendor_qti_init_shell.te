@@ -2,6 +2,7 @@ allow vendor_qti_init_shell vendor_sysfs_msm_perf:file w_file_perms;
 allow vendor_qti_init_shell sysfs_zram:dir r_dir_perms;
 allow vendor_qti_init_shell sysfs_zram:file rw_file_perms;
 allow vendor_qti_init_shell swap_block_device:blk_file rw_file_perms;
+allow vendor_qti_init_shell ram_device:blk_file rw_file_perms;
 allow vendor_qti_init_shell self:capability sys_admin;
 
 set_prop(vendor_qti_init_shell, vendor_panel_info_prop)

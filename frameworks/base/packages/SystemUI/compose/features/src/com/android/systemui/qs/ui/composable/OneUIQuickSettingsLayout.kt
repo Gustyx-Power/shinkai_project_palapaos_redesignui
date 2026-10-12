@@ -102,6 +102,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.compose.PlatformSliderDefaults
 import com.android.compose.animation.scene.ContentScope
+import com.android.compose.animation.scene.ElementKey
 import com.android.compose.animation.scene.content.state.TransitionState
 import com.android.systemui.animation.Expandable
 import com.android.systemui.brightness.ui.compose.BrightnessSliderContainer
@@ -131,6 +132,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.delay
+
+object OneUIElements {
+    val HeaderClock = ElementKey("OneUIHeaderClock")
+    val BrightnessSlider = ElementKey("OneUIBrightnessSlider")
+}
 
 @Composable
 fun rememberIsOneUiStyle(): State<Boolean> {
@@ -267,6 +273,8 @@ fun ContentScope.OneUIQuickSettingsLayout(
         OneUIHeaderClockRow(
             textPrimary = textPrimary,
             textSecondary = textSecondary,
+            showEditButton = true,
+            modifier = Modifier.element(OneUIElements.HeaderClock),
             onEditClick = {
                 try {
                     if (editModeButtonViewModel != null) {
@@ -391,7 +399,7 @@ fun ContentScope.OneUIQuickSettingsLayout(
                     OneUIBrightnessSlider(
                         viewModel = qsContainerViewModel.brightnessSliderViewModel,
                         isDark = isDark,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).element(OneUIElements.BrightnessSlider),
                     )
 
                     // Circular Dark Mode Toggle Button
@@ -483,9 +491,11 @@ fun ContentScope.OneUIQuickSettingsLayout(
 private fun OneUIHeaderClockRow(
     textPrimary: Color,
     textSecondary: Color,
-    onEditClick: () -> Unit,
+    showEditButton: Boolean = true,
+    onEditClick: () -> Unit = {},
     onPowerClick: () -> Unit,
     onSettingsClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val currentTimeMillis by produceState(initialValue = System.currentTimeMillis()) {
         while (true) {
@@ -502,7 +512,9 @@ private fun OneUIHeaderClockRow(
     }
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -524,13 +536,15 @@ private fun OneUIHeaderClockRow(
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            // Edit Button (pencil)
-            OneUIHeaderActionButton(
-                iconRes = R.drawable.ic_edit,
-                contentDescription = "Edit Quick Settings",
-                tint = textPrimary,
-                onClick = onEditClick,
-            )
+            if (showEditButton) {
+                // Edit Button (pencil)
+                OneUIHeaderActionButton(
+                    iconRes = R.drawable.ic_edit,
+                    contentDescription = "Edit Quick Settings",
+                    tint = textPrimary,
+                    onClick = onEditClick,
+                )
+            }
 
             // Power Button
             OneUIHeaderActionButton(
@@ -1196,15 +1210,12 @@ fun ContentScope.OneUIQuickQuickSettingsLayout(
     ) {
         GridAnchor()
 
-        // 0. Jam & Tanggal dan Quick Actions seperti di QS
+        // 0. Jam & Tanggal dan Quick Actions (tanpa edit button di QQS)
         OneUIHeaderClockRow(
             textPrimary = textPrimary,
             textSecondary = textSecondary,
-            onEditClick = {
-                try {
-                    qsContainerViewModel.editModeViewModel.startEditing()
-                } catch (_: Exception) {}
-            },
+            showEditButton = false,
+            modifier = Modifier.element(OneUIElements.HeaderClock),
             onPowerClick = {
                 try {
                     val intent = Intent("android.intent.action.ACTION_REQUEST_SHUTDOWN")
@@ -1247,7 +1258,7 @@ fun ContentScope.OneUIQuickQuickSettingsLayout(
             OneUIBrightnessSlider(
                 viewModel = qsContainerViewModel.brightnessSliderViewModel,
                 isDark = isDark,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().element(OneUIElements.BrightnessSlider),
             )
         }
 
@@ -1546,27 +1557,8 @@ fun OneUIEditMode(
                     onReorderComplete = { _ -> },
                 )
 
-                Spacer(Modifier.height(90.dp))
+                Spacer(Modifier.height(16.dp))
             }
-        }
-
-        // Sticky Bottom Bar "Done" Pill
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 22.dp)
-                .clip(RoundedCornerShape(28.dp))
-                .background(if (isDark) Color(0xFFFFFFFF) else Color(0xFF202124))
-                .clickable(onClick = onDone)
-                .padding(horizontal = 44.dp, vertical = 12.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "Done",
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold,
-                color = if (isDark) Color(0xFF202124) else Color(0xFFFFFFFF),
-            )
         }
     }
 }
