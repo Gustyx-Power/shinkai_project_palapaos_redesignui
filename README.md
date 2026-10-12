@@ -1,6 +1,6 @@
 # Shinkai Project - WowoOS Redesign UI (Settings & SystemUI)
 
-This repository contains the full source files, assets, and patch files for the custom UI redesign implemented for Shinkai Project / WowoOS on Android 16 (marble).
+This repository contains the full source files (XML layouts, drawables, assets, Kotlin and Java source code) for the custom UI redesign implemented for Shinkai Project / WowoOS on Android 16 (marble).
 
 ---
 
@@ -48,9 +48,6 @@ This repository contains the full source files, assets, and patch files for the 
 .
 |-- README.md
 |-- changelogs.md
-|-- patches/
-|   |-- 0001-Settings-redesign.patch
-|   `-- 0002-SystemUI-OneUI-redesign.patch
 |-- frameworks/
 |   `-- base/
 |       `-- packages/
@@ -65,40 +62,31 @@ This repository contains the full source files, assets, and patch files for the 
     `-- apps/
         `-- Settings/
             |-- res/
+            |   |-- anim/
+            |   |-- drawable/
+            |   |-- drawable-nodpi/
+            |   |-- layout/
+            |   |-- values/
+            |   |-- values-in/
+            |   |-- values-night/
+            |   `-- xml/
             `-- src/
+                `-- com/android/settings/
 ```
 
 ---
 
 ## How to Apply to Source Tree
 
-### Method 1: Applying via Git Patch (Recommended)
+Copy the full directories directly into your ROM source tree root:
 
-From your ROM source tree root:
-
-1. **Apply Settings Patch**:
-   ```bash
-   cd packages/apps/Settings
-   git apply --check ../../../patches/0001-Settings-redesign.patch
-   git apply ../../../patches/0001-Settings-redesign.patch
-   cd ../../..
-   ```
-
-2. **Apply SystemUI Patch**:
-   ```bash
-   cd frameworks/base
-   git apply --check ../../patches/0002-SystemUI-OneUI-redesign.patch
-   git apply ../../patches/0002-SystemUI-OneUI-redesign.patch
-   cd ../..
-   ```
-
-### Method 2: Direct File Copy
-
-From the root of this repository:
 ```bash
+# From the root of this repository:
 cp -rf packages/apps/Settings/* /path/to/rom/packages/apps/Settings/
 cp -rf frameworks/base/packages/SystemUI/* /path/to/rom/frameworks/base/packages/SystemUI/
 ```
+
+All XML layouts, drawables, values, and source files are provided in full standalone form, identical to the source tree.
 
 ---
 
