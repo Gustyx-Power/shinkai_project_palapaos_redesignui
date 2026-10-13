@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2026 Wowo OS / Shinkai Project
+-->
+<resources>
+    <!-- Dynamic Island Charging Strings -->
+    <string name="dynamic_island_charging">Mengisi daya</string>
+</resources>

@@ -379,3 +379,30 @@ During testing and review sessions, several core interface discrepancies and sub
 3. **Assets & Localization**:
    - Vector icon: `ic_restart_systemui.xml` (standard Material refresh/restart glyph).
    - String definitions added in English (`shinkai_strings.xml`) and Indonesian (`values-in/shinkai_strings.xml`).
+
+
+---
+
+## Section X: Dynamic Island Charging Capsule for POCO F5 (marble) [Experimental]
+
+### 1. Requirements & Overview
+- **Punch-Hole Integrated Dynamic Island**: Implemented a sleek Dynamic Island charging pill tailored for the centered camera punch-hole cutout of POCO F5 (`device/xiaomi/marble`, cutout: `M 0,0 H -28 V 94 H 28 V 0 H 0 Z`).
+- **Charging-Triggered Animation**: Activates exclusively when charging commences (cable plugged in), smoothly expanding from the center camera notch into a capsule status bar pill.
+- **Visual Design Matching Reference**:
+  * Capsule Shell: Pitch black (`#000000`) with rounded ends (100dp corner radius, stadium pill shape, height 35dp), subtle translucent rim (`#24FFFFFF`), and z-order layered directly above status bar contents.
+  * Left Info: Localized status text ("Mengisi daya" in ID, "Charging" in EN) in clean sans-serif white typography (13.5sp).
+  * Right Info: Real-time battery percentage (e.g. "29%") accompanied by an animated neon green lightning bolt vector icon (`#00E676`).
+  * Elastic Expansion & Auto-Retract: Scales organically from the punch hole center outwards with `OvershootInterpolator(1.18f)`, holds for 4.5 seconds to display charging status clearly, and retracts back into the camera cutout via `AccelerateInterpolator(1.4f)`.
+- **User Settings Toggle**: Integrated a dedicated toggle card in the Control Center subpage (`ControlCenterSettings`) with instant runtime persistence (`dynamic_island_charging`, default enabled).
+- **Interactive Controls & Testing**: Tapping the capsule dismisses it immediately. Supports broadcast intent `com.android.systemui.action.TEST_DYNAMIC_ISLAND` for automated and live manual testing.
+
+### 2. Implementation Details
+1. **Status Bar Hierarchy & Custom View (`SystemUI`)**:
+   - `status_bar.xml`: Placed `DynamicIslandChargingView` (`@+id/dynamic_island_charging`) inside `PhoneStatusBarView` with `layout_gravity="center_horizontal|center_vertical"`, aligning directly over the POCO F5 centered camera cutout.
+   - `DynamicIslandChargingView.kt`: Custom `FrameLayout` listening to sticky `Intent.ACTION_BATTERY_CHANGED`. Detects charging state transitions (`!wasPluggedIn && isPluggedIn`), measures display metrics, and manages fluid `AnimatorSet` spring animations.
+   - `dynamic_island_charging.xml` & `dynamic_island_pill_bg.xml`: Dedicated capsule layout and stadium pill drawable.
+   - `ic_dynamic_island_bolt.xml`: Custom neon green (`#00E676`) 16dp lightning bolt vector asset.
+2. **Settings Integration (`packages/apps/Settings`)**:
+   - `control_center_layout.xml`: Added `cc_dynamic_island_card` with `MaterialSwitch` (`@+id/cc_dynamic_island_switch`).
+   - `ControlCenterSettings.kt`: Bound switch state to `Settings.System.getInt("dynamic_island_charging", 1)`.
+   - String localization in `shinkai_strings.xml` and `values-in/shinkai_strings.xml`.

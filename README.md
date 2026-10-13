@@ -53,7 +53,18 @@ This repository contains the complete source code, XML layouts, drawables, asset
 - Complete SELinux policies (`system_app.te`, `vendor_qti_init_shell.te`, `property.te`, `property_contexts`, `file_contexts`) granting unblocked permission to configure zRAM.
 - **Native Hardware Dolby Atmos**: Enabled `hardware/dolby/dolby.mk` and restored VINTF manifests in `BoardConfig.mk`, providing hardware DSP DAP offload (`libhwdap.so`), Codec 2.0 AC4/DDP decoders, and the Material 3 `MarbleDolby` control application (AutoEQ, 10-band EQ, QS tile) natively without root/KernelSU/Mountify.
 
-### 4. Build Scripts & Environment (`build/`, `temp.sh`)
+### 4. Dynamic Island Charging Capsule [Experimental] (`SystemUI` & `Settings`)
+- **POCO F5 Punch-Hole Alignment**: Geometrically aligned with the top-center camera cutout of POCO F5 (`device/xiaomi/marble`, `M 0,0 H -28 V 94 H 28 V 0 H 0 Z`).
+- **Charging-Triggered Pop Animation**: Expands smoothly from the camera punch hole cutout when charging commences (via sticky `Intent.ACTION_BATTERY_CHANGED`).
+- **Signature Island Capsule Aesthetics**:
+  - Deep pitch-black capsule shell (`#000000`, 100dp pill radius, 35dp height) with a subtle luminous border (`#24FFFFFF`).
+  - Left text: Localized charging state ("Mengisi daya" in Indonesian / "Charging" in English).
+  - Right cluster: Real-time battery percentage ("29%") with an animated neon green lightning bolt icon (`#00E676`).
+  - Fluid spring expansion with `OvershootInterpolator(1.18f)`, 4.5-second hold time, and organic collapse back into the camera notch via `AccelerateInterpolator(1.4f)`.
+- **Settings Toggle**: Optional user toggle integrated into the Control Center page (`ControlCenterSettings`) with instant persistence (`dynamic_island_charging`).
+- **Testing & Diagnostics**: Can be triggered manually via broadcast (`am broadcast -a com.android.systemui.action.TEST_DYNAMIC_ISLAND --ei level 29`).
+
+### 5. Build Scripts & Environment (`build/`, `temp.sh`)
 - `temp.sh`: Non-trunking build script (release target `cp2a`) with memory-safe limits (`GOMEMLIMIT=10GiB`, `GOMAXPROCS=8`, and `-j32`).
 - `build/blueprint/bootstrap/bootstrap.go`: Hardened Soong Blueprint memory limits to prevent shared server cgroup OOM kills.
 
