@@ -491,7 +491,11 @@ constructor(
         val largeScreenConstraint = header.getConstraintSet(LARGE_SCREEN_HEADER_CONSTRAINT)
         largeScreenConstraint.load(context, resources.getXml(R.xml.large_screen_shade_header))
 
-        val isOneUi = android.provider.Settings.System.getInt(header.context.contentResolver, "qs_oneui_style", 0) == 1
+        val isOneUi = try {
+            android.provider.Settings.System.getInt(header.context.contentResolver, "qs_oneui_style", 0) == 1
+        } catch (_: Throwable) {
+            false
+        }
         if (isOneUi) {
             applyOneUiConstraints(qqsConstraint)
             applyOneUiConstraints(qsConstraint)
@@ -656,7 +660,11 @@ constructor(
     private fun updatePosition() {
         if (!largeScreenActive && visible) {
             logInstantEvent("updatePosition: $qsExpandedFraction")
-            val isOneUi = android.provider.Settings.System.getInt(header.context.contentResolver, "qs_oneui_style", 0) == 1
+            val isOneUi = try {
+                android.provider.Settings.System.getInt(header.context.contentResolver, "qs_oneui_style", 0) == 1
+            } catch (_: Throwable) {
+                false
+            }
             if (isOneUi) {
                 header.progress = 0f
                 clock.alpha = 0f

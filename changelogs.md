@@ -406,3 +406,18 @@ During testing and review sessions, several core interface discrepancies and sub
    - `control_center_layout.xml`: Added `cc_dynamic_island_card` with `MaterialSwitch` (`@+id/cc_dynamic_island_switch`).
    - `ControlCenterSettings.kt`: Bound switch state to `Settings.System.getInt("dynamic_island_charging", 1)`.
    - String localization in `shinkai_strings.xml` and `values-in/shinkai_strings.xml`.
+
+
+---
+
+## Section XI: Android Setup (OOBE) Boot Stability & Receiver Security Fix
+
+### 1. Requirements & Overview
+- **Issue Diagnosis**: After a clean flash or data format, SystemUI was crash-looping during the Android Setup Wizard (OOBE), causing the screen to flicker and triggering Android Rescue Party (ARP) reboot to recovery.
+- **Root Cause 1**: Registering a broadcast receiver in `DynamicIslandChargingView` with a non-protected intent (`ACTION_TEST_DYNAMIC_ISLAND`) without the mandatory Android 14+ `Context.RECEIVER_EXPORTED` flag threw an uncaught `java.lang.SecurityException` on the main thread when attaching to the window.
+- **Root Cause 2**: Triggering status bar animations and querying early-boot SettingsProvider before the device was provisioned (`DEVICE_PROVISIONED == 0`) during initial setup.
+- **Resolution**:
+  * Added `Context.RECEIVER_EXPORTED` flag to broadcast receiver registration.
+  * Added `Settings.Global.DEVICE_PROVISIONED` check so Dynamic Island remains strictly dormant during Setup Wizard (OOBE).
+  * Changed default setting to `0` (opt-in experimental feature via Control Center settings).
+  * Wrapped all lifecycle callbacks (`onFinishInflate`, `onAttachedToWindow`, `onDetachedFromWindow`, `triggerChargingIsland`, `dismissIsland`, `onReceive`) and `Settings.System.getInt` calls in `ShadeHeaderController.kt` in comprehensive `try-catch` blocks to ensure SystemUI can never crash under any circumstances.
