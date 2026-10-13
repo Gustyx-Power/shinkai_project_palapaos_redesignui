@@ -263,8 +263,8 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                 }
             }
 
-            // Auto-retract back into the punch-hole after 4.5 seconds
-            mainHandler.postDelayed(dismissRunnable, 4500L)
+            // Auto-retract back into the punch-hole after 7.8 seconds
+            mainHandler.postDelayed(dismissRunnable, 7800L)
         } catch (t: Throwable) {
             Log.e(TAG, "Failed to trigger charging island", t)
         }

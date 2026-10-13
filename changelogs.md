@@ -482,3 +482,12 @@ During testing and review sessions, several core interface discrepancies and sub
     3. Fallback: Call `ActivityManager.getService().killUid` with `evenPersistent = true`.
   * In `ControlCenterSettings.kt`, automatically display the "Restart System UI" card when the Dynamic Island toggle is flipped.
 
+---
+
+## Section XV: Dynamic Island Capsule Display Duration Tuning
+
+### 1. Requirements & Overview
+- **User Request**: The Dynamic Island charging capsule was auto-retracting too fast (previously 4.5 seconds).
+- **Adjustment**: Extended the display and hold time to **7.8 seconds** (`7800L`) in `DynamicIslandChargingView.kt` so the charging status, real-time percentage, and pulsating green lightning bolt remain clearly visible before smoothly retracting back into the camera punch-hole cutout.
+
+
