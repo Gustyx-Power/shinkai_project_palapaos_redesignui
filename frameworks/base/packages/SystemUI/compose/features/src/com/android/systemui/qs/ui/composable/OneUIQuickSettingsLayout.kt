@@ -128,9 +128,25 @@ import com.android.systemui.res.R
 import com.android.systemui.shade.ui.composable.OverlayShade
 import com.android.systemui.volume.panel.component.volume.slider.ui.viewmodel.AudioStreamSliderViewModel
 import com.android.systemui.volume.panel.component.volume.ui.composable.VolumeSlider
+import android.content.ComponentName
+import android.graphics.Bitmap
+import android.media.MediaMetadata
+import android.media.session.MediaController
+import android.media.session.MediaSessionManager
+import android.media.session.PlaybackState
+import android.os.SystemClock
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -139,6 +155,7 @@ import kotlinx.coroutines.delay
 object OneUIElements {
     val HeaderClock = ElementKey("OneUIHeaderClock")
     val BrightnessSlider = ElementKey("OneUIBrightnessSlider")
+    val MediaPlayer = ElementKey("OneUIMediaPlayer")
 }
 
 @Composable
@@ -495,11 +512,11 @@ fun ContentScope.OneUIQuickSettingsLayout(
 
         Spacer(Modifier.height(12.dp))
 
-        // 7. Card 5: Media Player Card
-        if (media != null) {
-            media()
-            Spacer(Modifier.height(12.dp))
-        }
+        // 7. Card 5: Media Player Card Compact (One UI)
+        OneUICompactMediaPlayer(
+            modifier = Modifier.fillMaxWidth().element(OneUIElements.MediaPlayer)
+        )
+        Spacer(Modifier.height(12.dp))
 
         // 8. Card 6: Bottom Pills (Any pills placed outside the box below media)
         if (bottomPillTiles.isNotEmpty()) {
@@ -1366,11 +1383,11 @@ fun ContentScope.OneUIQuickQuickSettingsLayout(
             )
         }
 
-        // Live Media player jika aktif
-        if (media != null && qsContainerViewModel.showMedia) {
-            Spacer(Modifier.height(8.dp))
-            media()
-        }
+        // 4. Compact One UI Media player di bawah 2x1 pill Wi-Fi & Bluetooth
+        Spacer(Modifier.height(10.dp))
+        OneUICompactMediaPlayer(
+            modifier = Modifier.fillMaxWidth().element(OneUIElements.MediaPlayer)
+        )
     }
 }
 
@@ -1432,6 +1449,559 @@ private fun ContentScope.OneUIQQSCircularTileItem(
         }
     }
 }
+
+private fun drawableToBitmap(drawable: android.graphics.drawable.Drawable): Bitmap? {
+    if (drawable is android.graphics.drawable.BitmapDrawable && drawable.bitmap != null) {
+        return drawable.bitmap
+    }
+    val width = if (drawable.intrinsicWidth > 0) drawable.intrinsicWidth else 48
+    val height = if (drawable.intrinsicHeight > 0) drawable.intrinsicHeight else 48
+    return try {
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(bitmap)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+        bitmap
+    } catch (_: Exception) {
+        null
+    }
+}
+
+private fun formatMediaTime(ms: Long): String {
+    val totalSec = (ms / 1000).coerceAtLeast(0)
+    val min = totalSec / 60
+    val sec = totalSec % 60
+    return "%02d:%02d".format(min, sec)
+}
+
+@Composable
+private fun OneUIWaveSeekbar(
+    progressFraction: Float,
+    onSeek: (Float) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var isDragging by remember { mutableStateOf(false) }
+    var dragFraction by remember { mutableFloatStateOf(0f) }
+
+    val currentFraction = if (isDragging) dragFraction else progressFraction.coerceIn(0f, 1f)
+
+    Canvas(
+        modifier = modifier
+            .height(28.dp)
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures(
+                    onDragStart = { offset ->
+                        isDragging = true
+                        val frac = (offset.x / size.width.toFloat()).coerceIn(0f, 1f)
+                        dragFraction = frac
+                    },
+                    onDragEnd = {
+                        isDragging = false
+                        onSeek(dragFraction)
+                    },
+                    onDragCancel = {
+                        isDragging = false
+                    },
+                    onHorizontalDrag = { _, dragAmount ->
+                        dragFraction = (dragFraction + dragAmount / size.width.toFloat()).coerceIn(0f, 1f)
+                    }
+                )
+            }
+            .pointerInput(Unit) {
+                detectTapGestures { offset ->
+                    val frac = (offset.x / size.width.toFloat()).coerceIn(0f, 1f)
+                    dragFraction = frac
+                    onSeek(frac)
+                }
+            }
+    ) {
+        val width = size.width
+        val height = size.height
+        val centerY = height / 2f
+        val thumbX = width * currentFraction
+        val waveColor = Color(0xFF29B6F6)
+        val unplayedColor = Color(0x40FFFFFF)
+
+        // 1. Draw unplayed line on right
+        if (thumbX < width) {
+            drawLine(
+                color = unplayedColor,
+                start = Offset(thumbX.coerceAtLeast(0f), centerY),
+                end = Offset(width, centerY),
+                strokeWidth = 3.dp.toPx(),
+                cap = StrokeCap.Round,
+            )
+        }
+
+        // 2. Draw wave on left (played portion)
+        if (thumbX > 0f) {
+            val wavePath = Path()
+            wavePath.moveTo(0f, centerY)
+            val waveLength = 48.dp.toPx()
+            val waveAmplitude = 5.dp.toPx()
+            var x = 0f
+            while (x < thumbX) {
+                val nextX = (x + waveLength / 2f).coerceAtMost(thumbX)
+                val midX = (x + nextX) / 2f
+                val sign = if (((x / waveLength).toInt() % 2) == 0) -1f else 1f
+                val controlY = centerY + (sign * waveAmplitude)
+                wavePath.quadraticBezierTo(midX, controlY, nextX, centerY)
+                x = nextX
+            }
+
+            // Stroke the wave line
+            drawPath(
+                path = wavePath,
+                color = waveColor,
+                style = Stroke(width = 3.5.dp.toPx(), cap = StrokeCap.Round),
+            )
+
+            // Fill beneath the wave for liquid look
+            val fillPath = Path().apply {
+                addPath(wavePath)
+                lineTo(thumbX, centerY + 4.dp.toPx())
+                lineTo(0f, centerY + 4.dp.toPx())
+                close()
+            }
+            drawPath(
+                path = fillPath,
+                brush = Brush.verticalGradient(
+                    colors = listOf(waveColor.copy(alpha = 0.6f), waveColor.copy(alpha = 0.15f)),
+                    startY = centerY - waveAmplitude,
+                    endY = centerY + 4.dp.toPx(),
+                )
+            )
+        }
+
+        // 3. Thumb circle at thumbX
+        drawCircle(
+            color = waveColor,
+            radius = 6.dp.toPx(),
+            center = Offset(thumbX.coerceIn(0f, width), centerY),
+        )
+        drawCircle(
+            color = Color.White,
+            radius = 2.5.dp.toPx(),
+            center = Offset(thumbX.coerceIn(0f, width), centerY),
+        )
+    }
+}
+
+/**
+ * Compact One UI Media Player Card (~130dp)
+ * Matches Samsung One UI with album art background, wave seekbar, and quick media controls.
+ */
+@Composable
+fun ContentScope.OneUICompactMediaPlayer(
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val mediaSessionManager = remember {
+        context.getSystemService(Context.MEDIA_SESSION_SERVICE) as? MediaSessionManager
+    }
+
+    val activeSessions = produceState<List<MediaController>>(initialValue = emptyList(), mediaSessionManager) {
+        if (mediaSessionManager == null) return@produceState
+        val listenerComponent = try {
+            ComponentName(context, "com.android.systemui.statusbar.NotificationListenerWithPlugins")
+        } catch (_: Throwable) {
+            null
+        }
+
+        fun getSessions(): List<MediaController> {
+            return try {
+                mediaSessionManager.getActiveSessions(listenerComponent)
+            } catch (_: Exception) {
+                try {
+                    mediaSessionManager.getActiveSessions(null)
+                } catch (_: Exception) {
+                    emptyList()
+                }
+            }
+        }
+
+        value = getSessions()
+
+        val listener = MediaSessionManager.OnActiveSessionsChangedListener { controllers ->
+            value = controllers ?: emptyList()
+        }
+        try {
+            mediaSessionManager.addOnActiveSessionsChangedListener(listener, listenerComponent)
+        } catch (_: Exception) {
+            try {
+                mediaSessionManager.addOnActiveSessionsChangedListener(listener, null)
+            } catch (_: Exception) {}
+        }
+
+        awaitDispose {
+            try {
+                mediaSessionManager.removeOnActiveSessionsChangedListener(listener)
+            } catch (_: Exception) {}
+        }
+    }.value
+
+    val activeController = activeSessions.firstOrNull() ?: return
+    var metadata by remember(activeController) { mutableStateOf(activeController.metadata) }
+    var playbackState by remember(activeController) { mutableStateOf(activeController.playbackState) }
+
+    DisposableEffect(activeController) {
+        val callback = object : MediaController.Callback() {
+            override fun onPlaybackStateChanged(state: PlaybackState?) {
+                playbackState = state
+            }
+            override fun onMetadataChanged(meta: MediaMetadata?) {
+                metadata = meta
+            }
+        }
+        activeController.registerCallback(callback)
+        metadata = activeController.metadata
+        playbackState = activeController.playbackState
+        onDispose {
+            try {
+                activeController.unregisterCallback(callback)
+            } catch (_: Exception) {}
+        }
+    }
+
+    val title = metadata?.getString(MediaMetadata.METADATA_KEY_TITLE)
+        ?: metadata?.getString(MediaMetadata.METADATA_KEY_DISPLAY_TITLE)
+        ?: "Media"
+    val artist = metadata?.getString(MediaMetadata.METADATA_KEY_ARTIST)
+        ?: metadata?.getString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST)
+        ?: metadata?.getString(MediaMetadata.METADATA_KEY_AUTHOR)
+        ?: ""
+
+    val durationMs = (metadata?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: 0L).coerceAtLeast(0L)
+
+    var currentPositionMs by remember(playbackState) {
+        mutableLongStateOf(playbackState?.position ?: 0L)
+    }
+
+    val isPlaying = playbackState?.state == PlaybackState.STATE_PLAYING
+
+    LaunchedEffect(playbackState?.state, playbackState?.position, isPlaying) {
+        if (isPlaying) {
+            val basePos = playbackState?.position ?: 0L
+            val lastUpdate = playbackState?.lastPositionUpdateTime ?: SystemClock.elapsedRealtime()
+            val speed = playbackState?.playbackSpeed ?: 1f
+            while (true) {
+                val elapsed = ((SystemClock.elapsedRealtime() - lastUpdate) * speed).toLong()
+                currentPositionMs = (basePos + elapsed).coerceIn(0L, if (durationMs > 0) durationMs else Long.MAX_VALUE)
+                delay(500)
+            }
+        } else {
+            currentPositionMs = playbackState?.position ?: 0L
+        }
+    }
+
+    val artworkBitmap = remember(metadata) {
+        metadata?.getBitmap(MediaMetadata.METADATA_KEY_ART)
+            ?: metadata?.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
+    }
+
+    val appIcon = remember(activeController.packageName) {
+        try {
+            val d = context.packageManager.getApplicationIcon(activeController.packageName)
+            drawableToBitmap(d)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    val progressFraction = if (durationMs > 0L) {
+        (currentPositionMs.toFloat() / durationMs.toFloat()).coerceIn(0f, 1f)
+    } else {
+        0f
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(130.dp)
+            .clip(RoundedCornerShape(26.dp))
+            .background(Color(0x3514171E))
+            .border(1.dp, Color(0x2EFFFFFF), RoundedCornerShape(26.dp))
+    ) {
+        // 1. Album art background or smoky glass gradient
+        if (artworkBitmap != null) {
+            Image(
+                bitmap = artworkBitmap.asImageBitmap(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            // Dark glass scrim overlay so text & controls pop
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(Color(0x9905070A), Color(0xCC05070A))
+                        )
+                    )
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.linearGradient(
+                            listOf(Color(0x551E222D), Color(0x4012151D))
+                        )
+                    )
+            )
+        }
+
+        // 2. Card Content
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            // TOP ROW: "This phone" chip | App icon + Title • Artist | Output Switcher
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f, fill = false).padding(end = 8.dp)
+                ) {
+                    // Device chip
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Color(0x38FFFFFF))
+                            .clickable {
+                                try {
+                                    val intent = Intent("com.android.systemui.action.LAUNCH_MEDIA_OUTPUT_DIALOG").apply {
+                                        putExtra("package_name", activeController.packageName)
+                                    }
+                                    context.sendBroadcast(intent)
+                                } catch (_: Exception) {}
+                            }
+                            .padding(horizontal = 7.dp, vertical = 3.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = "This phone",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White,
+                        )
+                    }
+
+                    Spacer(Modifier.width(8.dp))
+
+                    // App icon
+                    if (appIcon != null) {
+                        Image(
+                            bitmap = appIcon.asImageBitmap(),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(14.dp)
+                                .clip(RoundedCornerShape(3.dp)),
+                        )
+                        Spacer(Modifier.width(6.dp))
+                    }
+
+                    // Title • Artist
+                    val displaySubtitle = if (artist.isNotBlank()) "$title • $artist" else title
+                    Text(
+                        text = displaySubtitle,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.White,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+
+                // Output switcher circular button
+                Box(
+                    modifier = Modifier
+                        .size(26.dp)
+                        .clip(CircleShape)
+                        .background(Color(0x28FFFFFF))
+                        .clickable {
+                            try {
+                                val intent = Intent("com.android.systemui.action.LAUNCH_MEDIA_OUTPUT_DIALOG").apply {
+                                    putExtra("package_name", activeController.packageName)
+                                }
+                                context.sendBroadcast(intent)
+                            } catch (_: Exception) {}
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_speaker_on),
+                        contentDescription = "Output switcher",
+                        modifier = Modifier.size(15.dp),
+                        tint = Color.White,
+                    )
+                }
+            }
+
+            // MIDDLE ROW: Wave Seekbar
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = formatMediaTime(currentPositionMs),
+                    fontSize = 10.sp,
+                    color = Color(0xCCFFFFFF),
+                    modifier = Modifier.width(34.dp),
+                )
+
+                OneUIWaveSeekbar(
+                    progressFraction = progressFraction,
+                    onSeek = { frac ->
+                        if (durationMs > 0L) {
+                            val targetMs = (frac * durationMs).toLong()
+                            activeController.transportControls.seekTo(targetMs)
+                        }
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 4.dp),
+                )
+
+                Text(
+                    text = if (durationMs > 0L) formatMediaTime(durationMs) else "--:--",
+                    fontSize = 10.sp,
+                    color = Color(0xCCFFFFFF),
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.width(34.dp),
+                )
+            }
+
+            // BOTTOM ROW: Shuffle | Prev | Play/Pause | Next | Check
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                // Shuffle button
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .clickable {
+                            try {
+                                activeController.transportControls.setShuffleMode(
+                                    PlaybackState.SHUFFLE_MODE_ALL
+                                )
+                            } catch (_: Exception) {}
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_oneui_media_shuffle),
+                        contentDescription = "Shuffle",
+                        modifier = Modifier.size(18.dp),
+                        tint = Color(0xCCFFFFFF),
+                    )
+                }
+
+                // Center group: Prev, Play/Pause, Next
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    // Previous
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(CircleShape)
+                            .clickable {
+                                try {
+                                    activeController.transportControls.skipToPrevious()
+                                } catch (_: Exception) {}
+                            },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_media_prev),
+                            contentDescription = "Previous",
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.White,
+                        )
+                    }
+
+                    // Play / Pause (Frosted Glass Circle)
+                    Box(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(CircleShape)
+                            .background(Color(0x38FFFFFF))
+                            .border(1.dp, Color(0x2BFFFFFF), CircleShape)
+                            .clickable {
+                                try {
+                                    if (isPlaying) {
+                                        activeController.transportControls.pause()
+                                    } else {
+                                        activeController.transportControls.play()
+                                    }
+                                } catch (_: Exception) {}
+                            },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                if (isPlaying) R.drawable.ic_oneui_media_pause else R.drawable.ic_oneui_media_play
+                            ),
+                            contentDescription = if (isPlaying) "Pause" else "Play",
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.White,
+                        )
+                    }
+
+                    // Next
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(CircleShape)
+                            .clickable {
+                                try {
+                                    activeController.transportControls.skipToNext()
+                                } catch (_: Exception) {}
+                            },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_media_next),
+                            contentDescription = "Next",
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.White,
+                        )
+                    }
+                }
+
+                // Check / Favorite Button
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .clickable {
+                            // Favorite
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_oneui_media_check),
+                        contentDescription = "Favorite",
+                        modifier = Modifier.size(19.dp),
+                        tint = Color(0xCCFFFFFF),
+                    )
+                }
+            }
+        }
+    }
+}
+
 
 /** One UI Edit Mode for Quick Settings Tiles */
 @Composable
