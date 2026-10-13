@@ -6,10 +6,8 @@
 
 ramExpansion=`getprop persist.vendor.ram_expansion`
 if [ -z "$ramExpansion" ]; then
-    ramExpansion=`getprop vendor.ram_expansion`
-fi
-if [ -z "$ramExpansion" ]; then
-    ramExpansion=`getprop persist.sys.ram_expansion 2>/dev/null`
+    # Default: 4GB expansion
+    ramExpansion="4"
 fi
 
 if [ "$ramExpansion" = "0" ] || [ "$ramExpansion" = "off" ]; then

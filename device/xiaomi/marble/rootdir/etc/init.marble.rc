@@ -106,27 +106,17 @@ on post-fs-data
     mkdir /mnt/vendor/persist/fpc 0770 system system
     mkdir /mnt/vendor/persist/goodix 0770 system system
 
-on boot
-    setprop persist.vendor.ram_expansion ${persist.sys.ram_expansion}
-    setprop vendor.ram_expansion ${persist.sys.ram_expansion}
-
-on post-fs-data
-    setprop persist.vendor.ram_expansion ${persist.sys.ram_expansion}
-    setprop vendor.ram_expansion ${persist.sys.ram_expansion}
-
 on property:sys.boot_completed=1
     # Set thermal mode to mgame
     write /sys/devices/virtual/thermal/thermal_message/sconfig 20
-    setprop persist.vendor.ram_expansion ${persist.sys.ram_expansion}
-    setprop vendor.ram_expansion ${persist.sys.ram_expansion}
-    start vendor.ram_expansion
-
-on property:persist.sys.ram_expansion=*
-    setprop persist.vendor.ram_expansion ${persist.sys.ram_expansion}
-    setprop vendor.ram_expansion ${persist.sys.ram_expansion}
+    # Apply RAM expansion on boot
+    stop vendor.ram_expansion
     start vendor.ram_expansion
 
 on property:persist.vendor.ram_expansion=*
+    # Re-apply ZRAM whenever vendor property changes
+    # Must stop first because oneshot services won't restart otherwise
+    stop vendor.ram_expansion
     start vendor.ram_expansion
 
 service vendor.ram_expansion /vendor/bin/ram_expansion.sh
