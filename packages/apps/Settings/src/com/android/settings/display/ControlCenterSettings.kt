@@ -25,7 +25,8 @@ import com.android.settings.R
 import com.android.settings.dashboard.DashboardFragment
 import com.android.settingslib.widget.LayoutPreference
 
-import com.google.android.material.materialswitch.MaterialSwitch
+import android.util.Log
+import android.widget.CompoundButton
 
 class ControlCenterSettings : DashboardFragment() {
 
@@ -71,14 +72,18 @@ class ControlCenterSettings : DashboardFragment() {
         }
 
         // Dynamic Island Charging (Experimental) Switch
-        val islandSwitch = pref.findViewById<MaterialSwitch>(R.id.cc_dynamic_island_switch)
-        val isIslandEnabled = Settings.System.getInt(ctx.contentResolver, "dynamic_island_charging", 0) == 1
-        islandSwitch?.isChecked = isIslandEnabled
-        islandSwitch?.setOnCheckedChangeListener { _, isChecked ->
-            Settings.System.putInt(ctx.contentResolver, "dynamic_island_charging", if (isChecked) 1 else 0)
-        }
-        pref.findViewById<View>(R.id.cc_dynamic_island_card)?.setOnClickListener {
-            islandSwitch?.toggle()
+        try {
+            val islandSwitch = pref.findViewById<CompoundButton>(R.id.cc_dynamic_island_switch)
+            val isIslandEnabled = Settings.System.getInt(ctx.contentResolver, "dynamic_island_charging", 0) == 1
+            islandSwitch?.isChecked = isIslandEnabled
+            islandSwitch?.setOnCheckedChangeListener { _, isChecked ->
+                Settings.System.putInt(ctx.contentResolver, "dynamic_island_charging", if (isChecked) 1 else 0)
+            }
+            pref.findViewById<View>(R.id.cc_dynamic_island_card)?.setOnClickListener {
+                islandSwitch?.toggle()
+            }
+        } catch (t: Throwable) {
+            Log.e("ControlCenterSettings", "Error initializing dynamic island switch", t)
         }
     }
 

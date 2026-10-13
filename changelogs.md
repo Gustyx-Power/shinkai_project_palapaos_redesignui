@@ -421,3 +421,21 @@ During testing and review sessions, several core interface discrepancies and sub
   * Added `Settings.Global.DEVICE_PROVISIONED` check so Dynamic Island remains strictly dormant during Setup Wizard (OOBE).
   * Changed default setting to `0` (opt-in experimental feature via Control Center settings).
   * Wrapped all lifecycle callbacks (`onFinishInflate`, `onAttachedToWindow`, `onDetachedFromWindow`, `triggerChargingIsland`, `dismissIsland`, `onReceive`) and `Settings.System.getInt` calls in `ShadeHeaderController.kt` in comprehensive `try-catch` blocks to ensure SystemUI can never crash under any circumstances.
+
+---
+
+## Section XII: Control Center Settings Crash Fix (NullPointerException in SwitchCompat.makeLayout)
+
+### 1. Requirements & Overview
+- **Issue Diagnosis**: Opening **Pusat kontrol** (Control Center) in Settings resulted in an immediate crash:
+  ```
+  java.lang.NullPointerException: Attempt to invoke interface method 'int java.lang.CharSequence.length()' on a null object reference
+      at android.text.StaticLayout.<init>(StaticLayout.java:654)
+      at androidx.appcompat.widget.SwitchCompat.makeLayout(SwitchCompat.java:986)
+      at androidx.appcompat.widget.SwitchCompat.onMeasure(SwitchCompat.java:907)
+  ```
+- **Root Cause**: In `control_center_layout.xml`, `MaterialSwitch` extends `androidx.appcompat.widget.SwitchCompat`. During layout measurement (`onMeasure`), when `mShowText` is active or inherited from the theme and `textOn`/`textOff` are null, `SwitchCompat.makeLayout` passes `null` to `StaticLayout`, throwing a `NullPointerException` on `CharSequence.length()`.
+- **Resolution**:
+  * Replaced `MaterialSwitch` in `control_center_layout.xml` with native platform `Switch` (`android.widget.Switch`) with explicit `android:showText="false"`, `android:textOn=""`, and `android:textOff=""`.
+  * Updated `ControlCenterSettings.kt` to bind to `android.widget.CompoundButton`, which works universally for all switch components.
+  * Wrapped the entire Dynamic Island switch binding in `ControlCenterSettings.kt` inside a `try-catch` block for guaranteed resilience.

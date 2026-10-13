@@ -278,11 +278,14 @@
                     android:textColor="?android:attr/textColorSecondary" />
             </LinearLayout>
 
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <Switch
                 android:id="@+id/cc_dynamic_island_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp" />
+                android:layout_marginStart="12dp"
+                android:showText="false"
+                android:textOn=""
+                android:textOff="" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
