@@ -541,7 +541,11 @@ constructor(
     }
 
     private fun updateCarrierGroupPadding() {
-        val isOneUi = android.provider.Settings.System.getInt(header.context.contentResolver, "qs_oneui_style", 0) == 1
+        val isOneUi = try {
+            android.provider.Settings.System.getInt(header.context.contentResolver, "qs_oneui_style", 0) == 1
+        } catch (_: Throwable) {
+            false
+        }
         if (isOneUi) {
             mShadeCarrierGroup.setPaddingRelative(0, 0, 0, 0)
             return

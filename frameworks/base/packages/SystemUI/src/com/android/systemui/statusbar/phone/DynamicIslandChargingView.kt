@@ -113,10 +113,6 @@ class DynamicIslandChargingView @JvmOverloads constructor(
 
                         wasPluggedIn = isPluggedIn
                     }
-                    ACTION_TEST_DYNAMIC_ISLAND -> {
-                        val level = intent.getIntExtra("level", if (lastBatteryLevel >= 0) lastBatteryLevel else 29)
-                        triggerChargingIsland(level)
-                    }
                 }
             } catch (t: Throwable) {
                 Log.e(TAG, "Error in batteryReceiver", t)
@@ -148,14 +144,22 @@ class DynamicIslandChargingView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         try {
-            val filter = IntentFilter().apply {
-                addAction(Intent.ACTION_BATTERY_CHANGED)
-                addAction(ACTION_TEST_DYNAMIC_ISLAND)
+            // Safeguard: strictly dormant during Setup Wizard (OOBE) before device is provisioned
+            val isProvisioned = try {
+                Settings.Global.getInt(context.contentResolver, Settings.Global.DEVICE_PROVISIONED, 0) == 1
+            } catch (_: Throwable) {
+                false
             }
+            if (!isProvisioned) {
+                visibility = View.GONE
+                return
+            }
+
+            val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
             val stickyIntent = context.registerReceiver(
                 batteryReceiver,
                 filter,
-                Context.RECEIVER_EXPORTED
+                Context.RECEIVER_NOT_EXPORTED
             )
             isReceiverRegistered = true
 

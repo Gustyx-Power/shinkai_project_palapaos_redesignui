@@ -439,3 +439,24 @@ During testing and review sessions, several core interface discrepancies and sub
   * Replaced `MaterialSwitch` in `control_center_layout.xml` with native platform `Switch` (`android.widget.Switch`) with explicit `android:showText="false"`, `android:textOn=""`, and `android:textOff=""`.
   * Updated `ControlCenterSettings.kt` to bind to `android.widget.CompoundButton`, which works universally for all switch components.
   * Wrapped the entire Dynamic Island switch binding in `ControlCenterSettings.kt` inside a `try-catch` block for guaranteed resilience.
+
+---
+
+## Section XIII: Definitive SystemUI Setup Wizard Crash Loop & Receiver Isolation Fix
+
+### 1. Requirements & Overview
+- **Issue Diagnosis**: DropBox crash logs (`system_app_crash`) revealed that SystemUI was crash-looping with:
+  ```
+  java.lang.SecurityException: com.android.systemui: One of RECEIVER_EXPORTED or RECEIVER_NOT_EXPORTED should be specified when a receiver isn't being registered exclusively for system broadcasts
+      at android.app.ContextWrapper.registerReceiver(ContextWrapper.java:793)
+      at com.android.systemui.statusbar.phone.DynamicIslandChargingView.onAttachedToWindow
+  ```
+- **Root Cause**:
+  * In `DynamicIslandChargingView.kt`, the receiver was registered inside `onAttachedToWindow()` without checking whether the device was provisioned (`DEVICE_PROVISIONED == 1`).
+  * The `IntentFilter` previously registered for both `Intent.ACTION_BATTERY_CHANGED` (protected system broadcast) and `ACTION_TEST_DYNAMIC_ISLAND` (custom non-protected broadcast). On Android 14+, mixing protected and non-protected actions causes `BroadcastController` to enforce explicit export flags and throw `SecurityException`.
+  * In `ShadeHeaderController.kt`, `updateCarrierGroupPadding()` was calling `Settings.System.getInt("qs_oneui_style")` without a `try-catch` guard.
+  * In `OneUIQuickSettingsLayout.kt`, `rememberIsOneUiStyle()` was reading `Settings.System.getInt` directly during Compose initialization without early boot fault tolerance.
+- **Resolution**:
+  * In `DynamicIslandChargingView.kt`, added an immediate guard at the beginning of `onAttachedToWindow()`: if `DEVICE_PROVISIONED != 1`, set `visibility = View.GONE` and return immediately without registering any receiver or touching the window.
+  * Stripped `ACTION_TEST_DYNAMIC_ISLAND` from `batteryReceiver` so the receiver listens strictly to `Intent.ACTION_BATTERY_CHANGED` using `Context.RECEIVER_NOT_EXPORTED`.
+  * Wrapped `Settings.System.getInt` in `ShadeHeaderController.kt:updateCarrierGroupPadding()` and `OneUIQuickSettingsLayout.kt` inside `try-catch` blocks.

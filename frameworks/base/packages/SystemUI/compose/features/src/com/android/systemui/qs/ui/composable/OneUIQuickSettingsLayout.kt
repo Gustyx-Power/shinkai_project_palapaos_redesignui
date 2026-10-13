@@ -162,20 +162,32 @@ object OneUIElements {
 fun rememberIsOneUiStyle(): State<Boolean> {
     val context = LocalContext.current
     return produceState(
-        initialValue = Settings.System.getInt(context.contentResolver, "qs_oneui_style", 0) == 1,
+        initialValue = try {
+            Settings.System.getInt(context.contentResolver, "qs_oneui_style", 0) == 1
+        } catch (_: Throwable) {
+            false
+        },
         context
     ) {
-        val resolver = context.contentResolver
-        val uri = Settings.System.getUriFor("qs_oneui_style")
-        val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
-            override fun onChange(selfChange: Boolean) {
-                value = Settings.System.getInt(resolver, "qs_oneui_style", 0) == 1
+        try {
+            val resolver = context.contentResolver
+            val uri = Settings.System.getUriFor("qs_oneui_style")
+            val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
+                override fun onChange(selfChange: Boolean) {
+                    value = try {
+                        Settings.System.getInt(resolver, "qs_oneui_style", 0) == 1
+                    } catch (_: Throwable) {
+                        false
+                    }
+                }
             }
-        }
-        resolver.registerContentObserver(uri, false, observer)
-        awaitDispose {
-            resolver.unregisterContentObserver(observer)
-        }
+            resolver.registerContentObserver(uri, false, observer)
+            awaitDispose {
+                try {
+                    resolver.unregisterContentObserver(observer)
+                } catch (_: Throwable) {}
+            }
+        } catch (_: Throwable) {}
     }
 }
 
@@ -186,22 +198,30 @@ fun rememberPillTileSpecs(): State<Set<String>> {
         initialValue = getPillTileSpecs(context),
         context
     ) {
-        val resolver = context.contentResolver
-        val uri = Settings.System.getUriFor("qs_oneui_pill_tiles")
-        val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
-            override fun onChange(selfChange: Boolean) {
-                value = getPillTileSpecs(context)
+        try {
+            val resolver = context.contentResolver
+            val uri = Settings.System.getUriFor("qs_oneui_pill_tiles")
+            val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
+                override fun onChange(selfChange: Boolean) {
+                    value = getPillTileSpecs(context)
+                }
             }
-        }
-        resolver.registerContentObserver(uri, false, observer)
-        awaitDispose {
-            resolver.unregisterContentObserver(observer)
-        }
+            resolver.registerContentObserver(uri, false, observer)
+            awaitDispose {
+                try {
+                    resolver.unregisterContentObserver(observer)
+                } catch (_: Throwable) {}
+            }
+        } catch (_: Throwable) {}
     }
 }
 
 fun getPillTileSpecs(context: Context): Set<String> {
-    val raw = Settings.System.getString(context.contentResolver, "qs_oneui_pill_tiles")
+    val raw = try {
+        Settings.System.getString(context.contentResolver, "qs_oneui_pill_tiles")
+    } catch (_: Throwable) {
+        null
+    }
     return if (raw != null) {
         raw.split(",").map { it.trim() }.filter { it.isNotEmpty() }.toSet()
     } else {
