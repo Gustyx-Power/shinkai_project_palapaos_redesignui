@@ -506,6 +506,23 @@ constructor(
         constraintSet.setAlpha(R.id.clock, 0f)
         constraintSet.setVisibility(R.id.carrier_group, View.GONE)
         constraintSet.setAlpha(R.id.carrier_group, 0f)
+
+        // Lock system icons to top status bar guideline so battery/wifi/signal never get clipped or drowned
+        constraintSet.clear(R.id.shade_header_system_icons, ConstraintSet.TOP)
+        constraintSet.clear(R.id.shade_header_system_icons, ConstraintSet.BOTTOM)
+        constraintSet.clear(R.id.shade_header_system_icons, ConstraintSet.START)
+        constraintSet.clear(R.id.shade_header_system_icons, ConstraintSet.END)
+        constraintSet.connect(R.id.shade_header_system_icons, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
+        constraintSet.connect(R.id.shade_header_system_icons, ConstraintSet.BOTTOM, R.id.qqs_header_bottom_guideline, ConstraintSet.BOTTOM)
+        constraintSet.connect(R.id.shade_header_system_icons, ConstraintSet.END, R.id.end_guide, ConstraintSet.END)
+        constraintSet.constrainWidth(R.id.shade_header_system_icons, ConstraintSet.WRAP_CONTENT)
+
+        constraintSet.clear(R.id.privacy_container, ConstraintSet.TOP)
+        constraintSet.clear(R.id.privacy_container, ConstraintSet.BOTTOM)
+        constraintSet.clear(R.id.privacy_container, ConstraintSet.END)
+        constraintSet.connect(R.id.privacy_container, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
+        constraintSet.connect(R.id.privacy_container, ConstraintSet.BOTTOM, R.id.qqs_header_bottom_guideline, ConstraintSet.BOTTOM)
+        constraintSet.connect(R.id.privacy_container, ConstraintSet.END, R.id.end_guide, ConstraintSet.END)
     }
 
     private fun updateColors() {
@@ -639,11 +656,9 @@ constructor(
     private fun updatePosition() {
         if (!largeScreenActive && visible) {
             logInstantEvent("updatePosition: $qsExpandedFraction")
-            header.progress = qsExpandedFraction
-            updateBatteryMode()
-
             val isOneUi = android.provider.Settings.System.getInt(header.context.contentResolver, "qs_oneui_style", 0) == 1
             if (isOneUi) {
+                header.progress = 0f
                 clock.alpha = 0f
                 date.alpha = 0f
                 clock.visibility = View.GONE
@@ -652,10 +667,12 @@ constructor(
                 mShadeCarrierGroup.visibility = View.GONE
                 showBatteryEstimate.value = false
             } else {
+                header.progress = qsExpandedFraction
                 clock.visibility = View.VISIBLE
                 date.visibility = View.VISIBLE
                 mShadeCarrierGroup.visibility = View.VISIBLE
             }
+            updateBatteryMode()
         }
     }
 
