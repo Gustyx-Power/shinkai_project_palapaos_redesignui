@@ -2,6 +2,5 @@ allow system_app hal_mlipay_hwservice:hwservice_manager find;
 
 binder_call(system_app, hal_mlipay_default)
 
-# Allow Settings app to read/write RAM expansion property
+# Allow Settings app to read RAM expansion property
 get_prop(system_app, vendor_ram_expansion_prop)
-set_prop(system_app, vendor_ram_expansion_prop)

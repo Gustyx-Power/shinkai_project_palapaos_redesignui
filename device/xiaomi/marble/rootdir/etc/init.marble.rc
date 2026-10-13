@@ -110,6 +110,13 @@ on property:sys.boot_completed=1
     # Set thermal mode to mgame
     write /sys/devices/virtual/thermal/thermal_message/sconfig 20
     # Apply RAM expansion on boot
+    setprop persist.vendor.ram_expansion ${persist.sys.ram_expansion}
+    stop vendor.ram_expansion
+    start vendor.ram_expansion
+
+on property:persist.sys.ram_expansion=*
+    # Relay system property to vendor property via init (PID 1)
+    setprop persist.vendor.ram_expansion ${persist.sys.ram_expansion}
     stop vendor.ram_expansion
     start vendor.ram_expansion
 

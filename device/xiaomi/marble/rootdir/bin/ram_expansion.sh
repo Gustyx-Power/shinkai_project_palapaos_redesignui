@@ -28,10 +28,8 @@ else
 fi
 
 # 1. Swapoff zram0 if active
-if grep -q zram0 /proc/swaps 2>/dev/null; then
-    swapoff /dev/block/zram0 2>/dev/null
-    sleep 1
-fi
+swapoff /dev/block/zram0 2>/dev/null
+sleep 1
 
 # 2. If target is off (0), reset and set swappiness to 0
 if [ "$zRamSizeMB" -eq 0 ]; then

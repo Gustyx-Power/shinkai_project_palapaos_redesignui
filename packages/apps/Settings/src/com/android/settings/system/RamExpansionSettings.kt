@@ -69,7 +69,7 @@ class RamExpansionSettings : DashboardFragment() {
 
     private fun setupUI() {
         val pref = findPreference<LayoutPreference>("ram_expansion_card") ?: return
-        val currentExpansion = SystemProperties.getInt("persist.vendor.ram_expansion", 4)
+        val currentExpansion = SystemProperties.getInt("persist.sys.ram_expansion", 4)
         val physicalRam = getPhysicalRamGb()
 
         updateStats(pref, physicalRam, currentExpansion)
@@ -85,10 +85,8 @@ class RamExpansionSettings : DashboardFragment() {
 
         for ((rowId, value) in options) {
             pref.findViewById<View>(rowId)?.setOnClickListener {
-                if (SystemProperties.getInt("persist.vendor.ram_expansion", 4) != value) {
-                    // Write to vendor property - vendor_init can read this and
-                    // the property trigger will auto-restart the ZRAM service
-                    SystemProperties.set("persist.vendor.ram_expansion", value.toString())
+                if (SystemProperties.getInt("persist.sys.ram_expansion", 4) != value) {
+                    SystemProperties.set("persist.sys.ram_expansion", value.toString())
                     updateStats(pref, physicalRam, value)
                     updateRadioSelection(pref, value)
                     showRebootDialog()

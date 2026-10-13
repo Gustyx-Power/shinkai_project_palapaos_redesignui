@@ -28,7 +28,7 @@ class RamExpansionPreferenceController(context: Context, key: String) :
     override fun getAvailabilityStatus(): Int = AVAILABLE
 
     override fun getSummary(): CharSequence {
-        val expansionVal = SystemProperties.getInt("persist.vendor.ram_expansion", 4)
+        val expansionVal = SystemProperties.getInt("persist.sys.ram_expansion", 4)
         return if (expansionVal <= 0) {
             mContext.getString(R.string.ram_expansion_status_off)
         } else {
