@@ -44,13 +44,14 @@ class ControlCenterSettings : DashboardFragment() {
         val isOneUi = Settings.System.getInt(ctx.contentResolver, OneUIQSStylePreferenceController.SETTING_KEY, 0) == 1
 
         updateSelection(pref, isOneUi)
+        updateRestartCardVisibility(pref, isChanged = false)
 
         pref.findViewById<View>(R.id.cc_option_oneui)?.setOnClickListener {
             val current = Settings.System.getInt(ctx.contentResolver, OneUIQSStylePreferenceController.SETTING_KEY, 0) == 1
             if (!current) {
                 Settings.System.putInt(ctx.contentResolver, OneUIQSStylePreferenceController.SETTING_KEY, 1)
                 updateSelection(pref, true)
-                OneUIQSStylePreferenceController.restartSystemUI(ctx)
+                updateRestartCardVisibility(pref, isChanged = true)
             }
         }
 
@@ -59,9 +60,18 @@ class ControlCenterSettings : DashboardFragment() {
             if (current) {
                 Settings.System.putInt(ctx.contentResolver, OneUIQSStylePreferenceController.SETTING_KEY, 0)
                 updateSelection(pref, false)
-                OneUIQSStylePreferenceController.restartSystemUI(ctx)
+                updateRestartCardVisibility(pref, isChanged = true)
             }
         }
+
+        pref.findViewById<View>(R.id.cc_restart_button)?.setOnClickListener {
+            OneUIQSStylePreferenceController.restartSystemUI(ctx)
+        }
+    }
+
+    private fun updateRestartCardVisibility(pref: LayoutPreference, isChanged: Boolean) {
+        val restartCard = pref.findViewById<View>(R.id.cc_restart_card) ?: return
+        restartCard.visibility = if (isChanged) View.VISIBLE else View.GONE
     }
 
     private fun updateSelection(pref: LayoutPreference, isOneUi: Boolean) {

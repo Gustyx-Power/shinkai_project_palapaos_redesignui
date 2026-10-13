@@ -171,6 +171,10 @@
     <string name="control_center_desc_oneui">Tampilkan Pusat kontrol dan Pusat notifikasi secara terpisah. Gesek ke bawah dari kanan atas layar untuk membuka Pusat kontrol.</string>
     <string name="control_center_desc_pixel">Tampilkan Quick Settings dan Pusat notifikasi secara digabung dalam tata letak bawaan Google Pixel.</string>
 
+    <string name="control_center_restart_title">Mulai ulang System UI</string>
+    <string name="control_center_restart_desc">Memulai ulang System UI bersifat opsional namun disarankan agar seluruh perubahan tata letak diterapkan secara sempurna.</string>
+    <string name="control_center_restart_btn">Mulai ulang System UI</string>
+
     <string name="qs_oneui_style_title">Control Center One UI</string>
     <string name="qs_oneui_style_summary">Gunakan tampilan Control Center bergaya One UI 9 dengan kartu dan slider terpisah</string>
 </resources>

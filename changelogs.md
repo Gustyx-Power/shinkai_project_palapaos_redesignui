@@ -355,3 +355,27 @@ During testing and review sessions, several core interface discrepancies and sub
      * Next track: `42.dp` circular frosted glass container (`Color(0x38FFFFFF)` background, `1.dp` border `Color(0x28FFFFFF)`).
      * Spacing tightened to `Arrangement.spacedBy(10.dp)`.
      * Outer auxiliary controls: 36dp shuffle on left and 34dp favorite check on right.
+
+
+---
+
+## Section IX: Dedicated Dynamic "Restart System UI" Action in Control Center Settings
+
+### 1. Requirements & Overview
+- **Eliminated Forceful Auto-Restarts**: Previously, toggling between One UI and Pixel QS styles triggered an immediate SystemUI process kill on click, which caused an abrupt screen flicker.
+- **Dynamic Action Card**: Introduced a dedicated Material 3 action card (`cc_restart_card`) beneath the hero preview card that dynamically appears whenever the user switches between One UI and Pixel QS options.
+- **Clear User Guidance**: Displays an explicit description stating that restarting SystemUI is optional, but recommended for full layout and aesthetic synchronization ("Memulai ulang System UI bersifat opsional namun disarankan agar seluruh perubahan tata letak diterapkan secara sempurna.").
+- **Material 3 Action Button**: Features a prominent styled button ("Restart System UI" / "Mulai ulang System UI") with custom vector icon (`ic_restart_systemui`) allowing the user to trigger the restart at their own discretion.
+
+### 2. Implementation Details
+1. **Frontend Layout (`control_center_layout.xml`)**:
+   - Added `cc_restart_card` (rounded 24dp MaterialCardView, matching hero card surface color).
+   - Contains header icon (`@drawable/ic_restart_systemui`), title (`control_center_restart_title`), descriptive summary (`control_center_restart_desc`), and filled action button (`cc_restart_button`).
+   - Default visibility set to `android:visibility="gone"`.
+2. **Dynamic Flow Controller (`ControlCenterSettings.kt`)**:
+   - On fragment resume, initializes `cc_restart_card` visibility to `View.GONE`.
+   - When tapping either One UI or Pixel option, saves the setting and immediately reveals `cc_restart_card` (`View.VISIBLE`).
+   - Clicking `cc_restart_button` invokes `OneUIQSStylePreferenceController.restartSystemUI(ctx)`.
+3. **Assets & Localization**:
+   - Vector icon: `ic_restart_systemui.xml` (standard Material refresh/restart glyph).
+   - String definitions added in English (`shinkai_strings.xml`) and Indonesian (`values-in/shinkai_strings.xml`).

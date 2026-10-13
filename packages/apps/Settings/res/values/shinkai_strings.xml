@@ -257,6 +257,10 @@
     <string name="control_center_desc_oneui">Display Control Center and Notification Center separately. Swipe down from the top right of the screen to open Control Center.</string>
     <string name="control_center_desc_pixel">Display Quick Settings and Notification Center merged together in the default Google Pixel layout.</string>
 
+    <string name="control_center_restart_title">Restart System UI</string>
+    <string name="control_center_restart_desc">Restarting System UI is optional, but recommended to ensure all layout changes take effect smoothly.</string>
+    <string name="control_center_restart_btn">Restart System UI</string>
+
     <string name="qs_oneui_style_title">One UI Control Center</string>
     <string name="qs_oneui_style_summary">Use One UI 9 style Control Center with segregated cards and sliders</string>
 </resources>
