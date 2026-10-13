@@ -504,10 +504,8 @@ constructor(
         constraintSet.setAlpha(R.id.date, 0f)
         constraintSet.setVisibility(R.id.clock, View.GONE)
         constraintSet.setAlpha(R.id.clock, 0f)
-        constraintSet.clear(R.id.carrier_group, ConstraintSet.START)
-        constraintSet.connect(R.id.carrier_group, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-        constraintSet.setAlpha(R.id.carrier_group, 1f)
-        constraintSet.setVisibility(R.id.carrier_group, View.VISIBLE)
+        constraintSet.setVisibility(R.id.carrier_group, View.GONE)
+        constraintSet.setAlpha(R.id.carrier_group, 0f)
     }
 
     private fun updateColors() {
@@ -650,8 +648,8 @@ constructor(
                 date.alpha = 0f
                 clock.visibility = View.GONE
                 date.visibility = View.GONE
-                mShadeCarrierGroup.alpha = 1f
-                mShadeCarrierGroup.visibility = View.VISIBLE
+                mShadeCarrierGroup.alpha = 0f
+                mShadeCarrierGroup.visibility = View.GONE
                 showBatteryEstimate.value = false
             } else {
                 clock.visibility = View.VISIBLE

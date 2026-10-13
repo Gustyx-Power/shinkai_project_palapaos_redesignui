@@ -128,6 +128,9 @@ import com.android.systemui.res.R
 import com.android.systemui.shade.ui.composable.OverlayShade
 import com.android.systemui.volume.panel.component.volume.slider.ui.viewmodel.AudioStreamSliderViewModel
 import com.android.systemui.volume.panel.component.volume.ui.composable.VolumeSlider
+import android.telephony.SubscriptionInfo
+import android.telephony.SubscriptionManager
+import android.telephony.TelephonyManager
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -205,6 +208,55 @@ fun setTilePillMode(context: Context, spec: String, isPill: Boolean) {
 }
 
 @Composable
+fun rememberCarrierName(): String {
+    val context = LocalContext.current
+    return produceState(initialValue = "", context) {
+        val tm = context.getSystemService(Context.TELEPHONY_SERVICE) as? TelephonyManager
+        val sm = context.getSystemService(SubscriptionManager::class.java)
+
+        fun queryCarrier(): String {
+            try {
+                val subList = sm?.activeSubscriptionInfoList
+                if (!subList.isNullOrEmpty()) {
+                    val names = subList.mapNotNull { it.carrierName?.toString() }
+                        .filter { it.isNotBlank() }
+                    if (names.isNotEmpty()) {
+                        return names.joinToString(" • ")
+                    }
+                }
+                val opName = tm?.networkOperatorName
+                if (!opName.isNullOrBlank()) {
+                    return opName
+                }
+            } catch (_: Exception) {}
+            return ""
+        }
+
+        value = queryCarrier()
+
+        val filter = IntentFilter().apply {
+            addAction(TelephonyManager.ACTION_NETWORK_OPERATOR_CHANGED)
+            addAction("android.telephony.action.SERVICE_PROVIDERS_UPDATED")
+            addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED)
+        }
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(c: Context?, intent: Intent?) {
+                value = queryCarrier()
+            }
+        }
+        try {
+            context.registerReceiver(receiver, filter)
+        } catch (_: Exception) {}
+
+        awaitDispose {
+            try {
+                context.unregisterReceiver(receiver)
+            } catch (_: Exception) {}
+        }
+    }.value
+}
+
+@Composable
 fun ContentScope.OneUIQuickSettingsLayout(
     qsContainerViewModel: QuickSettingsContainerViewModel,
     modifier: Modifier = Modifier,
@@ -220,10 +272,10 @@ fun ContentScope.OneUIQuickSettingsLayout(
     val isDark = isSystemInDarkTheme()
     val context = LocalContext.current
 
-    // One UI Theme Colors
-    val cardBg = if (isDark) Color(0x38FFFFFF) else Color(0x8AFFFFFF)
-    val cardBorder = if (isDark) Color(0x1AFFFFFF) else Color(0x33FFFFFF)
-    val pillInactiveBg = if (isDark) Color(0x2EFFFFFF) else Color(0x18000000)
+    // One UI Theme Colors - Refined Frosted Glass Palette
+    val cardBg = if (isDark) Color(0x3514171E) else Color(0x66FFFFFF)
+    val cardBorder = if (isDark) Color(0x24FFFFFF) else Color(0x24000000)
+    val pillInactiveBg = if (isDark) Color(0x26FFFFFF) else Color(0x14000000)
     val pillActiveBg = if (isDark) Color(0xFFFFFFFF) else Color(0xFF202124)
     val textPrimary = if (isDark) Color(0xFFFFFFFF) else Color(0xFF1E2024)
     val textSecondary = if (isDark) Color(0xB3FFFFFF) else Color(0xFF6B7280)
@@ -511,6 +563,8 @@ private fun OneUIHeaderClockRow(
         SimpleDateFormat("EEE, d MMM", Locale.getDefault()).format(Date(currentTimeMillis))
     }
 
+    val carrierText = rememberCarrierName()
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -518,21 +572,34 @@ private fun OneUIHeaderClockRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(verticalAlignment = Alignment.Bottom) {
-            Text(
-                text = timeFormatted,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = textPrimary,
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(
-                text = dateFormatted,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Normal,
-                color = textSecondary,
-                modifier = Modifier.padding(bottom = 3.dp),
-            )
+        Column(horizontalAlignment = Alignment.Start) {
+            if (carrierText.isNotBlank()) {
+                Text(
+                    text = carrierText,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = textSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(bottom = 2.dp),
+                )
+            }
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(
+                    text = timeFormatted,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = textPrimary,
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = dateFormatted,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = textSecondary,
+                    modifier = Modifier.padding(bottom = 3.dp),
+                )
+            }
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -900,7 +967,7 @@ fun OneUIBrightnessSlider(
 
     val progress = sliderProgress
 
-    val trackBg = if (isDark) Color(0x2EFFFFFF) else Color(0x18000000)
+    val trackBg = if (isDark) Color(0x26FFFFFF) else Color(0x14000000)
     val fillBg = if (isDark) Color(0xFFFFFFFF) else Color(0xFF202124)
 
     BoxWithConstraints(
@@ -1036,7 +1103,7 @@ fun OneUIVolumeSlider(
         }
     }
 
-    val trackBg = if (isDark) Color(0x2EFFFFFF) else Color(0x18000000)
+    val trackBg = if (isDark) Color(0x26FFFFFF) else Color(0x14000000)
     val fillBg = if (isDark) Color(0xFFFFFFFF) else Color(0xFF202124)
 
     BoxWithConstraints(
@@ -1189,7 +1256,7 @@ fun ContentScope.OneUIQuickQuickSettingsLayout(
     modifier: Modifier = Modifier,
 ) {
     val isDark = isSystemInDarkTheme()
-    val pillInactiveBg = if (isDark) Color(0x2EFFFFFF) else Color(0x18000000)
+    val pillInactiveBg = if (isDark) Color(0x26FFFFFF) else Color(0x14000000)
     val pillActiveBg = if (isDark) Color(0xFFFFFFFF) else Color(0xFF202124)
     val activeContentColor = if (isDark) Color(0xFF1E2024) else Color(0xFFFFFFFF)
     val inactiveContentColor = if (isDark) Color(0xFFFFFFFF) else Color(0xFF202124)
@@ -1391,8 +1458,8 @@ fun OneUIEditMode(
 
     val textPrimary = if (isDark) Color(0xFFFFFFFF) else Color(0xFF1E2024)
     val textSecondary = if (isDark) Color(0xB3FFFFFF) else Color(0xFF6B7280)
-    val cardBg = if (isDark) Color(0x38FFFFFF) else Color(0x8AFFFFFF)
-    val cardBorder = if (isDark) Color(0x1AFFFFFF) else Color(0x33FFFFFF)
+    val cardBg = if (isDark) Color(0x3514171E) else Color(0x66FFFFFF)
+    val cardBorder = if (isDark) Color(0x24FFFFFF) else Color(0x24000000)
 
     var isDraggingAny by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
