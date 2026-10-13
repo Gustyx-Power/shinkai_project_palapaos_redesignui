@@ -252,7 +252,7 @@ fun rememberCarrierName(): String {
         value = queryCarrier()
 
         val filter = IntentFilter().apply {
-            addAction(TelephonyManager.ACTION_NETWORK_OPERATOR_CHANGED)
+            addAction("android.intent.action.NETWORK_OPERATOR_CHANGED")
             addAction("android.telephony.action.SERVICE_PROVIDERS_UPDATED")
             addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED)
         }
@@ -1891,8 +1891,9 @@ fun ContentScope.OneUICompactMediaPlayer(
                         .clip(CircleShape)
                         .clickable {
                             try {
-                                activeController.transportControls.setShuffleMode(
-                                    PlaybackState.SHUFFLE_MODE_ALL
+                                activeController.transportControls.sendCustomAction(
+                                    "android.media.action.SHUFFLE",
+                                    null
                                 )
                             } catch (_: Exception) {}
                         },
