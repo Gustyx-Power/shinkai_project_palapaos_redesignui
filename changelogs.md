@@ -460,3 +460,25 @@ During testing and review sessions, several core interface discrepancies and sub
   * In `DynamicIslandChargingView.kt`, added an immediate guard at the beginning of `onAttachedToWindow()`: if `DEVICE_PROVISIONED != 1`, set `visibility = View.GONE` and return immediately without registering any receiver or touching the window.
   * Stripped `ACTION_TEST_DYNAMIC_ISLAND` from `batteryReceiver` so the receiver listens strictly to `Intent.ACTION_BATTERY_CHANGED` using `Context.RECEIVER_NOT_EXPORTED`.
   * Wrapped `Settings.System.getInt` in `ShadeHeaderController.kt:updateCarrierGroupPadding()` and `OneUIQuickSettingsLayout.kt` inside `try-catch` blocks.
+
+---
+
+## Section XIV: Bulletproof "Restart System UI" Implementation from Settings
+
+### 1. Requirements & Overview
+- **Issue Diagnosis**: The "Restart System UI" button in the Control Center subpage (`ControlCenterSettings`) was not successfully restarting SystemUI when clicked, whereas the "Restart System UI" action in the Power Menu (Advanced Reboot) worked properly.
+- **Root Cause**:
+  * The Power Menu executes inside `com.android.systemui` and can directly call `Process.killProcess(Process.myPid())`.
+  * `com.android.settings` runs as an external process and lacks POSIX `CAP_KILL` capabilities to send arbitrary `SIGKILL` to another process directly via `Process.killProcess(proc.pid)`.
+  * Calling `ActivityManager.getService().killApplicationProcess("com.android.systemui", -1)` failed because `-1` did not match SystemUI's actual package UID in `ProcessList`.
+  * In SystemUI, `SysuiRestartReceiver` had `android:exported="false"` and crashed if `intent.getData()` was null.
+- **Resolution**:
+  * In `SysuiRestartReceiver.java`, made `onReceive()` null-safe for `intent.getData()` so that it can be invoked with standard broadcast intents, cleanly triggering `Process.killProcess(Process.myPid())` from within SystemUI.
+  * In SystemUI's `AndroidManifest.xml`, exported `SysuiRestartReceiver` protected by `android.permission.STATUS_BAR_SERVICE`.
+  * In Settings' `AndroidManifest.xml`, added `STATUS_BAR_SERVICE` and `KILL_UID` permissions.
+  * In `OneUIQSStylePreferenceController.java`, implemented a triple-redundant restart pipeline:
+    1. Send `com.android.systemui.action.RESTART` broadcast to `com.android.systemui` as `UserHandle.ALL`.
+    2. Fallback: Call `ActivityManager.getService().killApplicationProcess` using the resolved package UID from `PackageManager`.
+    3. Fallback: Call `ActivityManager.getService().killUid` with `evenPersistent = true`.
+  * In `ControlCenterSettings.kt`, automatically display the "Restart System UI" card when the Dynamic Island toggle is flipped.
+

@@ -78,6 +78,7 @@ class ControlCenterSettings : DashboardFragment() {
             islandSwitch?.isChecked = isIslandEnabled
             islandSwitch?.setOnCheckedChangeListener { _, isChecked ->
                 Settings.System.putInt(ctx.contentResolver, "dynamic_island_charging", if (isChecked) 1 else 0)
+                updateRestartCardVisibility(pref, isChanged = true)
             }
             pref.findViewById<View>(R.id.cc_dynamic_island_card)?.setOnClickListener {
                 islandSwitch?.toggle()

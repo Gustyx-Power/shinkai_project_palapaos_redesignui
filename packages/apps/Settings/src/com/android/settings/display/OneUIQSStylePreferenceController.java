@@ -18,7 +18,10 @@ package com.android.settings.display;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Process;
+import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -53,30 +56,35 @@ public class OneUIQSStylePreferenceController extends TogglePreferenceController
     }
 
     public static void restartSystemUI(Context context) {
+        if (context == null) return;
+
+        // 1. Direct broadcast to SysuiRestartReceiver (triggers Process.killProcess(Process.myPid()) directly inside SystemUI)
         try {
-            ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-            if (am != null) {
-                List<ActivityManager.RunningAppProcessInfo> processes = am.getRunningAppProcesses();
-                if (processes != null) {
-                    for (ActivityManager.RunningAppProcessInfo proc : processes) {
-                        if ("com.android.systemui".equals(proc.processName)) {
-                            Process.killProcess(proc.pid);
-                            break;
-                        }
-                    }
-                }
-            }
+            Intent intent = new Intent("com.android.systemui.action.RESTART");
+            intent.setPackage("com.android.systemui");
+            context.sendBroadcastAsUser(intent, UserHandle.ALL);
         } catch (Throwable t) {
-            Log.e(TAG, "Failed to kill systemui via ActivityManager", t);
+            Log.e(TAG, "Failed to broadcast RESTART to SystemUI", t);
         }
 
+        // 2. Kill persistent process via ActivityManagerService with accurate package UID
         try {
-            ActivityManager.getService().killApplicationProcess("com.android.systemui", -1);
-        } catch (Throwable ignored) {}
+            PackageManager pm = context.getPackageManager();
+            int uid = pm.getPackageUid("com.android.systemui", 0);
+            ActivityManager.getService().killApplicationProcess("com.android.systemui", uid);
+        } catch (Throwable t) {
+            Log.e(TAG, "Failed killApplicationProcess", t);
+        }
 
+        // 3. Official AMS killUid mechanism for persistent packages
         try {
-            Runtime.getRuntime().exec(new String[]{"pkill", "-f", "com.android.systemui"});
-        } catch (Throwable ignored) {}
+            PackageManager pm = context.getPackageManager();
+            int uid = pm.getPackageUid("com.android.systemui", 0);
+            int appId = UserHandle.getAppId(uid);
+            ActivityManager.getService().killUid(appId, UserHandle.USER_SYSTEM, "Restart SystemUI from Settings");
+        } catch (Throwable t) {
+            Log.e(TAG, "Failed killUid", t);
+        }
     }
 
     @Override
