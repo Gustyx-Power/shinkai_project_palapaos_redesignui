@@ -263,3 +263,60 @@ During testing and review sessions, several core interface discrepancies and sub
    - **Seamless SystemUI Refresh**: Tapping either option updates `Settings.System ("qs_oneui_style")` and automatically restarts SystemUI for an instantaneous UI transition.
 3. **Localization**:
    - Comprehensive string resources added to `shinkai_strings.xml` (EN) and `values-in/shinkai_strings.xml` (ID) for native Indonesian and English experiences.
+
+
+---
+
+## Section VII: Redesigned One UI Compact Media Player, Carrier Relocation, & Frosted Glass Refinement
+
+### 1. Requirements & Overview
+- **Refined Frosted Glass Palette**: The initial frosted glass palette in One UI Quick Settings was overly milky-white (22%–54% white opacity), washing out the background and obscuring system wallpaper blurs. Refined to deep translucent smoky glass with luminous rims.
+- **Relocated Carrier Text**: In One UI Control Center mode, the carrier name was awkwardly positioned above the battery indicator inside the status bar header. Moved to the top-left directly above the digital clock in `OneUIHeaderClockRow`.
+- **Compact One UI Media Player Card & QQS Integration**:
+  * Added media player card to QQS (1-pull) positioned directly below the 2x1 pill tiles (Wi-Fi & Bluetooth).
+  * Redesigned the bulky Pixel UMO layout into a compact (~130dp) Samsung One UI-style card featuring album art background, top header row, dynamic cyan wave seekbar/timeline, and bottom playback controls.
+  * Ensured shared-element animated transition between QQS (1-pull) and QS (2-pull) for fluid shade expansion.
+  * Preserved stock Google Pixel QS media player untouched when One UI mode is disabled.
+
+### 2. Implementation Details
+
+1. **Frosted Glass Blur Palette Refinement (`OneUIQuickSettingsLayout.kt`)**:
+   - Replaced flat milky-white containers with deep smoky translucent glass tokens:
+     * Dark Mode: `cardBg = Color(0x3514171E)`, luminous glass border `cardBorder = Color(0x24FFFFFF)`, `pillInactiveBg = Color(0x26FFFFFF)`.
+     * Light Mode: `cardBg = Color(0x66FFFFFF)`, `cardBorder = Color(0x24000000)`, `pillInactiveBg = Color(0x14000000)`.
+   - Updated slider track backgrounds in `OneUIBrightnessSlider` and `OneUIVolumeSlider` to `Color(0x26FFFFFF)` to allow native wallpaper blur to shine through with rich depth and clarity.
+   - Synchronized palette tokens across Quick Settings, QQS, and Tile Edit Mode (`OneUIEditMode`).
+
+2. **Carrier Relocation Above Clock (`ShadeHeaderController.kt` & `OneUIQuickSettingsLayout.kt`)**:
+   - `ShadeHeaderController.kt`: In `applyOneUiConstraints` and `updatePosition`, set `carrier_group` and `mShadeCarrierGroup` to `View.GONE` with `alpha = 0f` when `qs_oneui_style` is active.
+   - `OneUIQuickSettingsLayout.kt`:
+     * Created `rememberCarrierName()` composable observing `TelephonyManager` and `SubscriptionManager` (via `activeSubscriptionInfoList` and broadcast listeners).
+     * Placed `carrierText` in `OneUIHeaderClockRow` in a `Column` directly above the 28sp digital clock time with `12sp, FontWeight.Medium, color = textSecondary`.
+
+3. **Compact One UI Media Player Card (`OneUICompactMediaPlayer`)**:
+   - **Form Factor**: Compact ~130dp height with 26dp rounded corner radius (`RoundedCornerShape(26.dp)`), glass border, and cropped album artwork background with vertical gradient scrim (`Brush.verticalGradient(listOf(Color(0x9905070A), Color(0xCC05070A)))`).
+   - **Top Header Row**:
+     * Left: "This phone" device chip with rounded glass pill (`Color(0x38FFFFFF)`).
+     * Center/Left: Active app icon (via `PackageManager`) + single-line marquee/ellipsis text for `Title • Artist`.
+     * Right: Circular output switcher button (26dp, `ic_speaker_on`) that triggers `com.android.systemui.action.LAUNCH_MEDIA_OUTPUT_DIALOG`.
+   - **Wave Seekbar (`OneUIWaveSeekbar`)**:
+     * Elapsed time on left (`mm:ss`) and duration on right (`mm:ss`).
+     * Liquid cyan wave curve (`Color(0xFF29B6F6)`) along the played track with cubic bezier crests/troughs and gradient fill underneath.
+     * Scrubber thumb at progress position (cyan outer circle with white center dot).
+     * Unplayed track with smooth rounded grey line (`Color(0x40FFFFFF)`).
+     * Interactive drag and tap gestures for seeking via `activeController.transportControls.seekTo()`.
+   - **Bottom Media Controls**:
+     * Shuffle button (`ic_oneui_media_shuffle`).
+     * Previous track button (`ic_media_prev`).
+     * Large circular frosted glass play/pause button (42dp, `ic_oneui_media_play` / `ic_oneui_media_pause`).
+     * Next track button (`ic_media_next`).
+     * Favorite / check button (`ic_oneui_media_check`).
+   - **Transition & QQS Placement**:
+     * In QQS: Placed directly below the 2x1 pills (Wi-Fi & Bluetooth).
+     * In QS: Placed at Card 5 below volume/sound mode sliders.
+     * Both wrapped in `Modifier.element(OneUIElements.MediaPlayer)` in `SceneTransitionLayout` for buttery smooth expansion animations between 1-pull and 2-pull states.
+   - **Vector Assets Added**:
+     * `packages/SystemUI/res/drawable/ic_oneui_media_play.xml`
+     * `packages/SystemUI/res/drawable/ic_oneui_media_pause.xml`
+     * `packages/SystemUI/res/drawable/ic_oneui_media_shuffle.xml`
+     * `packages/SystemUI/res/drawable/ic_oneui_media_check.xml`
