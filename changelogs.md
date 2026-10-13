@@ -320,3 +320,38 @@ During testing and review sessions, several core interface discrepancies and sub
      * `packages/SystemUI/res/drawable/ic_oneui_media_pause.xml`
      * `packages/SystemUI/res/drawable/ic_oneui_media_shuffle.xml`
      * `packages/SystemUI/res/drawable/ic_oneui_media_check.xml`
+
+
+---
+
+## Section VIII: One UI Media Player Geometry Refinement & QS Header Status Icon Clipping Fix
+
+### 1. Requirements & Overview
+- **Centered Track Info**: Previously, `Title • Artist` and app icon were bunched leftward against the "This phone" device chip. Centered directly between the device chip and the audio output switcher.
+- **Circular Frosted Prev & Next Controls**: In One UI, playback controls sit on matching frosted glass circular backings. Added circular frosted backgrounds to both previous and next buttons, enlarged control diameters, and tightened button spacing.
+- **Authentic Liquid Wave Hill Seekbar**: Replaced rapid sinusoidal squiggles with Samsung's signature organic liquid wave hill curve (`Color(0xFF00C7FF)` to `Color(0xFF008FD6)` gradient fill beneath), cyan scrubber thumb with white center dot, and unplayed straight track line (`Color(0x45FFFFFF)`).
+- **Separated Seekbar & Timestamps**: Extracted timestamps into a dedicated row directly below the wave seekbar for maximum horizontal seekbar span and cleaner visual rhythm.
+- **Card Rounded Corners**: Increased media card curvature from 26dp to 32dp (`RoundedCornerShape(32.dp)`), accurately matching Samsung One UI card radius.
+- **Status Bar Icon Drowning / Clipping Fix in Full QS**: In full QS (2-pull), battery, Wi-Fi, and signal icons were getting displaced and clipped out of view at the top of the screen (while appearing normally in QQS). Resolved by re-anchoring constraints to the status bar guideline and locking MotionLayout progress to 0 in One UI mode.
+
+### 2. Implementation Details
+
+1. **SystemUI QS Header Status Bar Clipping Fix (`ShadeHeaderController.kt`)**:
+   - `applyOneUiConstraints`: Cleared conflicting top/bottom/start/end anchors for `R.id.shade_header_system_icons` and `R.id.privacy_container`, reconnecting them directly to `PARENT_ID` top, `R.id.qqs_header_bottom_guideline` bottom, and `R.id.end_guide` end.
+   - `updatePosition`: In One UI mode (`isOneUi == true`), locked `header.progress = 0f` instead of applying `qsExpandedFraction`. This prevents the MotionLayout transition from displacing system icons upwards when pulling down full QS, ensuring battery, Wi-Fi, and cell status remain perfectly positioned at standard status bar height at all times.
+
+2. **One UI Compact Media Player Geometry & Seekbar (`OneUIQuickSettingsLayout.kt`)**:
+   - **Curvature & Dimensions**: Updated media card outer shell to `RoundedCornerShape(32.dp)` with height `138.dp`.
+   - **Centered Header**: Wrapped `"This phone"` on the left, an expanded `Row` with `Modifier.weight(1f)` and `Arrangement.Center` in the middle holding the app icon and `Title • Artist`, and the 28dp circular output switcher on the right.
+   - **Liquid Wave Hill (`OneUIWaveSeekbar`)**:
+     * Implemented smooth cubic bezier crest and valley curve (`cubicTo`) creating the signature organic liquid wave crest spanning the played portion.
+     * Rendered vibrant vertical gradient liquid fill beneath the wave (`Color(0xFF00C7FF)` down to `Color(0xFF008FD6)`).
+     * Rendered unplayed portion as a straight 3.5dp rounded line (`Color(0x45FFFFFF)`).
+     * Rendered 7dp cyan thumb circle with 2.8dp white inner dot at progress position.
+   - **Dedicated Timestamp Row**: Positioned `01:20` and `04:23` timestamps directly beneath the wave seekbar in a separate row with `11.sp` font size and `Arrangement.SpaceBetween`.
+   - **Playback Button Trio**:
+     * Previous track: `42.dp` circular frosted glass container (`Color(0x38FFFFFF)` background, `1.dp` border `Color(0x28FFFFFF)`).
+     * Play/Pause: `50.dp` large circular frosted glass container (`Color(0x48FFFFFF)` background, `1.dp` border `Color(0x35FFFFFF)`).
+     * Next track: `42.dp` circular frosted glass container (`Color(0x38FFFFFF)` background, `1.dp` border `Color(0x28FFFFFF)`).
+     * Spacing tightened to `Arrangement.spacedBy(10.dp)`.
+     * Outer auxiliary controls: 36dp shuffle on left and 34dp favorite check on right.

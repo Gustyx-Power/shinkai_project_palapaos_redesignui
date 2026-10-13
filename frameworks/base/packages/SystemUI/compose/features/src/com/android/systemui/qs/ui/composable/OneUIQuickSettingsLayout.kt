@@ -1487,7 +1487,8 @@ private fun OneUIWaveSeekbar(
 
     Canvas(
         modifier = modifier
-            .height(28.dp)
+            .fillMaxWidth()
+            .height(24.dp)
             .pointerInput(Unit) {
                 detectHorizontalDragGestures(
                     onDragStart = { offset ->
@@ -1519,35 +1520,59 @@ private fun OneUIWaveSeekbar(
         val height = size.height
         val centerY = height / 2f
         val thumbX = width * currentFraction
-        val waveColor = Color(0xFF29B6F6)
-        val unplayedColor = Color(0x40FFFFFF)
+        val waveColor = Color(0xFF00C7FF)
+        val unplayedColor = Color(0x45FFFFFF)
 
-        // 1. Draw unplayed line on right
+        // 1. Draw unplayed straight track line on right
         if (thumbX < width) {
             drawLine(
                 color = unplayedColor,
                 start = Offset(thumbX.coerceAtLeast(0f), centerY),
                 end = Offset(width, centerY),
-                strokeWidth = 3.dp.toPx(),
+                strokeWidth = 3.5.dp.toPx(),
                 cap = StrokeCap.Round,
             )
         }
 
-        // 2. Draw wave on left (played portion)
+        // 2. Draw smooth organic liquid wave on left (played portion)
         if (thumbX > 0f) {
+            val baselineY = centerY + 2.dp.toPx()
             val wavePath = Path()
-            wavePath.moveTo(0f, centerY)
-            val waveLength = 48.dp.toPx()
-            val waveAmplitude = 5.dp.toPx()
-            var x = 0f
-            while (x < thumbX) {
-                val nextX = (x + waveLength / 2f).coerceAtMost(thumbX)
-                val midX = (x + nextX) / 2f
-                val sign = if (((x / waveLength).toInt() % 2) == 0) -1f else 1f
-                val controlY = centerY + (sign * waveAmplitude)
-                wavePath.quadraticBezierTo(midX, controlY, nextX, centerY)
-                x = nextX
+            wavePath.moveTo(0f, baselineY)
+
+            if (thumbX < 30.dp.toPx()) {
+                wavePath.quadraticBezierTo(thumbX * 0.5f, centerY - 4.dp.toPx(), thumbX, centerY)
+            } else {
+                val hillPeakY = centerY - 6.5.dp.toPx()
+                val valleyY = centerY + 1.5.dp.toPx()
+
+                wavePath.cubicTo(
+                    thumbX * 0.15f, hillPeakY,
+                    thumbX * 0.38f, hillPeakY,
+                    thumbX * 0.55f, centerY
+                )
+                wavePath.cubicTo(
+                    thumbX * 0.70f, valleyY,
+                    thumbX * 0.85f, centerY - 2.5.dp.toPx(),
+                    thumbX, centerY
+                )
             }
+
+            // Fill beneath the wave for liquid look
+            val fillPath = Path().apply {
+                addPath(wavePath)
+                lineTo(thumbX, baselineY)
+                lineTo(0f, baselineY)
+                close()
+            }
+            drawPath(
+                path = fillPath,
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color(0xFF00C7FF), Color(0xFF008FD6)),
+                    startY = centerY - 7.dp.toPx(),
+                    endY = baselineY,
+                )
+            )
 
             // Stroke the wave line
             drawPath(
@@ -1555,40 +1580,24 @@ private fun OneUIWaveSeekbar(
                 color = waveColor,
                 style = Stroke(width = 3.5.dp.toPx(), cap = StrokeCap.Round),
             )
-
-            // Fill beneath the wave for liquid look
-            val fillPath = Path().apply {
-                addPath(wavePath)
-                lineTo(thumbX, centerY + 4.dp.toPx())
-                lineTo(0f, centerY + 4.dp.toPx())
-                close()
-            }
-            drawPath(
-                path = fillPath,
-                brush = Brush.verticalGradient(
-                    colors = listOf(waveColor.copy(alpha = 0.6f), waveColor.copy(alpha = 0.15f)),
-                    startY = centerY - waveAmplitude,
-                    endY = centerY + 4.dp.toPx(),
-                )
-            )
         }
 
         // 3. Thumb circle at thumbX
         drawCircle(
             color = waveColor,
-            radius = 6.dp.toPx(),
+            radius = 7.dp.toPx(),
             center = Offset(thumbX.coerceIn(0f, width), centerY),
         )
         drawCircle(
             color = Color.White,
-            radius = 2.5.dp.toPx(),
+            radius = 2.8.dp.toPx(),
             center = Offset(thumbX.coerceIn(0f, width), centerY),
         )
     }
 }
 
 /**
- * Compact One UI Media Player Card (~130dp)
+ * Compact One UI Media Player Card (~138dp)
  * Matches Samsung One UI with album art background, wave seekbar, and quick media controls.
  */
 @Composable
@@ -1717,10 +1726,10 @@ fun ContentScope.OneUICompactMediaPlayer(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(130.dp)
-            .clip(RoundedCornerShape(26.dp))
+            .height(138.dp)
+            .clip(RoundedCornerShape(32.dp))
             .background(Color(0x3514171E))
-            .border(1.dp, Color(0x2EFFFFFF), RoundedCornerShape(26.dp))
+            .border(1.dp, Color(0x2BFFFFFF), RoundedCornerShape(32.dp))
     ) {
         // 1. Album art background or smoky glass gradient
         if (artworkBitmap != null) {
@@ -1736,7 +1745,7 @@ fun ContentScope.OneUICompactMediaPlayer(
                     .fillMaxSize()
                     .background(
                         Brush.verticalGradient(
-                            listOf(Color(0x9905070A), Color(0xCC05070A))
+                            listOf(Color(0x8005070A), Color(0xBB05070A))
                         )
                     )
             )
@@ -1756,75 +1765,74 @@ fun ContentScope.OneUICompactMediaPlayer(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+                .padding(horizontal = 16.dp, vertical = 11.dp),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
-            // TOP ROW: "This phone" chip | App icon + Title • Artist | Output Switcher
+            // TOP ROW: "This phone" chip | App icon + Title • Artist (CENTERED) | Output Switcher
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f, fill = false).padding(end = 8.dp)
+                // Device chip on the far left
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color(0x35FFFFFF))
+                        .clickable {
+                            try {
+                                val intent = Intent("com.android.systemui.action.LAUNCH_MEDIA_OUTPUT_DIALOG").apply {
+                                    putExtra("package_name", activeController.packageName)
+                                }
+                                context.sendBroadcast(intent)
+                            } catch (_: Exception) {}
+                        }
+                        .padding(horizontal = 9.dp, vertical = 3.5.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    // Device chip
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Color(0x38FFFFFF))
-                            .clickable {
-                                try {
-                                    val intent = Intent("com.android.systemui.action.LAUNCH_MEDIA_OUTPUT_DIALOG").apply {
-                                        putExtra("package_name", activeController.packageName)
-                                    }
-                                    context.sendBroadcast(intent)
-                                } catch (_: Exception) {}
-                            }
-                            .padding(horizontal = 7.dp, vertical = 3.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = "This phone",
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color.White,
-                        )
-                    }
+                    Text(
+                        text = "This phone",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White,
+                    )
+                }
 
-                    Spacer(Modifier.width(8.dp))
-
-                    // App icon
+                // App icon + Title • Artist CENTERED in the middle
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                ) {
                     if (appIcon != null) {
                         Image(
                             bitmap = appIcon.asImageBitmap(),
                             contentDescription = null,
                             modifier = Modifier
-                                .size(14.dp)
-                                .clip(RoundedCornerShape(3.dp)),
+                                .size(16.dp)
+                                .clip(RoundedCornerShape(4.dp)),
                         )
                         Spacer(Modifier.width(6.dp))
                     }
 
-                    // Title • Artist
                     val displaySubtitle = if (artist.isNotBlank()) "$title • $artist" else title
                     Text(
                         text = displaySubtitle,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
                         color = Color.White,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
 
-                // Output switcher circular button
+                // Output switcher circular button on the far right
                 Box(
                     modifier = Modifier
-                        .size(26.dp)
+                        .size(28.dp)
                         .clip(CircleShape)
-                        .background(Color(0x28FFFFFF))
+                        .background(Color(0x30FFFFFF))
                         .clickable {
                             try {
                                 val intent = Intent("com.android.systemui.action.LAUNCH_MEDIA_OUTPUT_DIALOG").apply {
@@ -1838,24 +1846,16 @@ fun ContentScope.OneUICompactMediaPlayer(
                     Icon(
                         painter = painterResource(R.drawable.ic_speaker_on),
                         contentDescription = "Output switcher",
-                        modifier = Modifier.size(15.dp),
+                        modifier = Modifier.size(16.dp),
                         tint = Color.White,
                     )
                 }
             }
 
-            // MIDDLE ROW: Wave Seekbar
-            Row(
+            // MIDDLE SECTION: Wave Seekbar + Timestamps Row
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = formatMediaTime(currentPositionMs),
-                    fontSize = 10.sp,
-                    color = Color(0xCCFFFFFF),
-                    modifier = Modifier.width(34.dp),
-                )
-
                 OneUIWaveSeekbar(
                     progressFraction = progressFraction,
                     onSeek = { frac ->
@@ -1864,30 +1864,46 @@ fun ContentScope.OneUICompactMediaPlayer(
                             activeController.transportControls.seekTo(targetMs)
                         }
                     },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp),
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
-                Text(
-                    text = if (durationMs > 0L) formatMediaTime(durationMs) else "--:--",
-                    fontSize = 10.sp,
-                    color = Color(0xCCFFFFFF),
-                    textAlign = TextAlign.End,
-                    modifier = Modifier.width(34.dp),
-                )
+                Spacer(Modifier.height(2.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 2.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = formatMediaTime(currentPositionMs),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color(0xB3FFFFFF),
+                    )
+
+                    Text(
+                        text = if (durationMs > 0L) formatMediaTime(durationMs) else "--:--",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color(0xB3FFFFFF),
+                    )
+                }
             }
 
-            // BOTTOM ROW: Shuffle | Prev | Play/Pause | Next | Check
+            // BOTTOM ROW: Shuffle | Trio (Prev, Play/Pause, Next) | Check
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                // Shuffle button
+                // Shuffle button on far left
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(36.dp)
                         .clip(CircleShape)
                         .clickable {
                             try {
@@ -1902,21 +1918,23 @@ fun ContentScope.OneUICompactMediaPlayer(
                     Icon(
                         painter = painterResource(R.drawable.ic_oneui_media_shuffle),
                         contentDescription = "Shuffle",
-                        modifier = Modifier.size(18.dp),
-                        tint = Color(0xCCFFFFFF),
+                        modifier = Modifier.size(20.dp),
+                        tint = Color(0xDDFFFFFF),
                     )
                 }
 
-                // Center group: Prev, Play/Pause, Next
+                // Center group: Trio of circular buttons (Prev, Play/Pause, Next) - large and close together!
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    // Previous
+                    // Previous (Circular frosted button)
                     Box(
                         modifier = Modifier
-                            .size(32.dp)
+                            .size(42.dp)
                             .clip(CircleShape)
+                            .background(Color(0x38FFFFFF))
+                            .border(1.dp, Color(0x28FFFFFF), CircleShape)
                             .clickable {
                                 try {
                                     activeController.transportControls.skipToPrevious()
@@ -1932,13 +1950,13 @@ fun ContentScope.OneUICompactMediaPlayer(
                         )
                     }
 
-                    // Play / Pause (Frosted Glass Circle)
+                    // Play / Pause (Large circular frosted button)
                     Box(
                         modifier = Modifier
-                            .size(42.dp)
+                            .size(50.dp)
                             .clip(CircleShape)
-                            .background(Color(0x38FFFFFF))
-                            .border(1.dp, Color(0x2BFFFFFF), CircleShape)
+                            .background(Color(0x48FFFFFF))
+                            .border(1.dp, Color(0x35FFFFFF), CircleShape)
                             .clickable {
                                 try {
                                     if (isPlaying) {
@@ -1955,16 +1973,18 @@ fun ContentScope.OneUICompactMediaPlayer(
                                 if (isPlaying) R.drawable.ic_oneui_media_pause else R.drawable.ic_oneui_media_play
                             ),
                             contentDescription = if (isPlaying) "Pause" else "Play",
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(22.dp),
                             tint = Color.White,
                         )
                     }
 
-                    // Next
+                    // Next (Circular frosted button)
                     Box(
                         modifier = Modifier
-                            .size(32.dp)
+                            .size(42.dp)
                             .clip(CircleShape)
+                            .background(Color(0x38FFFFFF))
+                            .border(1.dp, Color(0x28FFFFFF), CircleShape)
                             .clickable {
                                 try {
                                     activeController.transportControls.skipToNext()
@@ -1981,21 +2001,23 @@ fun ContentScope.OneUICompactMediaPlayer(
                     }
                 }
 
-                // Check / Favorite Button
+                // Check / Favorite button on far right
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(34.dp)
                         .clip(CircleShape)
+                        .background(Color(0x38FFFFFF))
+                        .border(1.dp, Color(0x28FFFFFF), CircleShape)
                         .clickable {
-                            // Favorite
+                            // Favorite toggle
                         },
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_oneui_media_check),
                         contentDescription = "Favorite",
-                        modifier = Modifier.size(19.dp),
-                        tint = Color(0xCCFFFFFF),
+                        modifier = Modifier.size(18.dp),
+                        tint = Color.White,
                     )
                 }
             }
