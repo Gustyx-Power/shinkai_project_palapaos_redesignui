@@ -1,12 +1,44 @@
-# System Update Changelog: WowoOS19Jt-BasedShinkaiProject (marble)
+# System Update Changelog: WowoOS Shinkai Project (POCO F5 / marble)
 
-Build Artifact: WowoOS19Jt-BasedShinkaiProject-marble-17.zip  
-Package Size: 2.9 GB  
-Target Device: POCO F5 (marble)  
-Platform Base: Android 17 (CP2A Release Target)  
-Build Status: Completed Successfully (Exit Code 0)  
+Target Perangkat: POCO F5 (marble)  
+Versi Android: Android 17 (CP2A)  
+Ukuran Paket: ~2.9 GB  
+Status Kompilasi: Berhasil Disiapkan (Exit Code 0)  
 
 ---
+
+## Ringkasan Pembaruan (Versi Simpel & Ringkas)
+
+Pembaruan ini membawa perombakan menyeluruh pada antarmuka pengguna (UI Redesign) bergaya One UI 9, penambahan fitur interaktif Dynamic Island, penyempurnaan menu Pengaturan, serta peningkatan performa dan audio:
+
+1. Dynamic Island Interaktif (Punch-Hole POCO F5)
+   - Indikator Pengisian Daya: Menampilkan animasi petir hijau dan persentase baterai selama 7.8 detik saat ponsel dicolokkan ke charger.
+   - Indikator Senter: Kapsul senter tetap aktif selama lampu senter menyala. Ketuk sekali untuk langsung mematikan senter.
+   - Indikator Perekam Layar (Screen Recording): Menampilkan timer digital berjalan dengan lebar kapsul seimbang (~200dp) ala iOS.
+   - Dual-Island (Meta-Ball): Jika perekam layar dan senter menyala bersamaan, perekam layar menjadi pulau utama dan senter menjadi gelembung bundar di sampingnya.
+   - Geser untuk Tukar Posisi: Usap Dynamic Island ke kiri atau kanan untuk menukar posisi antara perekam layar dan senter.
+   - Kartu Kontrol Mengambang (Expanded Island): Ketuk Dynamic Island untuk membuka panel kontrol dengan tombol stop, pause, atau matikan senter.
+
+2. Tampilan Baru Quick Settings (One UI 9 Style)
+   - Tampilan Tarik Satu Kali (QQS): Susunan rapi berisi 6 tombol lingkaran di atas, slider kecerahan tanpa flicker di tengah, dan 2 tombol pill besar (Wi-Fi dan Bluetooth) di bawah.
+   - Tampilan Tarik Penuh (Expanded QS): Dilengkapi kartu kaca buram untuk tombol cepat, slider volume media terintegrasi, pemilih mode suara (Dering, Getar, Hening), serta pintasan daya dan pengaturan.
+   - Mode Edit Bebas 2D: Tahan dan seret tombol ke mana saja (horizontal maupun vertikal) dengan animasi timbul dan tombol Selesai mengambang yang mudah dijangkau satu tangan.
+   - Pemutar Musik Terintegrasi: Menampilkan kontrol musik langsung di panel tanpa merusak tata letak.
+
+3. Penyempurnaan Menu Pengaturan (Settings)
+   - Dashboard Halaman Utama: Kartu status cepat untuk memantau Baterai, Penyimpanan, RAM, Tampilan, dan Suara secara langsung.
+   - Tombol Notifikasi Baru: Panel Aksesibilitas pada dashboard kini digantikan tombol Notifikasi untuk akses cepat. Menu Aksesibilitas tetap tersedia utuh di daftar pengaturan utama.
+   - Colored Notification Icons: Opsi baru pada Pengaturan Notifikasi untuk menampilkan ikon asli aplikasi yang berwarna penuh di status bar dan panel notifikasi, bukan sekadar siluet putih.
+   - Halaman Tentang Ponsel (About Phone): Banner visual Shinkai Project dengan kartu spesifikasi perangkat secara langsung (prosesor, layar, kamera) dan kredit kontributor.
+
+4. Peningkatan Sistem & Performa
+   - Dynamic RAM Expansion (zRAM): Pengaturan zRAM nyata yang terhubung langsung ke kernel Linux (Pilihan: Nonaktif, 2 GB, 4 GB, 8 GB, 16 GB), terbukti aktif di aplikasi monitor sistem.
+   - Hardware Dolby Atmos Asli: Dukungan DSP perangkat keras bawaan dengan aplikasi kontrol MarbleDolby (AutoEQ dan 10-band equalizer) aktif tanpa memerlukan root atau modul KernelSU.
+   - Navigasi Bersih: Opsi untuk menyembunyikan bilah navigasi bawah (navbar pill) dan menghilangkan ruang kosong di bawah keyboard.
+
+---
+
+## Catatan Rinci & Detail Teknis (Engineering Sections)
 
 ## Section I: Meeting Minutes & Executive Summary Version
 
@@ -509,8 +541,8 @@ During testing and review sessions, several core interface discrepancies and sub
      - **Horizontal Swipe Gesture**: Swiping left or right smoothly swaps priorities between the main capsule and the meta-ball with spring animations.
   5. **Interactive Expanded Floating Island Card (Tap to Expand)**:
      - Tapping the compact island capsule springs open a floating expanded card beneath the punch-hole (`WindowManager.LayoutParams.TYPE_STATUS_BAR_SUB_PANEL`).
-     - Screen Recording Expanded: Circular Stop button (⏹️) with red accent, Pause button (⏸️), and large digital clock font for running elapsed time under golden uppercase `SISA WAKTU` / `WAKTU BERJALAN`.
-     - Flashlight Expanded: Circular glowing amber button (🔦) with power icon, status `MENYALA`, and one-tap toggle to extinguish torch.
+     - Screen Recording Expanded: Circular Stop button  with red accent, Pause button , and large digital clock font for running elapsed time under golden uppercase `SISA WAKTU` / `WAKTU BERJALAN`.
+     - Flashlight Expanded: Circular glowing amber button  with power icon, status `MENYALA`, and one-tap toggle to extinguish torch.
      - Outside touch detection (`FLAG_WATCH_OUTSIDE_TOUCH`) cleanly collapses the card back into the compact punch-hole pill.
 
 ### 2. Files Modified & Added
