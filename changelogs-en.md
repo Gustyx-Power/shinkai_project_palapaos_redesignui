@@ -705,3 +705,41 @@ During testing and review sessions, several core interface discrepancies and sub
    - **Recording Interactivity**: Wired pause toggle to freeze/resume elapsed timer progression and bound haptic feedback to all interactive controls.
 
 
+
+---
+
+## Section XXII: Punch-Hole Geometry Clearance, Native Android Recording Chip Suppression, and Screen Record Controls on Expanded Island
+
+### 1. Requirements & Overview
+- **Background & Issues**:
+  1. **Punch-Hole Cutout Camera Obstruction**: On center punch-hole cutout displays (e.g., POCO F5 / `marble`), the compact Dynamic Island capsule for flashlight and screen recording was too narrow. Consequently, the flashlight glyph, "On" status text, pulsing red recording dot, and digital timer were physically obscured by the device front camera cutout.
+  2. **Status Bar Chip Duplication (Native Android Recording Pill)**: When Dynamic Island was recording, the native Android red ongoing recording chip adjacent to the status bar clock also displayed simultaneously, creating distracting visual duplication. The native chip must be suppressed whenever Dynamic Island is enabled and only reappear if Dynamic Island is toggled off by the user.
+  3. **Expanded Island Control Redesign**: The pause feature lacked native support in the AOSP MediaProjection recording pipeline, and secondary decorative buttons lacked functional utility. All controls other than Stop are replaced with 6 native Android screen recording configuration switches: Record device audio, Record microphone, Show touches, Lower quality (SD), Larger file size limit, and HEVC encoding (which defaults to ON and operates functionally). The Stop button remains accessible and fully functional.
+
+### 2. Implementation Details
+1. **Capsule Expansion & Camera Punch-Hole Clearance (`dynamic_island_charging.xml`)**:
+   - Expanded minimum capsule dimension (`minWidth="142dp"`) with comfortable edge padding (`paddingStart="14dp"`, `paddingEnd="14dp"`).
+   - Implemented a dual-wing symmetrical layout (`minWidth="38dp"` per wing) anchored around center clearance spacers (`island_torch_spacer` and `island_record_spacer`, 38dp each) that span precisely underneath the physical front camera punch hole.
+   - Flashlight icon and recording dot anchor neatly in the left wing; "On" label and digital timer (`00:00`) anchor in the right wing, preventing cutout obstruction.
+   - Widened charging spacer (`island_spacer`) to `36dp` for uniform clearance across all Dynamic Island modes.
+2. **Dynamic Island-Aware Native Recording Chip Suppression (`ScreenRecordChipViewModel.kt` & `ScreenRecordChipViewModelKosmos.kt`)**:
+   - Injected `SystemSettingsRepository` into `ScreenRecordChipViewModel` to track `Settings.System.DYNAMIC_ISLAND_CHARGING` reactively via Kotlin StateFlow.
+   - Combined flow logic: when Dynamic Island is enabled (`dynamic_island_charging == 1`), `ScreenRecordChipViewModel` emits `OngoingActivityChipModel.Inactive()`, completely hiding the red status bar pill next to the clock.
+   - If the user turns off Dynamic Island in Settings (`dynamic_island_charging == 0`), the native Android screen record chip immediately restores its default display behavior.
+   - Updated Kosmos test fixture (`ScreenRecordChipViewModelKosmos.kt`) to inject `systemSettingsRepository`.
+3. **Expanded Screen Recording Controls with 6 Quick Settings Toggles (`dynamic_island_expanded_card.xml`)**:
+   - Removed the unsupported pause button and decorative audio wave/stylus discs.
+   - Relocated the solid red OriginOS Stop button (`expanded_record_stop_btn`, 38dp) into the top-right header for direct one-tap recording termination.
+   - Integrated 6 stock-style `@style/ScreenRecord.Switch` rows for screen recording options:
+     * Record device audio switch (`expanded_record_switch_device_audio`)
+     * Record microphone switch (`expanded_record_switch_mic`)
+     * Show touches switch (`expanded_record_switch_touches`)
+     * Lower quality / SD switch (`expanded_record_switch_low_quality`)
+     * Larger file size limit switch (`expanded_record_switch_longer_duration`)
+     * HEVC encoding switch (`expanded_record_switch_hevc`, defaults to ON)
+4. **Reactive Logic & System Preferences Persistence (`DynamicIslandChargingView.kt`)**:
+   - Bound all 6 switches directly to SystemUI persistent `Prefs` storage and `Settings.System.SHOW_TOUCHES`.
+   - Defaulted HEVC encoding to active (`Prefs.getInt(context, "screenrecord_use_hevc", 1) == 1`), writing updates to persistent preferences on toggle changes.
+   - Connected the Stop button to native recording termination intent (`RecordingService.REQUEST_STOP`) with tactile haptic feedback on all interactions.
+5. **Multilingual Localization (`shinkai_strings.xml` & `values-in/shinkai_strings.xml`)**:
+   - Added complete string entries for both English and Indonesian for all screen recording options (`screen_record_show_touches_title`, `screen_record_low_quality_title`, `screen_record_longer_duration_title`, `screen_record_hevc_title`).

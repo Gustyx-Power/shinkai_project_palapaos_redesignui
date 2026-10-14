@@ -47,7 +47,7 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <!-- Top Row: [Red Badge: Camera + 00:40] .............. [Merekam layar] -->
+            <!-- Top Header: [Red Badge: Camera + 00:00] [Perekam Layar] .............. [Stop Ring] -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -82,145 +82,271 @@
                         android:singleLine="true" />
                 </LinearLayout>
 
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_weight="1" />
-
                 <!-- Title Label: Merekam layar / Screen Recording -->
                 <TextView
                     android:id="@+id/expanded_record_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
                     android:text="@string/dynamic_island_record_label"
                     android:textColor="#F2F2F2"
-                    android:textSize="15sp"
+                    android:textSize="14.5sp"
                     android:fontFamily="sans-serif-bold"
                     android:singleLine="true" />
-            </LinearLayout>
-
-            <!-- Bottom Row: [Audio Wave] [Mic] [Pencil] .............. [Pause] [Stop Ring] -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <!-- Left Group (3 Circular Buttons) -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <!-- Audio Waveform Button -->
-                    <FrameLayout
-                        android:id="@+id/expanded_record_audio_btn"
-                        android:layout_width="38dp"
-                        android:layout_height="38dp"
-                        android:background="@drawable/dynamic_island_origin_btn_circle"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <ImageView
-                            android:id="@+id/expanded_record_audio_icon"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_origin_sound_wave"
-                            android:contentDescription="@null" />
-                    </FrameLayout>
-
-                    <!-- Mic Toggle Button -->
-                    <FrameLayout
-                        android:id="@+id/expanded_record_mic_btn"
-                        android:layout_width="38dp"
-                        android:layout_height="38dp"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/dynamic_island_origin_btn_circle"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <ImageView
-                            android:id="@+id/expanded_record_mic_icon"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_origin_mic"
-                            android:contentDescription="@null" />
-                    </FrameLayout>
-
-                    <!-- Pencil / Draw Button -->
-                    <FrameLayout
-                        android:id="@+id/expanded_record_pencil_btn"
-                        android:layout_width="38dp"
-                        android:layout_height="38dp"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/dynamic_island_origin_btn_circle"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <ImageView
-                            android:id="@+id/expanded_record_pencil_icon"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_origin_pencil"
-                            android:contentDescription="@null" />
-                    </FrameLayout>
-                </LinearLayout>
 
                 <View
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:layout_weight="1" />
 
-                <!-- Right Group (Primary Record Actions: Pause & Stop) -->
+                <!-- Stop Button (White Outer Ring Border with Red Square Center) -->
+                <FrameLayout
+                    android:id="@+id/expanded_record_stop_btn"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:background="@drawable/dynamic_island_origin_stop_bg"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="@string/dynamic_island_record_stop">
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_origin_stop"
+                        android:contentDescription="@null" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <!-- Subtle Section Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="4dp"
+                android:background="#20FFFFFF" />
+
+            <!-- Recording Settings Section (Android Native Controls) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- 1. Rekam audio perangkat -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/expanded_record_row_device_audio"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true">
 
-                    <!-- Pause / Resume Button (Solid White Circle with Black Bars) -->
-                    <FrameLayout
-                        android:id="@+id/expanded_record_pause_btn"
-                        android:layout_width="42dp"
-                        android:layout_height="42dp"
-                        android:background="@drawable/dynamic_island_origin_pause_bg"
-                        android:clickable="true"
-                        android:focusable="true">
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_origin_sound_wave"
+                        android:tint="#CCCCCC"
+                        android:contentDescription="@null" />
 
-                        <ImageView
-                            android:id="@+id/expanded_record_pause_icon"
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_origin_pause"
-                            android:contentDescription="@null" />
-                    </FrameLayout>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/dynamic_island_record_device_audio"
+                        android:textColor="#EEEEEE"
+                        android:textSize="13sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:singleLine="true" />
 
-                    <!-- Stop Button (White Outer Ring Border with Red Square Center) -->
-                    <FrameLayout
-                        android:id="@+id/expanded_record_stop_btn"
-                        android:layout_width="42dp"
-                        android:layout_height="42dp"
-                        android:layout_marginStart="10dp"
-                        android:background="@drawable/dynamic_island_origin_stop_bg"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:contentDescription="@string/dynamic_island_record_stop">
-
-                        <ImageView
-                            android:layout_width="15dp"
-                            android:layout_height="15dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_origin_stop"
-                            android:contentDescription="@null" />
-                    </FrameLayout>
+                    <Switch
+                        android:id="@+id/expanded_record_switch_device_audio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/ScreenRecord.Switch" />
                 </LinearLayout>
 
+                <!-- 2. Rekam mikrofon -->
+                <LinearLayout
+                    android:id="@+id/expanded_record_row_mic"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_origin_mic"
+                        android:tint="#CCCCCC"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/dynamic_island_record_mic"
+                        android:textColor="#EEEEEE"
+                        android:textSize="13sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:singleLine="true" />
+
+                    <Switch
+                        android:id="@+id/expanded_record_switch_mic"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/ScreenRecord.Switch" />
+                </LinearLayout>
+
+                <!-- 3. Tampilkan sentuhan -->
+                <LinearLayout
+                    android:id="@+id/expanded_record_row_touches"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_touch"
+                        android:tint="#CCCCCC"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/dynamic_island_record_show_touches"
+                        android:textColor="#EEEEEE"
+                        android:textSize="13sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:singleLine="true" />
+
+                    <Switch
+                        android:id="@+id/expanded_record_switch_touches"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/ScreenRecord.Switch" />
+                </LinearLayout>
+
+                <!-- 4. Kualitas lebih rendah (SD) -->
+                <LinearLayout
+                    android:id="@+id/expanded_record_row_low_quality"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_sr_quality"
+                        android:tint="#CCCCCC"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/dynamic_island_record_low_quality"
+                        android:textColor="#EEEEEE"
+                        android:textSize="13sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:singleLine="true" />
+
+                    <Switch
+                        android:id="@+id/expanded_record_switch_low_quality"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/ScreenRecord.Switch" />
+                </LinearLayout>
+
+                <!-- 5. Batas ukuran file lebih besar -->
+                <LinearLayout
+                    android:id="@+id/expanded_record_row_longer_duration"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_storage"
+                        android:tint="#CCCCCC"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/dynamic_island_record_longer_duration"
+                        android:textColor="#EEEEEE"
+                        android:textSize="13sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:singleLine="true" />
+
+                    <Switch
+                        android:id="@+id/expanded_record_switch_longer_duration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/ScreenRecord.Switch" />
+                </LinearLayout>
+
+                <!-- 6. Encoding HEVC -->
+                <LinearLayout
+                    android:id="@+id/expanded_record_row_hevc"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_hevc"
+                        android:tint="#CCCCCC"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/dynamic_island_record_hevc"
+                        android:textColor="#EEEEEE"
+                        android:textSize="13sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:singleLine="true" />
+
+                    <Switch
+                        android:id="@+id/expanded_record_switch_hevc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/ScreenRecord.Switch" />
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>

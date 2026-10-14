@@ -11,4 +11,13 @@
     <string name="dynamic_island_record_label">Perekam Layar</string>
     <string name="dynamic_island_record_elapsed">Waktu Berjalan</string>
     <string name="dynamic_island_record_stop">Berhenti</string>
+
+    <!-- Dynamic Island Expanded Recording Settings -->
+    <string name="dynamic_island_record_device_audio">Rekam audio perangkat</string>
+    <string name="dynamic_island_record_mic">Rekam mikrofon</string>
+    <string name="dynamic_island_record_show_touches">Tampilkan sentuhan</string>
+    <string name="dynamic_island_record_low_quality">Kualitas lebih rendah (SD)</string>
+    <string name="dynamic_island_record_longer_duration">Batas ukuran file lebih besar</string>
+    <string name="dynamic_island_record_hevc">Encoding HEVC</string>
+    <string name="dynamic_island_record_settings_footer">Saat Anda merekam seluruh layar, semua hal yang ditampilkan di layar akan direkam. Jadi, berhati-hatilah saat menangani sandi, detail pembayaran, pesan, foto, audio, dan video.</string>
 </resources>

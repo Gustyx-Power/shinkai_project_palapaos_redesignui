@@ -11,4 +11,13 @@
     <string name="dynamic_island_record_label">Screen Recording</string>
     <string name="dynamic_island_record_elapsed">Elapsed Time</string>
     <string name="dynamic_island_record_stop">Stop</string>
+
+    <!-- Dynamic Island Expanded Recording Settings -->
+    <string name="dynamic_island_record_device_audio">Record device audio</string>
+    <string name="dynamic_island_record_mic">Record microphone</string>
+    <string name="dynamic_island_record_show_touches">Show touches</string>
+    <string name="dynamic_island_record_low_quality">Lower quality (SD)</string>
+    <string name="dynamic_island_record_longer_duration">Larger file size limit</string>
+    <string name="dynamic_island_record_hevc">Encoding HEVC</string>
+    <string name="dynamic_island_record_settings_footer">When you record the entire screen, everything displayed on the screen will be recorded. So be careful when handling passwords, payment details, messages, photos, audio, and video.</string>
 </resources>

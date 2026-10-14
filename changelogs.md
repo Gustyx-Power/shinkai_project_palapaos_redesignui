@@ -705,3 +705,41 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - **Interaktivitas Perekaman**: Menghubungkan tombol jeda dengan status pembekuan waktu langsung serta respon getar haptic pada semua tombol kontrol.
 
 
+
+---
+
+## Bagian XXII: Optimalisasi Geometri Kapsul Punch-Hole, Supresi Chip Rekam Bawaan Android, dan Integrasi Kontrol Pengaturan Perekaman Layar pada Expanded Island
+
+### 1. Kebutuhan & Gambaran Umum
+- **Latar Belakang & Masalah**:
+  1. **Geometri Kapsul Punch-Hole Tertutup Kamera**: Pada perangkat berlubang kamera tengah (seperti POCO F5 / `marble`), kapsul compact senter dan perekam layar terlalu pendek sehingga logo senter, teks status "On", titik merah perekam, dan waktu durasi tertutup oleh punch-hole fisik kamera.
+  2. **Duplikasi Indikator Status Bar (Chip Perekam Android)**: Saat Dynamic Island aktif merekam, chip/pill merah perekaman bawaan Android (Ongoing Activity Chip) di sebelah kanan jam status bar tetap muncul bersamaan, menyebabkan redundansi visual yang mengganggu. Chip bawaan seharusnya disupresi saat Dynamic Island aktif dan hanya muncul kembali jika fitur Dynamic Island dinonaktifkan oleh pengguna.
+  3. **Penyesuaian Kontrol Expanded Island**: Fitur jeda (`pause`) tidak memiliki dukungan native pada arsitektur pipeline MediaProjection AOSP, dan tombol ornamen pendukung lainnya kurang fungsional. Seluruh kontrol selain tombol Stop diubah menjadi 6 opsi pengaturan perekaman layar bawaan Android yang interaktif: Rekam audio perangkat, Rekam mikrofon, Tampilkan sentuhan, Kualitas lebih rendah (SD), Batas ukuran file lebih besar, dan Pengodean HEVC (yang secara default aktif otomatis dan berfungsi). Tombol Stop tetap dipertahankan dan berfungsi penuh.
+
+### 2. Detail Implementasi
+1. **Pelebaran Kapsul & Pembersihan Ruang Punch-Hole (`dynamic_island_charging.xml`)**:
+   - Memperbesar batas minimum lebar kapsul (`minWidth="142dp"`) dengan bantalan padding awal dan akhir (`paddingStart="14dp"`, `paddingEnd="14dp"`).
+   - Menerapkan arsitektur simetris sayap ganda (`minWidth="38dp"` per sayap) dengan spacer penyeimbang kamera tengah (`island_torch_spacer` dan `island_record_spacer` masing-masing selebar `38dp`) yang membentang tepat di balik area cutout punch-hole fisik.
+   - Logo senter dan titik rekam berlabuh rapi di sayap kiri, sedangkan teks "On" dan waktu durasi (`00:00`) berlabuh di sayap kanan, sehingga konten informasi tidak lagi tertutup atau terpotong oleh kamera depan.
+   - Spacer pengisian daya (`island_spacer`) juga diperlebar menjadi `36dp` untuk menjaga konsistensi clearance di seluruh status island.
+2. **Supresi Chip Perekam Bawaan Android Berbasis Status Dynamic Island (`ScreenRecordChipViewModel.kt` & `ScreenRecordChipViewModelKosmos.kt`)**:
+   - Menyuntikkan `SystemSettingsRepository` ke dalam `ScreenRecordChipViewModel` untuk memantau nilai pengaturan `Settings.System.DYNAMIC_ISLAND_CHARGING` secara reaktif melalui Kotlin StateFlow.
+   - Memadukan kondisi chip: ketika Dynamic Island aktif (`dynamic_island_charging == 1`), `ScreenRecordChipViewModel` memancarkan `OngoingActivityChipModel.Inactive()`, sehingga chip merah bawaan di sebelah jam status bar disembunyikan sepenuhnya.
+   - Jika pengguna mematikan Dynamic Island di Pengaturan (`dynamic_island_charging == 0`), chip perekaman bawaan Android otomatis aktif dan muncul kembali secara normal.
+   - Memperbarui fixture pengujian Kosmos (`ScreenRecordChipViewModelKosmos.kt`) untuk menyertakan ketergantungan `systemSettingsRepository`.
+3. **Kartu Kontrol Expanded Rekam Layar dengan 6 Opsi Pengaturan Cepat (`dynamic_island_expanded_card.xml`)**:
+   - Menghapus tombol jeda dan tombol ornamen gelombang suara/pena yang tidak fungsional.
+   - Memindahkan tombol Stop merah solid OriginOS (`expanded_record_stop_btn`, 38dp) ke bilah header kanan atas kartu, memudahkan penghentian rekaman dengan satu ketukan.
+   - Menambahkan 6 baris sakelar pengaturan perekaman layar bawaan bergaya `@style/ScreenRecord.Switch`:
+     * Sakelar Audio Perangkat (`expanded_record_switch_device_audio`)
+     * Sakelar Mikrofon (`expanded_record_switch_mic`)
+     * Sakelar Tampilkan Sentuhan (`expanded_record_switch_touches`)
+     * Sakelar Kualitas Lebih Rendah / SD (`expanded_record_switch_low_quality`)
+     * Sakelar Batas Ukuran File Lebih Besar (`expanded_record_switch_longer_duration`)
+     * Sakelar Pengodean HEVC (`expanded_record_switch_hevc`, default ON)
+4. **Logika Reaktif & Persistensi Pengaturan di Framework (`DynamicIslandChargingView.kt`)**:
+   - Menghubungkan seluruh sakelar secara langsung ke penyimpanan SharedPreferences bawaan SystemUI (`Prefs`) dan `Settings.System.SHOW_TOUCHES`.
+   - Menginisialisasi sakelar HEVC otomatis aktif (`Prefs.getInt(context, "screenrecord_use_hevc", 1) == 1`) dan memperbarui preferensi secara persisten setiap kali sakelar diubah.
+   - Menghubungkan tombol Stop dengan intent penghentian rekaman bawaan (`RecordingService.REQUEST_STOP`) dan memberikan respon haptic pada setiap interaksi.
+5. **Lokalisasi Multibahasa (`shinkai_strings.xml` & `values-in/shinkai_strings.xml`)**:
+   - Menambahkan string lokalisasi lengkap Bahasa Indonesia dan Bahasa Inggris untuk seluruh label opsi perekaman layar (`screen_record_show_touches_title`, `screen_record_low_quality_title`, `screen_record_longer_duration_title`, `screen_record_hevc_title`).
