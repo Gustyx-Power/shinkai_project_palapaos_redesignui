@@ -267,5 +267,10 @@
     <!-- Dynamic Island Charging Strings -->
     <string name="dynamic_island_title">Dynamic Island charging</string>
     <string name="dynamic_island_summary">Show charging status pill expanding from camera punch-hole cutout (Experimental)</string>
+
+    <!-- Notification & Colored Icons -->
+    <string name="home_notification_sub">Status bar, bubbles &amp; more</string>
+    <string name="notification_colored_icons_title">Colored notification icons</string>
+    <string name="notification_colored_icons_summary">Show real application icons with their original colors for notifications</string>
 </resources>
 

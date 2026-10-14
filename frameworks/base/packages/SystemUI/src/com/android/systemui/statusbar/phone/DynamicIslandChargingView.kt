@@ -25,25 +25,47 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
+import android.database.ContentObserver
+import android.graphics.PixelFormat
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraManager
+import android.media.projection.StopReason
 import android.os.BatteryManager
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.provider.Settings
 import android.util.AttributeSet
 import android.util.Log
+import android.view.GestureDetector
+import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
+import android.view.WindowManager
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import com.android.systemui.Dependency
 import com.android.systemui.res.R
+import com.android.systemui.screenrecord.RecordingService
+import com.android.systemui.screenrecord.ScreenRecordUxController
+import com.android.systemui.statusbar.policy.FlashlightController
 
 /**
- * Dynamic Island Charging Capsule View tailored for POCO F5 (marble).
- * Expands smoothly from the top-center camera punch hole cutout when charging commences,
- * presenting charging state, battery percentage, and an animated neon green lightning bolt.
+ * Dynamic Island View tailored for POCO F5 (marble).
+ *
+ * Features:
+ * - Fluid iOS-style spring overshoot expansion and retracting recoil physics.
+ * - Three primary events: Charging (ephemeral 7.8s), Flashlight (persistent), and Screen Recording (persistent with live timer).
+ * - Dual-Island Meta-Ball Architecture: When both Torch and Recording are active, Recording takes the main pill
+ *   and Torch becomes the secondary circular meta-ball bubble.
+ * - Horizontal swipe gesture smoothly swaps priorities between the main capsule and the meta-ball.
+ * - Interactive Taps: Tapping the compact capsule springs open the Expanded Floating Control Island
+ *   with circular stop/action buttons and large digital timer/status.
  *
  * Completely guarded against early boot / Setup Wizard exceptions.
  */
@@ -54,46 +76,161 @@ class DynamicIslandChargingView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val mainHandler = Handler(Looper.getMainLooper())
-    private var capsuleView: View? = null
+
+    // --- Compact Views ---
+    private var rootContainer: LinearLayout? = null
+    private var capsuleView: FrameLayout? = null
+    private var chargingContentView: LinearLayout? = null
+    private var torchContentView: LinearLayout? = null
+    private var recordContentView: LinearLayout? = null
+
     private var statusTextView: TextView? = null
     private var batteryTextView: TextView? = null
     private var boltIconView: ImageView? = null
 
+    private var torchTextView: TextView? = null
+    private var torchActionTextView: TextView? = null
+    private var torchIconView: ImageView? = null
+
+    private var recordTimerView: TextView? = null
+    private var recordDotView: ImageView? = null
+
+    private var metaBallView: FrameLayout? = null
+    private var metaIconView: ImageView? = null
+    private var metaRecordDotView: ImageView? = null
+
+    // --- Expanded Card Views (Floating Window) ---
+    private var expandedWindowView: View? = null
+    private var expandedCardContainer: LinearLayout? = null
+    private var expandedRecordContent: LinearLayout? = null
+    private var expandedTorchContent: LinearLayout? = null
+    private var expandedChargingContent: LinearLayout? = null
+    private var expandedRecordTimer: TextView? = null
+    private var expandedBatteryText: TextView? = null
+    private var expandedTorchStatus: TextView? = null
+    private var isExpandedCardShowing = false
+
+    // --- State Machine ---
+    private var isCharging: Boolean = false
     private var wasPluggedIn: Boolean = false
-    private var isExpanded: Boolean = false
-    private var currentAnimSet: AnimatorSet? = null
     private var lastBatteryLevel: Int = -1
+
+    private var isTorchOn: Boolean = false
+    private var isRecording: Boolean = false
+    private var recordingStartTimestamp: Long = 0L
+
+    // Dual-island priority: true = Record is in main capsule, Torch is in meta-ball
+    private var prioritizeRecord: Boolean = true
+
+    private var isCompactExpanded: Boolean = false
+    private var currentCompactAnimSet: AnimatorSet? = null
     private var isReceiverRegistered: Boolean = false
 
-    private val dismissRunnable = Runnable {
-        dismissIsland()
+    // --- Controllers ---
+    private var flashlightController: FlashlightController? = null
+    private var screenRecordController: ScreenRecordUxController? = null
+    private var cameraManager: CameraManager? = null
+    private var rearCameraId: String? = null
+
+    // --- Runnables ---
+    private val chargingDismissRunnable = Runnable {
+        isCharging = false
+        refreshIslandState(animate = true)
+    }
+
+    private val recordTickerRunnable = object : Runnable {
+        override fun run() {
+            if (isRecording) {
+                updateRecordTimer()
+                mainHandler.postDelayed(this, 1000L)
+            }
+        }
+    }
+
+    private val expandedAutoCollapseRunnable = Runnable {
+        dismissExpandedCard()
+    }
+
+    // --- Callbacks ---
+    private val flashlightListener = object : FlashlightController.FlashlightListener {
+        override fun onFlashlightChanged(enabled: Boolean) {
+            mainHandler.post {
+                if (isTorchOn != enabled) {
+                    isTorchOn = enabled
+                    refreshIslandState(animate = true)
+                }
+            }
+        }
+
+        override fun onFlashlightError() {
+            mainHandler.post {
+                isTorchOn = false
+                refreshIslandState(animate = true)
+            }
+        }
+
+        override fun onFlashlightAvailabilityChanged(available: Boolean) {
+            if (!available) {
+                mainHandler.post {
+                    isTorchOn = false
+                    refreshIslandState(animate = true)
+                }
+            }
+        }
+
+        override fun onFlashlightStrengthChanged(level: Int) {}
+    }
+
+    private val screenRecordCallback = object : ScreenRecordUxController.StateChangeCallback {
+        override fun onRecordingStart() {
+            mainHandler.post {
+                if (!isRecording) {
+                    isRecording = true
+                    recordingStartTimestamp = SystemClock.elapsedRealtime()
+                    prioritizeRecord = true
+                    startRecordTicker()
+                    refreshIslandState(animate = true)
+                }
+            }
+        }
+
+        override fun onRecordingEnd() {
+            mainHandler.post {
+                if (isRecording) {
+                    isRecording = false
+                    stopRecordTicker()
+                    dismissExpandedCard()
+                    refreshIslandState(animate = true)
+                }
+            }
+        }
+    }
+
+    private val cameraTorchCallback = object : CameraManager.TorchCallback() {
+        override fun onTorchModeChanged(cameraId: String, enabled: Boolean) {
+            if (rearCameraId == null || cameraId == rearCameraId) {
+                mainHandler.post {
+                    if (isTorchOn != enabled) {
+                        isTorchOn = enabled
+                        refreshIslandState(animate = true)
+                    }
+                }
+            }
+        }
     }
 
     private val batteryReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             try {
-                // Safeguard: Never trigger during Setup Wizard (OOBE) before device is provisioned
-                val isProvisioned = try {
-                    Settings.Global.getInt(context.contentResolver, Settings.Global.DEVICE_PROVISIONED, 0) == 1
-                } catch (_: Throwable) {
-                    false
-                }
-                if (!isProvisioned) return
-
-                val isEnabled = try {
-                    Settings.System.getInt(context.contentResolver, "dynamic_island_charging", 0) == 1
-                } catch (_: Throwable) {
-                    false
-                }
-                if (!isEnabled) return
+                if (!isDeviceProvisioned() || !isFeatureEnabled()) return
 
                 when (intent.action) {
                     Intent.ACTION_BATTERY_CHANGED -> {
                         val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
-                        val isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                        val charging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
                                 status == BatteryManager.BATTERY_STATUS_FULL
                         val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0)
-                        val isPluggedIn = plugged != 0 || isCharging
+                        val isPluggedIn = plugged != 0 || charging
 
                         val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
                         val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
@@ -101,17 +238,36 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                         lastBatteryLevel = batteryPct
 
                         if (!wasPluggedIn && isPluggedIn) {
-                            // Charger connected -> trigger dynamic island animation
-                            triggerChargingIsland(batteryPct)
-                        } else if (wasPluggedIn && isPluggedIn && isExpanded) {
-                            // Update percentage while visible
+                            // Plugged in -> trigger charging capsule
+                            isCharging = true
+                            mainHandler.removeCallbacks(chargingDismissRunnable)
+                            mainHandler.postDelayed(chargingDismissRunnable, 7800L)
+                            refreshIslandState(animate = true)
+                        } else if (wasPluggedIn && isPluggedIn && isCharging) {
                             batteryTextView?.text = "$batteryPct%"
+                            expandedBatteryText?.text = "$batteryPct%"
                         } else if (wasPluggedIn && !isPluggedIn) {
-                            // Charger disconnected -> retract immediately
-                            dismissIsland()
+                            isCharging = false
+                            mainHandler.removeCallbacks(chargingDismissRunnable)
+                            refreshIslandState(animate = true)
                         }
 
                         wasPluggedIn = isPluggedIn
+                    }
+                    ScreenRecordUxController.INTENT_UPDATE_STATE -> {
+                        val state = intent.getBooleanExtra(ScreenRecordUxController.EXTRA_STATE, false)
+                        if (state != isRecording) {
+                            isRecording = state
+                            if (isRecording) {
+                                recordingStartTimestamp = SystemClock.elapsedRealtime()
+                                prioritizeRecord = true
+                                startRecordTicker()
+                            } else {
+                                stopRecordTicker()
+                                dismissExpandedCard()
+                            }
+                            refreshIslandState(animate = true)
+                        }
                     }
                 }
             } catch (t: Throwable) {
@@ -120,21 +276,70 @@ class DynamicIslandChargingView @JvmOverloads constructor(
         }
     }
 
+    private val settingsObserver = object : ContentObserver(mainHandler) {
+        override fun onChange(selfChange: Boolean) {
+            if (!isFeatureEnabled()) {
+                dismissIsland()
+                dismissExpandedCard()
+            } else {
+                refreshIslandState(animate = true)
+            }
+        }
+    }
+
+    // --- Gesture Detection for Pill Swipe & Click ---
+    private val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+            showExpandedCard()
+            return true
+        }
+
+        override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+            if (isTorchOn && isRecording) {
+                // Horizontal swipe swaps primary pill and meta-ball!
+                swapDualIslandPriority()
+                return true
+            }
+            return false
+        }
+    })
+
     override fun onFinishInflate() {
         super.onFinishInflate()
         try {
             LayoutInflater.from(context).inflate(R.layout.dynamic_island_charging, this, true)
 
+            rootContainer = findViewById(R.id.island_root_container)
             capsuleView = findViewById(R.id.island_capsule)
+            chargingContentView = findViewById(R.id.island_charging_content)
+            torchContentView = findViewById(R.id.island_torch_content)
+            recordContentView = findViewById(R.id.island_record_content)
+
             statusTextView = findViewById(R.id.island_status_text)
             batteryTextView = findViewById(R.id.island_battery_text)
             boltIconView = findViewById(R.id.island_bolt_icon)
 
+            torchTextView = findViewById(R.id.island_torch_text)
+            torchActionTextView = findViewById(R.id.island_torch_action_text)
+            torchIconView = findViewById(R.id.island_torch_icon)
+
+            recordTimerView = findViewById(R.id.island_record_timer)
+            recordDotView = findViewById(R.id.island_record_dot)
+
+            metaBallView = findViewById(R.id.island_meta_ball)
+            metaIconView = findViewById(R.id.island_meta_icon)
+            metaRecordDotView = findViewById(R.id.island_meta_record_dot)
+
             visibility = View.GONE
             alpha = 0f
 
-            capsuleView?.setOnClickListener {
-                dismissIsland()
+            capsuleView?.setOnTouchListener { _, event ->
+                gestureDetector.onTouchEvent(event)
+                true
+            }
+
+            metaBallView?.setOnClickListener {
+                onMetaBallClicked()
             }
         } catch (t: Throwable) {
             Log.e(TAG, "Failed to inflate DynamicIslandChargingView", t)
@@ -144,18 +349,16 @@ class DynamicIslandChargingView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         try {
-            // Safeguard: strictly dormant during Setup Wizard (OOBE) before device is provisioned
-            val isProvisioned = try {
-                Settings.Global.getInt(context.contentResolver, Settings.Global.DEVICE_PROVISIONED, 0) == 1
-            } catch (_: Throwable) {
-                false
-            }
-            if (!isProvisioned) {
+            if (!isDeviceProvisioned()) {
                 visibility = View.GONE
                 return
             }
 
-            val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+            // Register Battery & ScreenRecord broadcast receiver
+            val filter = IntentFilter().apply {
+                addAction(Intent.ACTION_BATTERY_CHANGED)
+                addAction(ScreenRecordUxController.INTENT_UPDATE_STATE)
+            }
             val stickyIntent = context.registerReceiver(
                 batteryReceiver,
                 filter,
@@ -165,17 +368,48 @@ class DynamicIslandChargingView @JvmOverloads constructor(
 
             if (stickyIntent != null) {
                 val status = stickyIntent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
-                val isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                val charging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
                         status == BatteryManager.BATTERY_STATUS_FULL
                 val plugged = stickyIntent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0)
-                wasPluggedIn = plugged != 0 || isCharging
+                wasPluggedIn = plugged != 0 || charging
 
                 val level = stickyIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
                 val scale = stickyIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
                 lastBatteryLevel = if (level >= 0 && scale > 0) ((level * 100f) / scale).toInt() else level
             }
+
+            // Initialize Flashlight Controller / Listener
+            try {
+                flashlightController = Dependency.get(FlashlightController::class.java)
+                flashlightController?.addCallback(flashlightListener)
+                isTorchOn = flashlightController?.isEnabled == true
+            } catch (_: Throwable) {
+                initCameraTorchFallback()
+            }
+
+            // Initialize ScreenRecord Controller / Listener
+            try {
+                screenRecordController = Dependency.get(ScreenRecordUxController::class.java)
+                screenRecordController?.addCallback(screenRecordCallback)
+                if (screenRecordController?.isRecording == true) {
+                    isRecording = true
+                    recordingStartTimestamp = SystemClock.elapsedRealtime()
+                    startRecordTicker()
+                }
+            } catch (t: Throwable) {
+                Log.w(TAG, "ScreenRecordUxController not yet initialized in Dependency", t)
+            }
+
+            // Observe Dynamic Island toggle changes
+            context.contentResolver.registerContentObserver(
+                Settings.System.getUriFor("dynamic_island_charging"),
+                false,
+                settingsObserver
+            )
+
+            refreshIslandState(animate = false)
         } catch (t: Throwable) {
-            Log.e(TAG, "Failed to register receiver in onAttachedToWindow", t)
+            Log.e(TAG, "Failed in onAttachedToWindow", t)
         }
     }
 
@@ -186,145 +420,595 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                 context.unregisterReceiver(batteryReceiver)
                 isReceiverRegistered = false
             }
+            flashlightController?.removeCallback(flashlightListener)
+            screenRecordController?.removeCallback(screenRecordCallback)
+            cameraManager?.unregisterTorchCallback(cameraTorchCallback)
+            context.contentResolver.unregisterContentObserver(settingsObserver)
         } catch (_: Exception) {}
-        mainHandler.removeCallbacks(dismissRunnable)
-        currentAnimSet?.cancel()
+
+        mainHandler.removeCallbacks(chargingDismissRunnable)
+        mainHandler.removeCallbacks(recordTickerRunnable)
+        mainHandler.removeCallbacks(expandedAutoCollapseRunnable)
+        currentCompactAnimSet?.cancel()
+        dismissExpandedCard()
+    }
+
+    private fun initCameraTorchFallback() {
+        try {
+            cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as? CameraManager
+            cameraManager?.let { cm ->
+                for (id in cm.cameraIdList) {
+                    val characteristics = cm.getCameraCharacteristics(id)
+                    val flashAvailable = characteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE) == true
+                    val facing = characteristics.get(CameraCharacteristics.LENS_FACING)
+                    if (flashAvailable && facing == CameraCharacteristics.LENS_FACING_BACK) {
+                        rearCameraId = id
+                        break
+                    }
+                }
+                cm.registerTorchCallback(cameraTorchCallback, mainHandler)
+            }
+        } catch (t: Throwable) {
+            Log.w(TAG, "CameraManager fallback init failed", t)
+        }
     }
 
     /**
-     * Triggers the Dynamic Island charging expansion from the POCO F5 punch-hole.
+     * Refreshes the Dynamic Island layout state based on active events:
+     * Charging, Flashlight, and Screen Recording.
      */
-    fun triggerChargingIsland(batteryLevel: Int) {
-        try {
-            val isProvisioned = try {
-                Settings.Global.getInt(context.contentResolver, Settings.Global.DEVICE_PROVISIONED, 0) == 1
-            } catch (_: Throwable) {
-                false
+    fun refreshIslandState(animate: Boolean) {
+        if (!isDeviceProvisioned() || !isFeatureEnabled()) {
+            dismissIsland()
+            dismissExpandedCard()
+            return
+        }
+
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            dismissIsland()
+            dismissExpandedCard()
+            return
+        }
+
+        val hasCharging = isCharging
+        val hasTorch = isTorchOn
+        val hasRecord = isRecording
+
+        if (!hasCharging && !hasTorch && !hasRecord) {
+            dismissIsland()
+            dismissExpandedCard()
+            return
+        }
+
+        // Determine who occupies the main pill and who occupies the meta-ball
+        var mainSlot: IslandSlot = IslandSlot.NONE
+        var metaSlot: IslandSlot = IslandSlot.NONE
+
+        if (hasCharging) {
+            // Charging has immediate presentation priority for its 7.8s duration
+            mainSlot = IslandSlot.CHARGING
+            if (hasRecord) {
+                metaSlot = IslandSlot.RECORD
+            } else if (hasTorch) {
+                metaSlot = IslandSlot.TORCH
             }
-            if (!isProvisioned) return
-
-            val isEnabled = try {
-                Settings.System.getInt(context.contentResolver, "dynamic_island_charging", 0) == 1
-            } catch (_: Throwable) {
-                false
+        } else if (hasRecord && hasTorch) {
+            // Dual-Island: Both record & flashlight active!
+            if (prioritizeRecord) {
+                mainSlot = IslandSlot.RECORD
+                metaSlot = IslandSlot.TORCH
+            } else {
+                mainSlot = IslandSlot.TORCH
+                metaSlot = IslandSlot.RECORD
             }
-            if (!isEnabled) return
+        } else if (hasRecord) {
+            mainSlot = IslandSlot.RECORD
+            metaSlot = IslandSlot.NONE
+        } else if (hasTorch) {
+            mainSlot = IslandSlot.TORCH
+            metaSlot = IslandSlot.NONE
+        }
 
-            // In landscape mode, punch-hole is at the side, so only trigger in portrait
-            if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                return
+        applyCompactLayout(mainSlot, metaSlot, animate)
+        updateExpandedCardIfShowing(mainSlot)
+    }
+
+    private fun applyCompactLayout(mainSlot: IslandSlot, metaSlot: IslandSlot, animate: Boolean) {
+        // Toggle Main Pill Subviews
+        chargingContentView?.visibility = if (mainSlot == IslandSlot.CHARGING) View.VISIBLE else View.GONE
+        torchContentView?.visibility = if (mainSlot == IslandSlot.TORCH) View.VISIBLE else View.GONE
+        recordContentView?.visibility = if (mainSlot == IslandSlot.RECORD) View.VISIBLE else View.GONE
+
+        when (mainSlot) {
+            IslandSlot.CHARGING -> {
+                batteryTextView?.text = if (lastBatteryLevel >= 0) "$lastBatteryLevel%" else ""
+                statusTextView?.setText(R.string.dynamic_island_charging)
+                animateBoltPulse()
+            }
+            IslandSlot.TORCH -> {
+                torchActionTextView?.setText(R.string.dynamic_island_torch_on)
+            }
+            IslandSlot.RECORD -> {
+                updateRecordTimer()
+            }
+            IslandSlot.NONE -> {}
+        }
+
+        // Toggle Meta-Ball View
+        if (metaSlot != IslandSlot.NONE) {
+            metaBallView?.visibility = View.VISIBLE
+            if (metaSlot == IslandSlot.TORCH) {
+                metaIconView?.setImageResource(R.drawable.qs_flashlight_icon_on)
+                metaIconView?.imageTintList = android.content.res.ColorStateList.valueOf(0xFFFFD60A.toInt())
+                metaIconView?.visibility = View.VISIBLE
+                metaRecordDotView?.visibility = View.GONE
+            } else if (metaSlot == IslandSlot.RECORD) {
+                metaIconView?.visibility = View.GONE
+                metaRecordDotView?.visibility = View.VISIBLE
             }
 
-            mainHandler.removeCallbacks(dismissRunnable)
-            currentAnimSet?.cancel()
+            if (animate && metaBallView?.scaleX != 1.0f) {
+                metaBallView?.scaleX = 0.2f
+                metaBallView?.scaleY = 0.2f
+                metaBallView?.alpha = 0f
+                metaBallView?.animate()
+                    ?.scaleX(1.0f)
+                    ?.scaleY(1.0f)
+                    ?.alpha(1.0f)
+                    ?.setDuration(320L)
+                    ?.setInterpolator(OvershootInterpolator(1.4f))
+                    ?.start()
+            }
+        } else {
+            if (metaBallView?.visibility == View.VISIBLE) {
+                metaBallView?.animate()
+                    ?.scaleX(0.2f)
+                    ?.scaleY(0.2f)
+                    ?.alpha(0f)
+                    ?.setDuration(220L)
+                    ?.withEndAction {
+                        metaBallView?.visibility = View.GONE
+                        metaBallView?.scaleX = 1.0f
+                        metaBallView?.scaleY = 1.0f
+                    }
+                    ?.start()
+            } else {
+                metaBallView?.visibility = View.GONE
+            }
+        }
 
-            batteryTextView?.text = if (batteryLevel >= 0) "$batteryLevel%" else ""
-            statusTextView?.setText(R.string.dynamic_island_charging)
+        // Expand compact capsule with spring overshoot
+        if (!isCompactExpanded || visibility != View.VISIBLE) {
+            expandCompactIsland(animate)
+        }
+    }
 
-            visibility = View.VISIBLE
-            isExpanded = true
+    /**
+     * Bouncy Spring Overshoot entrance from the POCO F5 punch-hole.
+     */
+    private fun expandCompactIsland(animate: Boolean) {
+        visibility = View.VISIBLE
+        isCompactExpanded = true
+        currentCompactAnimSet?.cancel()
 
-            capsuleView?.let { capsule ->
-                val capsuleWidth = if (capsule.width > 0) capsule.width.toFloat() else 210f * resources.displayMetrics.density
-                val capsuleHeight = if (capsule.height > 0) capsule.height.toFloat() else 35f * resources.displayMetrics.density
-                capsule.pivotX = capsuleWidth / 2f
-                capsule.pivotY = capsuleHeight / 2f
+        capsuleView?.let { capsule ->
+            val capsuleWidth = if (capsule.width > 0) capsule.width.toFloat() else 210f * resources.displayMetrics.density
+            val capsuleHeight = if (capsule.height > 0) capsule.height.toFloat() else 35f * resources.displayMetrics.density
+            capsule.pivotX = capsuleWidth / 2f
+            capsule.pivotY = capsuleHeight / 2f
 
+            if (animate) {
                 val scaleXAnim = ObjectAnimator.ofFloat(capsule, View.SCALE_X, 0.15f, 1.0f).apply {
                     duration = 380L
-                    interpolator = OvershootInterpolator(1.18f)
+                    interpolator = OvershootInterpolator(1.35f)
                 }
-                val scaleYAnim = ObjectAnimator.ofFloat(capsule, View.SCALE_Y, 0.4f, 1.0f).apply {
-                    duration = 350L
-                    interpolator = OvershootInterpolator(1.15f)
+                val scaleYAnim = ObjectAnimator.ofFloat(capsule, View.SCALE_Y, 0.35f, 1.0f).apply {
+                    duration = 360L
+                    interpolator = OvershootInterpolator(1.22f)
                 }
                 val alphaAnim = ObjectAnimator.ofFloat(this, View.ALPHA, 0f, 1.0f).apply {
-                    duration = 240L
+                    duration = 200L
                 }
 
-                // Green bolt pulse animation
-                boltIconView?.let { bolt ->
-                    bolt.scaleX = 0.8f
-                    bolt.scaleY = 0.8f
-                    bolt.animate()
-                        .scaleX(1.28f)
-                        .scaleY(1.28f)
-                        .setDuration(240L)
-                        .withEndAction {
-                            bolt.animate().scaleX(1.0f).scaleY(1.0f).setDuration(180L).start()
-                        }
-                        .start()
-                }
-
-                AnimatorSet().apply {
+                currentCompactAnimSet = AnimatorSet().apply {
                     playTogether(scaleXAnim, scaleYAnim, alphaAnim)
                     start()
-                    currentAnimSet = this
                 }
+            } else {
+                capsule.scaleX = 1.0f
+                capsule.scaleY = 1.0f
+                alpha = 1.0f
             }
-
-            // Auto-retract back into the punch-hole after 7.8 seconds
-            mainHandler.postDelayed(dismissRunnable, 7800L)
-        } catch (t: Throwable) {
-            Log.e(TAG, "Failed to trigger charging island", t)
         }
     }
 
     /**
-     * Retracts the Dynamic Island smoothly back into the punch-hole.
+     * Tactile iOS-style spring recoil closing animation back into the punch-hole.
      */
     fun dismissIsland() {
+        if (!isCompactExpanded && visibility != View.VISIBLE) return
+
+        mainHandler.removeCallbacks(chargingDismissRunnable)
+        currentCompactAnimSet?.cancel()
+
+        capsuleView?.let { capsule ->
+            val capsuleWidth = if (capsule.width > 0) capsule.width.toFloat() else 210f * resources.displayMetrics.density
+            val capsuleHeight = if (capsule.height > 0) capsule.height.toFloat() else 35f * resources.displayMetrics.density
+            capsule.pivotX = capsuleWidth / 2f
+            capsule.pivotY = capsuleHeight / 2f
+
+            // Recoil Phase 1: Slight rubber stretch anticipation
+            capsule.animate()
+                .scaleX(1.05f)
+                .scaleY(0.95f)
+                .setDuration(70L)
+                .withEndAction {
+                    // Recoil Phase 2: Snap cleanly inward into the camera punch-hole
+                    val scaleXAnim = ObjectAnimator.ofFloat(capsule, View.SCALE_X, 1.05f, 0.15f).apply {
+                        duration = 240L
+                        interpolator = AccelerateInterpolator(1.5f)
+                    }
+                    val scaleYAnim = ObjectAnimator.ofFloat(capsule, View.SCALE_Y, 0.95f, 0.35f).apply {
+                        duration = 240L
+                        interpolator = AccelerateInterpolator(1.5f)
+                    }
+                    val alphaAnim = ObjectAnimator.ofFloat(this@DynamicIslandChargingView, View.ALPHA, 1.0f, 0.0f).apply {
+                        duration = 200L
+                    }
+
+                    currentCompactAnimSet = AnimatorSet().apply {
+                        playTogether(scaleXAnim, scaleYAnim, alphaAnim)
+                        addListener(object : AnimatorListenerAdapter() {
+                            override fun onAnimationEnd(animation: Animator) {
+                                visibility = View.GONE
+                                capsule.scaleX = 1.0f
+                                capsule.scaleY = 1.0f
+                                alpha = 1.0f
+                                isCompactExpanded = false
+                            }
+                        })
+                        start()
+                    }
+                }
+                .start()
+        } ?: run {
+            visibility = View.GONE
+            isCompactExpanded = false
+        }
+    }
+
+    /**
+     * Swaps priorities between Main Capsule and Meta-Ball when swiped horizontally.
+     */
+    private fun swapDualIslandPriority() {
+        if (!isTorchOn || !isRecording) return
+
+        prioritizeRecord = !prioritizeRecord
+
+        capsuleView?.let { capsule ->
+            capsule.animate()
+                .scaleX(0.86f)
+                .scaleY(0.86f)
+                .setDuration(110L)
+                .withEndAction {
+                    refreshIslandState(animate = false)
+                    capsule.animate()
+                        .scaleX(1.0f)
+                        .scaleY(1.0f)
+                        .setInterpolator(OvershootInterpolator(1.3f))
+                        .setDuration(240L)
+                        .start()
+                }
+                .start()
+        }
+
+        metaBallView?.let { meta ->
+            meta.animate()
+                .scaleX(0.7f)
+                .scaleY(0.7f)
+                .setDuration(110L)
+                .withEndAction {
+                    meta.animate()
+                        .scaleX(1.0f)
+                        .scaleY(1.0f)
+                        .setInterpolator(OvershootInterpolator(1.4f))
+                        .setDuration(240L)
+                        .start()
+                }
+                .start()
+        }
+    }
+
+    /**
+     * Interacting with the Meta-Ball bubble.
+     */
+    private fun onMetaBallClicked() {
+        if (prioritizeRecord) {
+            // Torch is inside the meta-ball -> tapping toggles torch off!
+            toggleTorch()
+        } else {
+            // Record is inside the meta-ball -> tapping expands record controls!
+            showExpandedCard()
+        }
+    }
+
+    // --- Expanded Floating Card Logic ---
+
+    fun showExpandedCard() {
+        if (isExpandedCardShowing) {
+            dismissExpandedCard()
+            return
+        }
+
+        val wm = context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager ?: return
+
         try {
-            if (!isExpanded && visibility != View.VISIBLE) return
+            val root = LayoutInflater.from(context).inflate(R.layout.dynamic_island_expanded_card, null)
+            expandedWindowView = root
 
-            mainHandler.removeCallbacks(dismissRunnable)
-            currentAnimSet?.cancel()
+            expandedCardContainer = root.findViewById(R.id.expanded_card_container)
+            expandedRecordContent = root.findViewById(R.id.expanded_record_content)
+            expandedTorchContent = root.findViewById(R.id.expanded_torch_content)
+            expandedChargingContent = root.findViewById(R.id.expanded_charging_content)
+            expandedRecordTimer = root.findViewById(R.id.expanded_record_timer)
+            expandedBatteryText = root.findViewById(R.id.expanded_battery_text)
+            expandedTorchStatus = root.findViewById(R.id.expanded_torch_status)
 
-            capsuleView?.let { capsule ->
-                val capsuleWidth = if (capsule.width > 0) capsule.width.toFloat() else 210f * resources.displayMetrics.density
-                val capsuleHeight = if (capsule.height > 0) capsule.height.toFloat() else 35f * resources.displayMetrics.density
-                capsule.pivotX = capsuleWidth / 2f
-                capsule.pivotY = capsuleHeight / 2f
+            val stopBtn: FrameLayout? = root.findViewById(R.id.expanded_record_stop_btn)
+            val pauseBtn: FrameLayout? = root.findViewById(R.id.expanded_record_pause_btn)
+            val torchBtn: FrameLayout? = root.findViewById(R.id.expanded_torch_btn)
 
-                val scaleXAnim = ObjectAnimator.ofFloat(capsule, View.SCALE_X, 1.0f, 0.15f).apply {
-                    duration = 260L
-                    interpolator = AccelerateInterpolator(1.4f)
+            stopBtn?.setOnClickListener {
+                stopScreenRecording()
+                dismissExpandedCard()
+            }
+
+            pauseBtn?.setOnClickListener {
+                // Pause recording or trigger stop
+                stopScreenRecording()
+                dismissExpandedCard()
+            }
+
+            torchBtn?.setOnClickListener {
+                toggleTorch()
+                dismissExpandedCard()
+            }
+
+            // Outside touch listener collapses the expanded card back to compact pill
+            root.setOnTouchListener { _, event ->
+                if (event.action == MotionEvent.ACTION_OUTSIDE) {
+                    dismissExpandedCard()
+                    true
+                } else {
+                    false
                 }
-                val scaleYAnim = ObjectAnimator.ofFloat(capsule, View.SCALE_Y, 1.0f, 0.4f).apply {
-                    duration = 260L
-                    interpolator = AccelerateInterpolator(1.4f)
-                }
-                val alphaAnim = ObjectAnimator.ofFloat(this, View.ALPHA, 1.0f, 0.0f).apply {
-                    duration = 220L
-                }
+            }
 
-                val animSet = AnimatorSet().apply {
-                    playTogether(scaleXAnim, scaleYAnim, alphaAnim)
-                    addListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            visibility = View.GONE
-                            capsule.scaleX = 1.0f
-                            capsule.scaleY = 1.0f
-                            alpha = 1.0f
-                            isExpanded = false
+            expandedCardContainer?.setOnClickListener {
+                dismissExpandedCard()
+            }
+
+            // Determine active mode to display inside the expanded card
+            val activeMode = when {
+                isRecording && prioritizeRecord -> IslandSlot.RECORD
+                isTorchOn && !prioritizeRecord -> IslandSlot.TORCH
+                isRecording -> IslandSlot.RECORD
+                isTorchOn -> IslandSlot.TORCH
+                isCharging -> IslandSlot.CHARGING
+                else -> IslandSlot.NONE
+            }
+
+            if (activeMode == IslandSlot.NONE) return
+
+            updateExpandedCardIfShowing(activeMode)
+
+            val lp = WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.TYPE_STATUS_BAR_SUB_PANEL,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH or
+                        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                PixelFormat.TRANSLUCENT
+            ).apply {
+                gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+                y = (resources.getDimensionPixelSize(com.android.internal.R.dimen.status_bar_height) * 0.12f).toInt()
+            }
+
+            wm.addView(root, lp)
+            isExpandedCardShowing = true
+
+            // Spring animate expand
+            expandedCardContainer?.let { container ->
+                container.scaleX = 0.65f
+                container.scaleY = 0.4f
+                container.alpha = 0f
+                container.translationY = -25f * resources.displayMetrics.density
+
+                container.animate()
+                    .scaleX(1.0f)
+                    .scaleY(1.0f)
+                    .alpha(1.0f)
+                    .translationY(0f)
+                    .setDuration(340L)
+                    .setInterpolator(OvershootInterpolator(1.22f))
+                    .start()
+            }
+
+            mainHandler.removeCallbacks(expandedAutoCollapseRunnable)
+            mainHandler.postDelayed(expandedAutoCollapseRunnable, 10000L)
+        } catch (t: Throwable) {
+            Log.e(TAG, "Failed to show expanded island card", t)
+        }
+    }
+
+    private fun updateExpandedCardIfShowing(slot: IslandSlot) {
+        if (!isExpandedCardShowing) return
+
+        expandedRecordContent?.visibility = if (slot == IslandSlot.RECORD) View.VISIBLE else View.GONE
+        expandedTorchContent?.visibility = if (slot == IslandSlot.TORCH) View.VISIBLE else View.GONE
+        expandedChargingContent?.visibility = if (slot == IslandSlot.CHARGING) View.VISIBLE else View.GONE
+
+        when (slot) {
+            IslandSlot.RECORD -> {
+                updateRecordTimer()
+            }
+            IslandSlot.TORCH -> {
+                expandedTorchStatus?.setText(if (isTorchOn) R.string.dynamic_island_torch_on else R.string.dynamic_island_torch_label)
+            }
+            IslandSlot.CHARGING -> {
+                expandedBatteryText?.text = if (lastBatteryLevel >= 0) "$lastBatteryLevel%" else ""
+            }
+            IslandSlot.NONE -> {
+                dismissExpandedCard()
+            }
+        }
+    }
+
+    fun dismissExpandedCard() {
+        if (!isExpandedCardShowing || expandedWindowView == null) return
+
+        mainHandler.removeCallbacks(expandedAutoCollapseRunnable)
+        val wm = context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+        val view = expandedWindowView
+
+        expandedCardContainer?.let { container ->
+            container.animate()
+                .scaleX(0.7f)
+                .scaleY(0.4f)
+                .alpha(0f)
+                .translationY(-25f * resources.displayMetrics.density)
+                .setDuration(220L)
+                .setInterpolator(AccelerateInterpolator(1.4f))
+                .withEndAction {
+                    try {
+                        if (view != null && view.isAttachedToWindow) {
+                            wm?.removeView(view)
                         }
-                    })
-                    start()
+                    } catch (_: Throwable) {}
+                    expandedWindowView = null
+                    isExpandedCardShowing = false
                 }
-                currentAnimSet = animSet
+                .start()
+        } ?: run {
+            try {
+                if (view != null && view.isAttachedToWindow) {
+                    wm?.removeView(view)
+                }
+            } catch (_: Throwable) {}
+            expandedWindowView = null
+            isExpandedCardShowing = false
+        }
+    }
+
+    // --- Action Handlers ---
+
+    private fun toggleTorch() {
+        try {
+            flashlightController?.let { controller ->
+                controller.setFlashlight(!controller.isEnabled)
             } ?: run {
-                visibility = View.GONE
-                isExpanded = false
+                cameraManager?.let { cm ->
+                    val id = rearCameraId
+                    if (id != null) {
+                        cm.setTorchMode(id, !isTorchOn)
+                    }
+                }
             }
         } catch (t: Throwable) {
-            Log.e(TAG, "Failed to dismiss island", t)
-            visibility = View.GONE
-            isExpanded = false
+            Log.e(TAG, "Failed to toggle flashlight", t)
         }
+    }
+
+    private fun stopScreenRecording() {
+        try {
+            screenRecordController?.stopRecording(StopReason.STOP_HOST_APP)
+        } catch (_: Throwable) {
+            try {
+                context.startService(RecordingService.getStopIntent(context))
+            } catch (t: Throwable) {
+                Log.e(TAG, "Failed to stop screen recording via service", t)
+            }
+        }
+    }
+
+    private fun startRecordTicker() {
+        mainHandler.removeCallbacks(recordTickerRunnable)
+        mainHandler.post(recordTickerRunnable)
+    }
+
+    private fun stopRecordTicker() {
+        mainHandler.removeCallbacks(recordTickerRunnable)
+    }
+
+    private fun updateRecordTimer() {
+        val elapsed = if (recordingStartTimestamp > 0) {
+            Math.max(0L, (SystemClock.elapsedRealtime() - recordingStartTimestamp) / 1000L)
+        } else {
+            0L
+        }
+        val mins = elapsed / 60
+        val secs = elapsed % 60
+        val timeString = if (mins >= 60) {
+            val hours = mins / 60
+            val remMins = mins % 60
+            String.format("%02d:%02d:%02d", hours, remMins, secs)
+        } else {
+            String.format("%02d:%02d", mins, secs)
+        }
+
+        recordTimerView?.text = timeString
+        expandedRecordTimer?.text = timeString
+
+        // Subtle pulse on the record red dot
+        recordDotView?.let { dot ->
+            dot.animate().alpha(0.35f).setDuration(400L).withEndAction {
+                dot.animate().alpha(1.0f).setDuration(400L).start()
+            }.start()
+        }
+    }
+
+    private fun animateBoltPulse() {
+        boltIconView?.let { bolt ->
+            bolt.scaleX = 0.8f
+            bolt.scaleY = 0.8f
+            bolt.animate()
+                .scaleX(1.28f)
+                .scaleY(1.28f)
+                .setDuration(240L)
+                .withEndAction {
+                    bolt.animate().scaleX(1.0f).scaleY(1.0f).setDuration(180L).start()
+                }
+                .start()
+        }
+    }
+
+    private fun isDeviceProvisioned(): Boolean {
+        return try {
+            Settings.Global.getInt(context.contentResolver, Settings.Global.DEVICE_PROVISIONED, 0) == 1
+        } catch (_: Throwable) {
+            false
+        }
+    }
+
+    private fun isFeatureEnabled(): Boolean {
+        return try {
+            Settings.System.getInt(context.contentResolver, "dynamic_island_charging", 0) == 1
+        } catch (_: Throwable) {
+            false
+        }
+    }
+
+    enum class IslandSlot {
+        NONE,
+        CHARGING,
+        TORCH,
+        RECORD
     }
 
     companion object {
-        private const val TAG = "DynamicIslandCharging"
+        private const val TAG = "DynamicIsland"
         const val ACTION_TEST_DYNAMIC_ISLAND = "com.android.systemui.action.TEST_DYNAMIC_ISLAND"
     }
 }

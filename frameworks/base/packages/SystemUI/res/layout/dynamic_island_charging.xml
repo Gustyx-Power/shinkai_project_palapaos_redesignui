@@ -17,51 +17,189 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
-        android:id="@+id/island_capsule"
+        android:id="@+id/island_root_container"
         android:layout_width="wrap_content"
-        android:layout_height="35dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:background="@drawable/dynamic_island_pill_bg"
-        android:paddingStart="16dp"
-        android:paddingEnd="14dp">
+        android:clipChildren="false"
+        android:clipToPadding="false">
 
-        <!-- Left: Charging Status Text -->
-        <TextView
-            android:id="@+id/island_status_text"
+        <!-- Main Dynamic Island Capsule (Punch-Hole Aligned) -->
+        <FrameLayout
+            android:id="@+id/island_capsule"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/dynamic_island_charging"
-            android:textColor="#FFFFFF"
-            android:textSize="13.5sp"
-            android:fontFamily="sans-serif-medium"
-            android:singleLine="true" />
+            android:layout_height="35dp"
+            android:background="@drawable/dynamic_island_pill_bg"
+            android:clickable="true"
+            android:focusable="true">
 
-        <!-- Spacer / Gap -->
-        <View
-            android:id="@+id/island_spacer"
-            android:layout_width="32dp"
-            android:layout_height="1dp" />
+            <!-- 1. Charging Content -->
+            <LinearLayout
+                android:id="@+id/island_charging_content"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="14dp"
+                android:visibility="gone">
 
-        <!-- Right: Battery Percentage Text -->
-        <TextView
-            android:id="@+id/island_battery_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="29%"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:fontFamily="sans-serif-bold"
-            android:singleLine="true" />
+                <TextView
+                    android:id="@+id/island_status_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dynamic_island_charging"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13.5sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:singleLine="true" />
 
-        <!-- Right: Green Lightning Bolt -->
-        <ImageView
-            android:id="@+id/island_bolt_icon"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_marginStart="4dp"
-            android:src="@drawable/ic_dynamic_island_bolt"
-            android:contentDescription="@null" />
+                <View
+                    android:id="@+id/island_spacer"
+                    android:layout_width="28dp"
+                    android:layout_height="1dp" />
+
+                <TextView
+                    android:id="@+id/island_battery_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="100%"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:singleLine="true" />
+
+                <ImageView
+                    android:id="@+id/island_bolt_icon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="4dp"
+                    android:src="@drawable/ic_dynamic_island_bolt"
+                    android:contentDescription="@null" />
+            </LinearLayout>
+
+            <!-- 2. Flashlight Content (Main Pill) -->
+            <LinearLayout
+                android:id="@+id/island_torch_content"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/island_torch_icon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/qs_flashlight_icon_on"
+                    android:tint="#FFD60A"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/island_torch_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/dynamic_island_torch_label"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:singleLine="true" />
+
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="1dp" />
+
+                <TextView
+                    android:id="@+id/island_torch_action_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dynamic_island_torch_on"
+                    android:textColor="#FFD60A"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <!-- 3. Screen Recording Content (Main Pill) -->
+            <LinearLayout
+                android:id="@+id/island_record_content"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:visibility="gone">
+
+                <!-- Red Pulsing Dot -->
+                <ImageView
+                    android:id="@+id/island_record_dot"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:src="@drawable/ic_dynamic_island_record_dot"
+                    android:contentDescription="@null" />
+
+                <!-- Running Elapsed Timer (00:00) -->
+                <TextView
+                    android:id="@+id/island_record_timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="00:00"
+                    android:textColor="#FF453A"
+                    android:textSize="13.5sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:singleLine="true" />
+
+                <View
+                    android:layout_width="20dp"
+                    android:layout_height="1dp" />
+
+                <!-- Waveform / Record Icon -->
+                <ImageView
+                    android:id="@+id/island_record_stop_icon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/qs_screen_record_icon_on"
+                    android:tint="#FF453A"
+                    android:contentDescription="@null" />
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <!-- Meta-Ball (Secondary Bubble on Right Side) -->
+        <FrameLayout
+            android:id="@+id/island_meta_ball"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/dynamic_island_circle_bg"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/island_meta_icon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null" />
+
+            <!-- Red Dot for record when in meta ball -->
+            <ImageView
+                android:id="@+id/island_meta_record_dot"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_dynamic_island_record_dot"
+                android:visibility="gone"
+                android:contentDescription="@null" />
+
+        </FrameLayout>
 
     </LinearLayout>
 

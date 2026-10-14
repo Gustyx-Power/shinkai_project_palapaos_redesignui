@@ -350,12 +350,12 @@ class HomepageQuickDashboardPreferenceController(
             )
         }
 
-        // 6. Aksesibilitas & Sistem
-        pref.findViewById<View>(R.id.home_card_accessibility)?.setOnClickListener {
+        // 6. Notifikasi & Sistem
+        pref.findViewById<View>(R.id.home_card_notification)?.setOnClickListener {
             launchIntent(
-                "android.settings.ACCESSIBILITY_SETTINGS",
-                "com.android.settings.accessibility.AccessibilitySettings",
-                R.string.accessibility_settings
+                "android.settings.NOTIFICATION_SETTINGS",
+                "com.android.settings.notification.ConfigureNotificationSettings",
+                R.string.configure_notification_settings
             )
         }
 

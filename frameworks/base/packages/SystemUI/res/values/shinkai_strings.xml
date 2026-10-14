@@ -3,6 +3,12 @@
   Copyright (C) 2026 Wowo OS / Shinkai Project
 -->
 <resources>
-    <!-- Dynamic Island Charging Strings -->
+    <!-- Dynamic Island Strings -->
     <string name="dynamic_island_charging">Charging</string>
+    <string name="dynamic_island_torch_label">Flashlight</string>
+    <string name="dynamic_island_torch_on">On</string>
+    <string name="dynamic_island_torch_subtext">Tap to turn off</string>
+    <string name="dynamic_island_record_label">Recording</string>
+    <string name="dynamic_island_record_elapsed">Elapsed Time</string>
+    <string name="dynamic_island_record_stop">Stop</string>
 </resources>

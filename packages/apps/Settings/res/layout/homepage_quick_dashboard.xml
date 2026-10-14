@@ -981,9 +981,9 @@
         android:layout_marginBottom="4dp"
         android:orientation="horizontal">
 
-        <!-- Pill Aksesibilitas -->
+        <!-- Pill Notifikasi -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/home_card_accessibility"
+            android:id="@+id/home_card_notification"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -1007,14 +1007,14 @@
                 <FrameLayout
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:background="@drawable/home_circle_cyan"
+                    android:background="@drawable/home_circle_orange"
                     android:padding="7dp">
 
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/ic_settings_accessibility_filled"
-                        app:tint="#2DD4BF"
+                        android:src="@drawable/ic_notifications_filled"
+                        app:tint="#FB923C"
                         android:contentDescription="@null" />
                 </FrameLayout>
 
@@ -1028,18 +1028,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/accessibility_settings"
+                        android:text="@string/configure_notification_settings"
                         android:textSize="13.5sp"
                         android:fontFamily="@font/product_sans_bold"
                         android:textColor="?android:attr/textColorPrimary"
                         android:includeFontPadding="false" />
 
                     <TextView
-                        android:id="@+id/home_accessibility_subtitle"
+                        android:id="@+id/home_notification_subtitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="1dp"
-                        android:text="@string/home_accessibility_sub"
+                        android:text="@string/home_notification_sub"
                         android:textSize="11sp"
                         android:textColor="?android:attr/textColorSecondary"
                         android:singleLine="true"

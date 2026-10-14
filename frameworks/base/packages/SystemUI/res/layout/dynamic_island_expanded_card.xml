@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2026 Wowo OS / Shinkai Project
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/expanded_island_root"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:padding="4dp">
+
+    <!-- Card Body (Smooth Rounded Floating Island) -->
+    <LinearLayout
+        android:id="@+id/expanded_card_container"
+        android:layout_width="326dp"
+        android:layout_height="wrap_content"
+        android:minHeight="82dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/dynamic_island_expanded_bg"
+        android:paddingStart="16dp"
+        android:paddingEnd="18dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <!-- 1. Screen Recording Expanded Controls -->
+        <LinearLayout
+            android:id="@+id/expanded_record_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <!-- Circular Action Buttons (Left) -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- Stop Recording Button (Red Square) -->
+                <FrameLayout
+                    android:id="@+id/expanded_record_stop_btn"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/dynamic_island_btn_bg"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="@string/dynamic_island_record_stop">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_dynamic_island_stop"
+                        android:contentDescription="@null" />
+                </FrameLayout>
+
+                <!-- Pause / Marker Button (Amber Outline) -->
+                <FrameLayout
+                    android:id="@+id/expanded_record_pause_btn"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/dynamic_island_btn_amber_bg"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="@null">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_media_pause_button"
+                        android:tint="#FFD60A"
+                        android:contentDescription="@null" />
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- Timer / Timestamp (Right) -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="end|center_vertical">
+
+                <TextView
+                    android:id="@+id/expanded_record_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dynamic_island_record_elapsed"
+                    android:textColor="#FFD60A"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:letterSpacing="0.06"
+                    android:textAllCaps="true" />
+
+                <TextView
+                    android:id="@+id/expanded_record_timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="00:00"
+                    android:textColor="#FFFFFF"
+                    android:textSize="26sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:singleLine="true" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- 2. Flashlight Expanded Controls -->
+        <LinearLayout
+            android:id="@+id/expanded_torch_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <!-- Glowing Flashlight Toggle Button (Left) -->
+            <FrameLayout
+                android:id="@+id/expanded_torch_btn"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="@drawable/dynamic_island_btn_amber_bg"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="@string/dynamic_island_torch_label">
+
+                <ImageView
+                    android:id="@+id/expanded_torch_icon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/qs_flashlight_icon_on"
+                    android:tint="#FFD60A"
+                    android:contentDescription="@null" />
+            </FrameLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- Flashlight Status (Right) -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="end|center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dynamic_island_torch_label"
+                    android:textColor="#FFD60A"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:letterSpacing="0.06"
+                    android:textAllCaps="true" />
+
+                <TextView
+                    android:id="@+id/expanded_torch_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/dynamic_island_torch_on"
+                    android:textColor="#FFFFFF"
+                    android:textSize="22sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:singleLine="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:text="@string/dynamic_island_torch_subtext"
+                    android:textColor="#8E8E93"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif"
+                    android:singleLine="true" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- 3. Charging Expanded Info -->
+        <LinearLayout
+            android:id="@+id/expanded_charging_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <!-- Green Bolt Badge (Left) -->
+            <FrameLayout
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/dynamic_island_btn_bg">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_dynamic_island_bolt"
+                    android:contentDescription="@null" />
+            </FrameLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- Charging Percentage & Status (Right) -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="end|center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dynamic_island_charging"
+                    android:textColor="#30D158"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:letterSpacing="0.06"
+                    android:textAllCaps="true" />
+
+                <TextView
+                    android:id="@+id/expanded_battery_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="100%"
+                    android:textColor="#FFFFFF"
+                    android:textSize="25sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:singleLine="true" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

@@ -181,5 +181,10 @@
     <!-- Dynamic Island Charging Strings -->
     <string name="dynamic_island_title">Dynamic Island saat mengisi daya</string>
     <string name="dynamic_island_summary">Tampilkan kapsul status pengisian daya di sekitar notch kamera (Eksperimental)</string>
+
+    <!-- Notification & Colored Icons -->
+    <string name="home_notification_sub">Bilah status, gelembung &amp; lainnya</string>
+    <string name="notification_colored_icons_title">Ikon notifikasi berwarna</string>
+    <string name="notification_colored_icons_summary">Tampilkan logo asli berwarna dari aplikasi untuk ikon notifikasi</string>
 </resources>
 

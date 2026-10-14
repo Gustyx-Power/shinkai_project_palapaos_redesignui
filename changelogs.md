@@ -490,4 +490,69 @@ During testing and review sessions, several core interface discrepancies and sub
 - **User Request**: The Dynamic Island charging capsule was auto-retracting too fast (previously 4.5 seconds).
 - **Adjustment**: Extended the display and hold time to **7.8 seconds** (`7800L`) in `DynamicIslandChargingView.kt` so the charging status, real-time percentage, and pulsating green lightning bolt remain clearly visible before smoothly retracting back into the camera punch-hole cutout.
 
+---
+
+## Section XVI: Full Dynamic Island Evolution – Spring Physics, Meta-Ball Dual Island, and Expanded Floating Controls
+
+### 1. Requirements & Overview
+- **User Request**:
+  1. Transform the Dynamic Island into a comprehensive, true Dynamic Island system beyond just charging.
+  2. Implement iOS-style fluid **Spring & Overshoot physics**:
+     - Expansion: Horizontal expansion left and right from the POCO F5 centered camera punch-hole with bouncy spring overshoot.
+     - Closing: Two-phase elastic recoil (slight horizontal rubber stretch before rapidly collapsing into the punch-hole).
+  3. Support three core events:
+     - **Charging**: Ephemeral 7.8s hold with live battery percentage and green neon pulsing bolt.
+     - **Flashlight (Senter)**: Persistent live activity while torch is ON.
+     - **Screen Recording (Record)**: Persistent live activity while recording is active, featuring a running live timestamp timer (`00:00`, `02:31`).
+  4. **Dual-Island Meta-Ball Architecture**:
+     - When Flashlight and Screen Recording run simultaneously, Screen Recording takes priority in the **Main Capsule** (displaying the running timer) and Flashlight becomes the **Meta-Ball** (separate circular bubble on the right side).
+     - **Horizontal Swipe Gesture**: Swiping left or right smoothly swaps priorities between the main capsule and the meta-ball with spring animations.
+  5. **Interactive Expanded Floating Island Card (Tap to Expand)**:
+     - Tapping the compact island capsule springs open a floating expanded card beneath the punch-hole (`WindowManager.LayoutParams.TYPE_STATUS_BAR_SUB_PANEL`).
+     - Screen Recording Expanded: Circular Stop button (⏹️) with red accent, Pause button (⏸️), and large digital clock font for running elapsed time under golden uppercase `SISA WAKTU` / `WAKTU BERJALAN`.
+     - Flashlight Expanded: Circular glowing amber button (🔦) with power icon, status `MENYALA`, and one-tap toggle to extinguish torch.
+     - Outside touch detection (`FLAG_WATCH_OUTSIDE_TOUCH`) cleanly collapses the card back into the compact punch-hole pill.
+
+### 2. Files Modified & Added
+- `frameworks/base/packages/SystemUI/src/com/android/systemui/Dependency.java`: Added `@Inject Lazy<FlashlightController>` and `@Inject Lazy<ScreenRecordUxController>` to `mProviders` for safe controller discovery.
+- `frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/phone/DynamicIslandChargingView.kt`: Re-architected with state machine, spring overshoot animations, live timer ticker runnable, dual-island swipe gesture detector, and expanded window manager card lifecycle.
+- `frameworks/base/packages/SystemUI/res/layout/dynamic_island_charging.xml`: Rebuilt with root horizontal container, `island_capsule` (with charging, torch, and record views), and `island_meta_ball` circular bubble.
+- `frameworks/base/packages/SystemUI/res/layout/dynamic_island_expanded_card.xml`: Created expanded floating card layout with circular action buttons and large digital readout.
+- `frameworks/base/packages/SystemUI/res/drawable/dynamic_island_circle_bg.xml`: Oval pure black background with subtle white border for meta-ball.
+- `frameworks/base/packages/SystemUI/res/drawable/dynamic_island_expanded_bg.xml`: 28dp rounded rectangle pure black background for expanded card.
+- `frameworks/base/packages/SystemUI/res/drawable/dynamic_island_btn_bg.xml`: Circular ripple button background for stop and action controls.
+- `frameworks/base/packages/SystemUI/res/drawable/dynamic_island_btn_amber_bg.xml`: Circular glowing amber button background for torch and pause controls.
+- `frameworks/base/packages/SystemUI/res/drawable/ic_dynamic_island_record_dot.xml`: Pure red pulsing dot for screen recording indicator.
+- `frameworks/base/packages/SystemUI/res/drawable/ic_dynamic_island_stop.xml`: Square stop vector asset for recording dismissal.
+- `frameworks/base/packages/SystemUI/res/values/shinkai_strings.xml` & `res/values-in/shinkai_strings.xml`: English and Indonesian strings for torch and recording labels.
+
+---
+
+## Section XVII: Home Settings Notification Dashboard Card & Colored Notification Icons
+
+### 1. Requirements & Overview
+- **User Request**:
+  1. In the Home Settings Quick Dashboard (`homepage_quick_dashboard.xml`), replace the **Accessibility** card with a dedicated **Notification** panel card.
+  2. Inside Notification Settings (`ConfigureNotificationSettings`), add a new feature toggle: **Colored Notification Icons** (`notification_colored_icons`).
+  3. "Colored Notification Icons": display the real, full-color application logos (`pm.getApplicationIcon(packageName)`) for notifications in the status bar and shade cards instead of monochrome/tinted silhouettes (as popularized by Evolution X, crDroid, and Iconify).
+
+### 2. Implementation Details
+1. **Home Settings Quick Dashboard Panel Replacement (`packages/apps/Settings`)**:
+   - `homepage_quick_dashboard.xml`: Replaced `home_card_accessibility` with `home_card_notification` featuring a warm orange icon container (`#FB923C`), `@drawable/ic_notifications_filled`, title `@string/configure_notification_settings`, and subtitle `@string/home_notification_sub`.
+   - `HomepageQuickDashboardPreferenceController.kt`: Bound `home_card_notification` click listener to launch `Settings.ACTION_NOTIFICATION_SETTINGS` / `ConfigureNotificationSettings`.
+2. **Settings Preference Controller & XML Integration**:
+   - `ColoredNotificationIconsPreferenceController.java`: Created `TogglePreferenceController` controlling `Settings.System.notification_colored_icons`.
+   - `configure_notification_settings.xml`: Added `<SwitchPreferenceCompat>` with key `notification_colored_icons` at order 0 under `general_notifications_category`.
+   - `res/values/shinkai_strings.xml` & `res/values-in/shinkai_strings.xml`: Added localization strings for English and Indonesian.
+3. **SystemUI Real-Time Colored Notification Icon Rendering (`frameworks/base`)**:
+   - `StatusBarIconView.java`:
+     * In `loadDrawable`: If `isNotification()` and `notification_colored_icons == 1`, loads and returns the authentic launcher application icon via `pm.getApplicationIcon(packageName)`.
+     * In `updateIconColor`: Bypasses matrix color tinting and grayscaling when the screen is active, ensuring authentic app brand colors remain untouched.
+     * In `setNotification`: Immediately updates drawable and color state when a notification is attached.
+   - `NotificationHeaderViewWrapper.java`:
+     * In `onContentUpdated`: Replaces monochromatic header small icon with the full-color app logo (`mIcon.setImageDrawable(appIcon)`), clears color filters, resets background, and normalizes padding for pristine display in shade and lockscreen cards.
+   - `IconManager.kt`:
+     * In `attach()`: Registered a `ContentObserver` on `Settings.System.getUriFor("notification_colored_icons")` that dynamically re-renders all existing notification icons via `updateIconsSafe(entry)` in real time when toggled, without requiring a SystemUI reboot.
+
+
 
