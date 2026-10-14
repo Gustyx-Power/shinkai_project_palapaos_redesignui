@@ -20,6 +20,9 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.app.ActivityManager
+import android.app.BroadcastOptions
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -54,6 +57,7 @@ import com.android.systemui.Dependency
 import com.android.systemui.res.R
 import com.android.systemui.screenrecord.RecordingService
 import com.android.systemui.screenrecord.ScreenRecordUxController
+import com.android.systemui.screenrecord.service.ScreenRecordingService
 import com.android.systemui.statusbar.policy.FlashlightController
 
 /**
@@ -808,15 +812,9 @@ class DynamicIslandChargingView @JvmOverloads constructor(
             expandedTorchStatus = root.findViewById(R.id.expanded_torch_status)
 
             val stopBtn: FrameLayout? = root.findViewById(R.id.expanded_record_stop_btn)
-            val pauseBtn: FrameLayout? = root.findViewById(R.id.expanded_record_pause_btn)
             val torchBtn: FrameLayout? = root.findViewById(R.id.expanded_torch_btn)
 
             stopBtn?.setOnClickListener {
-                stopScreenRecording()
-                dismissExpandedCard()
-            }
-
-            pauseBtn?.setOnClickListener {
                 stopScreenRecording()
                 dismissExpandedCard()
             }
@@ -996,25 +994,82 @@ class DynamicIslandChargingView @JvmOverloads constructor(
     }
 
     private fun stopScreenRecording() {
+        Log.d(TAG, "Dynamic Island: Stopping screen recording via multi-layered dispatch")
+
+        // Layer 1: Trigger active screen record notification's stop PendingIntent directly
         try {
-            screenRecordController?.stopRecording(StopReason.STOP_HOST_APP)
-        } catch (_: Throwable) {
-            try {
-                val stopIntent = RecordingService.getStopIntent(context)
-                PendingIntent.getService(
-                    context,
-                    RecordingService.REQUEST_CODE,
-                    stopIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                ).send()
-            } catch (t: Throwable) {
-                try {
-                    context.startService(RecordingService.getStopIntent(context))
-                } catch (e: Throwable) {
-                    Log.e(TAG, "Failed to stop screen recording via service", e)
+            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+            nm?.activeNotifications?.forEach { sbn ->
+                val channelId = sbn.notification.channelId
+                if (channelId == "screen_record" || sbn.id in 4273..4285) {
+                    sbn.notification.actions?.forEach { act ->
+                        try {
+                            act.actionIntent?.send()
+                            Log.d(TAG, "Sent stop via notification action intent")
+                        } catch (e: Throwable) {
+                            Log.w(TAG, "Failed sending notification actionIntent", e)
+                        }
+                    }
                 }
             }
+        } catch (t: Throwable) {
+            Log.w(TAG, "Failed inspecting notification actions", t)
         }
+
+        // Layer 2: Send stop intent to ScreenRecordingService (New Android 15/17 Coroutine/Flow Service)
+        try {
+            val intent1 = Intent(context, ScreenRecordingService::class.java).apply {
+                action = ScreenRecordingService.ACTION_STOP
+                putExtra(ScreenRecordingService.EXTRA_STOP_REASON, StopReason.STOP_HOST_APP)
+            }
+            context.startService(intent1)
+            Log.d(TAG, "Sent startService with ACTION_STOP to ScreenRecordingService")
+        } catch (t: Throwable) {
+            Log.w(TAG, "Failed to startService on ScreenRecordingService", t)
+        }
+
+        // Layer 3: Send stop intent to RecordingService (Legacy Foreground Service)
+        try {
+            val currentUserId = ActivityManager.getCurrentUser()
+            val intent2 = Intent(context, RecordingService::class.java).apply {
+                action = "com.android.systemui.screenrecord.STOP_FROM_NOTIF"
+                putExtra("extra_stopReason", StopReason.STOP_HOST_APP)
+                putExtra(Intent.EXTRA_USER_HANDLE, currentUserId)
+            }
+            context.startService(intent2)
+            Log.d(TAG, "Sent startService with STOP_FROM_NOTIF to RecordingService")
+        } catch (t: Throwable) {
+            Log.w(TAG, "Failed to startService on RecordingService", t)
+        }
+
+        // Layer 4: Broadcast/Service PendingIntent with interactive BroadcastOptions
+        try {
+            val currentUserId = ActivityManager.getCurrentUser()
+            val stopIntent3 = RecordingService.getStopIntent(context).apply {
+                putExtra(Intent.EXTRA_USER_HANDLE, currentUserId)
+                putExtra("extra_stopReason", StopReason.STOP_HOST_APP)
+            }
+            val bOptions = BroadcastOptions.makeBasic().setInteractive(true).toBundle()
+            PendingIntent.getService(
+                context,
+                RecordingService.REQUEST_CODE,
+                stopIntent3,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            ).send(bOptions)
+            Log.d(TAG, "Sent PendingIntent with BroadcastOptions to RecordingService")
+        } catch (t: Throwable) {
+            Log.w(TAG, "Failed to send PendingIntent to RecordingService", t)
+        }
+
+        // Layer 5: Fallback via ScreenRecordUxController
+        try {
+            screenRecordController?.stopRecording(StopReason.STOP_HOST_APP)
+        } catch (t: Throwable) {
+            Log.w(TAG, "Failed to stop recording via screenRecordController", t)
+        }
+
+        isRecording = false
+        refreshIslandState(animate = true)
     }
 
     private fun startRecordTicker() {

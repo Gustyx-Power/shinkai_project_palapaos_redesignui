@@ -47,51 +47,23 @@
             android:visibility="gone">
 
             <!-- Circular Action Buttons (Left) -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+            <!-- Stop Recording Button (Red Circle with White Square) -->
+            <FrameLayout
+                android:id="@+id/expanded_record_stop_btn"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/dynamic_island_btn_bg"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="@string/dynamic_island_record_stop">
 
-                <!-- Stop Recording Button (Red Square) -->
-                <FrameLayout
-                    android:id="@+id/expanded_record_stop_btn"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:background="@drawable/dynamic_island_btn_bg"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:contentDescription="@string/dynamic_island_record_stop">
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_dynamic_island_stop"
-                        android:contentDescription="@null" />
-                </FrameLayout>
-
-                <!-- Pause / Marker Button (Amber Outline) -->
-                <FrameLayout
-                    android:id="@+id/expanded_record_pause_btn"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:layout_marginStart="10dp"
-                    android:background="@drawable/dynamic_island_btn_amber_bg"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:contentDescription="@null">
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_media_pause_button"
-                        android:tint="#FFD60A"
-                        android:contentDescription="@null" />
-                </FrameLayout>
-
-            </LinearLayout>
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_dynamic_island_stop"
+                    android:contentDescription="@null" />
+            </FrameLayout>
 
             <View
                 android:layout_width="0dp"

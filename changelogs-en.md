@@ -620,3 +620,30 @@ During testing and review sessions, several core interface discrepancies and sub
    - `dynamic_island_charging.xml`:
      * Redesigned `island_record_content` with `minWidth="200dp"`, eliminating the cramped/short appearance and matching the balanced width of the charging capsule.
      * Symmetrical dual-wing architecture: Left wing hosts the pulsing red indicator dot (`gravity="start"`), center features a 36dp clearance spacer positioned directly across the camera punch-hole, and right wing houses the bold red digital timer (`00:00`) and record icon (`gravity="end"`). This ensures the punch-hole never occludes content and maintains iOS Dynamic Island symmetry.
+
+---
+
+## Section XIX: Dynamic Island Settings Nomenclature Tuning & Screen Record Multi-Layer Stop Dispatch
+
+### 1. Requirements & Overview
+- **User Request**:
+  1. The title in Settings still read "Dynamic Island charging", whereas flashlight and screen recording activities are already supported.
+  2. String localizations were inconsistent across Indonesian and English (such as the elapsed time label previously displaying countdown text).
+  3. Bug during screen recording: pressing the square stop button only dismissed the island while background recording continued running. Tapping pause also failed to pause and immediately closed the island.
+
+### 2. Implementation Details
+1. **Settings Nomenclature & Description Updates (`packages/apps/Settings`)**:
+   - `shinkai_strings.xml` (EN): Updated `dynamic_island_title` to "Dynamic Island" and `dynamic_island_summary` to "Interactive punch-hole capsule for charging, flashlight, and screen recording (Experimental)".
+   - `values-in/shinkai_strings.xml` (ID): Updated `dynamic_island_title` to "Dynamic Island" and `dynamic_island_summary` to "Kapsul interaktif notch kamera untuk pengisian daya, senter, dan perekam layar (Eksperimental)".
+2. **SystemUI Localization Harmonization (`frameworks/base/packages/SystemUI`)**:
+   - `values-in/shinkai_strings.xml`: Corrected `dynamic_island_record_elapsed` to "Waktu Berjalan" (replacing misleading countdown string) and aligned `dynamic_island_record_label` to "Perekam Layar".
+   - `values/shinkai_strings.xml`: Aligned `dynamic_island_record_label` to "Screen Recording".
+3. **Multi-Layer Screen Recording Stop Dispatch**:
+   - `DynamicIslandChargingView.kt`: Resolved the root cause where `RecordingController.stopRecording()` prematurely flipped `isRecording` state to false while silently dropping stop execution when `mStop` was null. Implemented a 5-layer redundant stop pipeline:
+     * Layer 1: Directly triggers the active recording notification's stop `actionIntent` (`channelId == "screen_record"`).
+     * Layer 2: Dispatches `ScreenRecordingService.ACTION_STOP` with `STOP_HOST_APP` to Android 15/17 flow-based `ScreenRecordingService`.
+     * Layer 3: Dispatches `STOP_FROM_NOTIF` with `currentUserId` to legacy `RecordingService`.
+     * Layer 4: Dispatches interactive `PendingIntent` with `BroadcastOptions` to bypass background execution limitations.
+     * Layer 5: Fallback dispatch via `screenRecordController?.stopRecording(...)`.
+4. **Expanded Card Streamlining (iOS Authentic Form Factor)**:
+   - `dynamic_island_expanded_card.xml`: Eliminated the non-functional pause button (unsupported by AOSP MediaProjection architecture) and enlarged the red Stop button (44dp with 18dp square icon), matching authentic iOS Dynamic Island design.

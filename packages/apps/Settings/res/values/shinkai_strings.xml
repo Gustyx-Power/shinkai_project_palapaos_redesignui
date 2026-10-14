@@ -264,9 +264,9 @@
     <string name="qs_oneui_style_title">One UI Control Center</string>
     <string name="qs_oneui_style_summary">Use One UI 9 style Control Center with segregated cards and sliders</string>
 
-    <!-- Dynamic Island Charging Strings -->
-    <string name="dynamic_island_title">Dynamic Island charging</string>
-    <string name="dynamic_island_summary">Show charging status pill expanding from camera punch-hole cutout (Experimental)</string>
+    <!-- Dynamic Island Strings -->
+    <string name="dynamic_island_title">Dynamic Island</string>
+    <string name="dynamic_island_summary">Interactive punch-hole capsule for charging, flashlight, and screen recording (Experimental)</string>
 
     <!-- Notification & Colored Icons -->
     <string name="home_notification_sub">Status bar, bubbles &amp; more</string>

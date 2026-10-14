@@ -178,9 +178,9 @@
     <string name="qs_oneui_style_title">Control Center One UI</string>
     <string name="qs_oneui_style_summary">Gunakan tampilan Control Center bergaya One UI 9 dengan kartu dan slider terpisah</string>
 
-    <!-- Dynamic Island Charging Strings -->
-    <string name="dynamic_island_title">Dynamic Island saat mengisi daya</string>
-    <string name="dynamic_island_summary">Tampilkan kapsul status pengisian daya di sekitar notch kamera (Eksperimental)</string>
+    <!-- Dynamic Island Strings -->
+    <string name="dynamic_island_title">Dynamic Island</string>
+    <string name="dynamic_island_summary">Kapsul interaktif notch kamera untuk pengisian daya, senter, dan perekam layar (Eksperimental)</string>
 
     <!-- Notification & Colored Icons -->
     <string name="home_notification_sub">Bilah status, gelembung &amp; lainnya</string>

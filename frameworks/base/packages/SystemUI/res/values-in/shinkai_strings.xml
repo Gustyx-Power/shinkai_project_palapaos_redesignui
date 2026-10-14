@@ -8,7 +8,7 @@
     <string name="dynamic_island_torch_label">Senter</string>
     <string name="dynamic_island_torch_on">Menyala</string>
     <string name="dynamic_island_torch_subtext">Ketuk untuk mematikan</string>
-    <string name="dynamic_island_record_label">Rekam Layar</string>
-    <string name="dynamic_island_record_elapsed">Sisa Waktu</string>
+    <string name="dynamic_island_record_label">Perekam Layar</string>
+    <string name="dynamic_island_record_elapsed">Waktu Berjalan</string>
     <string name="dynamic_island_record_stop">Berhenti</string>
 </resources>

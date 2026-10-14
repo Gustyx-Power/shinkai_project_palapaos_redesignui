@@ -620,3 +620,30 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - `dynamic_island_charging.xml`:
      * Mendesain ulang `island_record_content` dengan `minWidth="200dp"`, menghilangkan tampilan yang terlalu pendek/sempit dan menyelaraskannya dengan lebar seimbang kapsul pengisian daya.
      * Arsitektur sayap ganda yang simetris: Sayap kiri memuat titik indikator merah berdenyut (`gravity="start"`), bagian tengah menyediakan ruang kosong 36dp tepat di posisi punch-hole kamera, dan sayap kanan menampung penghitung waktu digital merah tebal (`00:00`) serta ikon rekam (`gravity="end"`). Desain ini memastikan lubang kamera tidak pernah menutupi konten dan menjaga simetri Dynamic Island ala iOS.
+
+---
+
+## Bagian XIX: Penyempurnaan Teks Dynamic Island di Pengaturan & Perbaikan Penghentian Perekaman Layar
+
+### 1. Kebutuhan & Gambaran Umum
+- **Permintaan Pengguna**:
+  1. Teks Dynamic Island pada Pengaturan masih bertuliskan "Dynamic Island charging", padahal fiturnya telah diperluas mencakup senter dan perekam layar.
+  2. Lokalisasi teks masih belang-belang antara bahasa Indonesia dan Inggris (misalnya teks waktu perekaman yang sebelumnya bertuliskan "Sisa Waktu").
+  3. Bug pada Dynamic Island saat perekaman layar: menekan tombol kotak stop hanya menghilangkan pulau/island sementara proses perekaman di latar belakang tetap berjalan. Tombol pause juga tidak berfungsi menjeda rekaman.
+
+### 2. Detail Implementasi
+1. **Pembaruan String & Judul Pengaturan (`packages/apps/Settings`)**:
+   - `shinkai_strings.xml` (EN): Memperbarui `dynamic_island_title` menjadi "Dynamic Island" dan `dynamic_island_summary` menjadi "Interactive punch-hole capsule for charging, flashlight, and screen recording (Experimental)".
+   - `values-in/shinkai_strings.xml` (ID): Memperbarui `dynamic_island_title` menjadi "Dynamic Island" dan `dynamic_island_summary` menjadi "Kapsul interaktif notch kamera untuk pengisian daya, senter, dan perekam layar (Eksperimental)".
+2. **Penyelarasan Lokalisasi SystemUI (`frameworks/base/packages/SystemUI`)**:
+   - `values-in/shinkai_strings.xml`: Memperbaiki label `dynamic_island_record_elapsed` menjadi "Waktu Berjalan" (menggantikan "Sisa Waktu" yang keliru), dan menyelaraskan `dynamic_island_record_label` menjadi "Perekam Layar".
+   - `values/shinkai_strings.xml`: Memperbarui `dynamic_island_record_label` menjadi "Screen Recording".
+3. **Perbaikan Penghentian Perekaman Layar Berlapis (Multi-Layer Stop Dispatch)**:
+   - `DynamicIslandChargingView.kt`: Mengatasi akar masalah di mana pemanggilan tunggal `stopRecording()` pada `RecordingController` mengembalikan nilai tanpa aksi jika `mStop` bernilai null sambil tergesa-gesa mengubah status `isRecording` menjadi false. Menggantikannya dengan pipa penghentian redundan 5 lapis:
+     * Lapisan 1: Memicu langsung `actionIntent` (PendingIntent berhenti) dari notifikasi perekam layar aktif (`channelId == "screen_record"`).
+     * Lapisan 2: Mengirim intent `ScreenRecordingService.ACTION_STOP` dengan `EXTRA_STOP_REASON = STOP_HOST_APP` ke `ScreenRecordingService` (layanan coroutine/flow Android 15/17).
+     * Lapisan 3: Mengirim intent `STOP_FROM_NOTIF` dengan `currentUserId` ke layanan `RecordingService` warisan (legacy).
+     * Lapisan 4: Mengirim PendingIntent interaktif dengan `BroadcastOptions` aktif untuk melewati batasan eksekusi latar belakang.
+     * Lapisan 5: Menjalankan `screenRecordController?.stopRecording(...)` sebagai cadangan framework.
+4. **Penyederhanaan Kartu Diperluas Rekam Layar (Gaya Asli iOS)**:
+   - `dynamic_island_expanded_card.xml`: Menghapus tombol jeda (`pause`) yang tidak didukung secara native oleh arsitektur AOSP MediaProjection, dan membesarkan tombol Stop lingkaran merah (44dp dengan ikon kotak 18dp) sehingga fokus kontrol menjadi jelas, responsif, dan sesuai dengan Dynamic Island asli iOS.
