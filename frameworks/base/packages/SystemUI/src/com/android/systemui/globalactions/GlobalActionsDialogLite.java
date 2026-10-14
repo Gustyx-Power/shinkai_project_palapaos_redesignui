@@ -56,6 +56,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -138,6 +139,8 @@ import com.android.systemui.globalactions.shared.model.GlobalActionType;
 import com.android.systemui.globalactions.shared.model.GlobalActionsEvent;
 import com.android.systemui.plugins.ActivityStarter;
 import com.android.systemui.deviceentry.domain.interactor.DeviceEntryInteractor;
+import com.android.systemui.Dependency;
+import com.android.systemui.statusbar.policy.FlashlightController;
 import com.android.systemui.plugins.GlobalActions.GlobalActionsManager;
 import com.android.systemui.plugins.GlobalActionsPanelPlugin;
 import com.android.systemui.scene.shared.flag.SceneContainerFlag;
@@ -2801,6 +2804,10 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
         @Nullable
         private ListPopupWindow mOverflowPopup;
         private float mInitialWindowDimAmount;
+        @Nullable
+        private FlashlightController.FlashlightListener mTorchListener;
+        @Nullable
+        private ContentObserver mAirplaneContentObserver;
 
         private final OnBackInvokedCallback mOnBackInvokedCallback = () -> {
             if (mEnhancedAdvContainer != null && mEnhancedAdvContainer.getVisibility() == View.VISIBLE) {
@@ -3254,46 +3261,105 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
         }
 
         private void setupEnhancedControls(@NonNull SystemUIDialog dialog) {
-            View btnHome = dialog.findViewById(com.android.systemui.res.R.id.btn_home_control);
-            View btnWallet = dialog.findViewById(com.android.systemui.res.R.id.btn_wallet);
+            View btnTorch = dialog.findViewById(com.android.systemui.res.R.id.btn_torch);
+            TextView txtTorchStatus = dialog.findViewById(com.android.systemui.res.R.id.txt_torch_status);
+            View btnAirplane = dialog.findViewById(com.android.systemui.res.R.id.btn_airplane);
+            TextView txtAirplaneStatus = dialog.findViewById(com.android.systemui.res.R.id.txt_airplane_status);
 
-            if (btnHome != null) {
-                btnHome.setOnClickListener(v -> {
-                    mRescheduleBurnInTimeout.run();
-                    dismissWithoutAnimation();
-                    try {
-                        Intent homeIntent = new Intent(mContext, com.android.systemui.controls.ui.ControlsActivity.class);
-                        homeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        mContext.startActivityAsUser(homeIntent, mUserTracker.getUserHandle());
-                    } catch (Exception e) {
-                        try {
-                            Intent fallback = new Intent(android.provider.Settings.ACTION_SETTINGS);
-                            fallback.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            mContext.startActivityAsUser(fallback, mUserTracker.getUserHandle());
-                        } catch (Exception ignored) {}
+            // Setup Flashlight (Senter) - 100% Real hardware toggle
+            FlashlightController flashlightController = Dependency.get(FlashlightController.class);
+            if (btnTorch != null && flashlightController != null) {
+                final Runnable updateTorchUi = () -> {
+                    boolean isEnabled = flashlightController.isEnabled();
+                    btnTorch.setBackgroundResource(isEnabled
+                            ? com.android.systemui.res.R.drawable.power_menu_control_torch_on_bg
+                            : com.android.systemui.res.R.drawable.power_menu_control_off_bg);
+                    if (txtTorchStatus != null) {
+                        txtTorchStatus.setText(isEnabled
+                                ? com.android.systemui.res.R.string.power_menu_torch_on
+                                : com.android.systemui.res.R.string.power_menu_torch_off);
+                        txtTorchStatus.setTextColor(isEnabled ? 0xFFFFD60A : 0xFFA6B0AA);
                     }
+                };
+
+                updateTorchUi.run();
+
+                mTorchListener = new FlashlightController.FlashlightListener() {
+                    @Override
+                    public void onFlashlightChanged(boolean enabled) {
+                        btnTorch.post(updateTorchUi);
+                    }
+
+                    @Override
+                    public void onFlashlightError() {
+                        btnTorch.post(updateTorchUi);
+                    }
+
+                    @Override
+                    public void onFlashlightAvailabilityChanged(boolean available) {
+                        btnTorch.post(updateTorchUi);
+                    }
+                };
+                flashlightController.addCallback(mTorchListener);
+
+                btnTorch.setOnClickListener(v -> {
+                    v.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
+                    mRescheduleBurnInTimeout.run();
+                    boolean newState = !flashlightController.isEnabled();
+                    flashlightController.setFlashlight(newState);
+                    updateTorchUi.run();
                 });
             }
 
-            if (btnWallet != null) {
-                btnWallet.setOnClickListener(v -> {
-                    mRescheduleBurnInTimeout.run();
-                    dismissWithoutAnimation();
-                    try {
-                        Intent walletIntent = mContext.getPackageManager().getLaunchIntentForPackage("com.google.android.apps.walletnfcrel");
-                        if (walletIntent == null) {
-                            walletIntent = new Intent(mContext, com.android.systemui.wallet.ui.WalletActivity.class);
-                            walletIntent.setAction(Intent.ACTION_VIEW);
-                        }
-                        walletIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        mContext.startActivityAsUser(walletIntent, mUserTracker.getUserHandle());
-                    } catch (Exception e) {
-                        try {
-                            Intent nfcIntent = new Intent(android.provider.Settings.ACTION_NFC_PAYMENT_SETTINGS);
-                            nfcIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            mContext.startActivityAsUser(nfcIntent, mUserTracker.getUserHandle());
-                        } catch (Exception ignored) {}
+            // Setup Airplane Mode (Mode Pesawat) - 100% Real network toggle
+            ConnectivityManager cm = mContext.getSystemService(ConnectivityManager.class);
+            if (btnAirplane != null) {
+                final Runnable updateAirplaneUi = () -> {
+                    int mode = Settings.Global.getInt(
+                            mContext.getContentResolver(),
+                            Settings.Global.AIRPLANE_MODE_ON, 0);
+                    boolean isAirplaneOn = mode != 0;
+                    btnAirplane.setBackgroundResource(isAirplaneOn
+                            ? com.android.systemui.res.R.drawable.power_menu_control_airplane_on_bg
+                            : com.android.systemui.res.R.drawable.power_menu_control_off_bg);
+                    if (txtAirplaneStatus != null) {
+                        txtAirplaneStatus.setText(isAirplaneOn
+                                ? com.android.systemui.res.R.string.power_menu_airplane_on
+                                : com.android.systemui.res.R.string.power_menu_airplane_off);
+                        txtAirplaneStatus.setTextColor(isAirplaneOn ? 0xFF80D2DC : 0xFFA6B0AA);
                     }
+                };
+
+                updateAirplaneUi.run();
+
+                mAirplaneContentObserver = new ContentObserver(new Handler(mContext.getMainLooper())) {
+                    @Override
+                    public void onChange(boolean selfChange) {
+                        btnAirplane.post(updateAirplaneUi);
+                    }
+                };
+                mContext.getContentResolver().registerContentObserver(
+                        Settings.Global.getUriFor(Settings.Global.AIRPLANE_MODE_ON),
+                        false,
+                        mAirplaneContentObserver);
+
+                btnAirplane.setOnClickListener(v -> {
+                    v.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
+                    mRescheduleBurnInTimeout.run();
+                    int currentMode = Settings.Global.getInt(
+                            mContext.getContentResolver(),
+                            Settings.Global.AIRPLANE_MODE_ON, 0);
+                    boolean targetState = currentMode == 0;
+                    if (cm != null) {
+                        cm.setAirplaneMode(targetState);
+                    } else {
+                        Settings.Global.putInt(mContext.getContentResolver(),
+                                Settings.Global.AIRPLANE_MODE_ON, targetState ? 1 : 0);
+                        Intent intent = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+                        intent.putExtra("state", targetState);
+                        mContext.sendBroadcastAsUser(intent, UserHandle.ALL);
+                    }
+                    updateAirplaneUi.run();
                 });
             }
         }
@@ -3472,6 +3538,17 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
             mColorExtractor.removeOnColorsChangedListener(this);
             dialog.getOnBackInvokedDispatcher()
                     .unregisterOnBackInvokedCallback(mOnBackInvokedCallback);
+            if (mTorchListener != null) {
+                FlashlightController fc = Dependency.get(FlashlightController.class);
+                if (fc != null) {
+                    fc.removeCallback(mTorchListener);
+                }
+                mTorchListener = null;
+            }
+            if (mAirplaneContentObserver != null) {
+                mContext.getContentResolver().unregisterContentObserver(mAirplaneContentObserver);
+                mAirplaneContentObserver = null;
+            }
             if (DEBUG) Log.d(TAG, "OnBackInvokedCallback handler unregistered");
         }
 

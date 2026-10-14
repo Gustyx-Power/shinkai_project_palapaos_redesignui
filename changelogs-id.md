@@ -942,3 +942,54 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - Menambahkan opsi switch enhanced_power_menu pada packages/apps/Settings/res/xml/power_menu_settings.xml tepat di bawah advanced_reboot.
    - Menyediakan handler otomatis pada PowerMenuSettings.java yang mengirimkan broadcast pemuatan ulang SystemUI saat switch diubah.
    - Melokalkan seluruh string pendukung dalam Bahasa Indonesia (res/values-in/shinkai_strings.xml) dan Bahasa Inggris (res/values/shinkai_strings.xml).
+
+
+---
+
+## Bagian XXIX: Pembaruan Menu Daya Wowo OS: Penggantian Tag Menjadi Wowo OS dan Kontrol Cepat Senter serta Mode Pesawat Fungsional
+
+### 1. Kebutuhan & Gambaran Umum
+- **Permintaan Pengguna**:
+  - Menghapus tag "Pixel VIP" pada kartu kontrol cepat bawah dan menggantinya menjadi "Wowo OS".
+  - Mengganti kontrol cepat Lampu Kamar (Kontrol Rumah) dan Google Wallet yang jarang digunakan menjadi:
+    * Senter (Flashlight): Berfungsi nyata 100% untuk menghidupkan dan mematikan senter perangkat via FlashlightController secara langsung, lengkap dengan sinkronisasi status (Nyala / Mati) dan perubahan warna latar kartu secara dinamis.
+    * Mode Pesawat (Airplane Mode): Berfungsi nyata 100% untuk mengaktifkan dan menonaktifkan mode pesawat via ConnectivityManager dan Settings.Global.AIRPLANE_MODE_ON secara langsung, lengkap dengan sinkronisasi status (Aktif / Nonaktif) dan perubahan warna latar kartu secara dinamis.
+  - Memperbarui label judul grup kontrol menjadi "Kontrol Cepat Sistem".
+  - Mempertahankan integritas bebas fitur dummy dan bebas emoji di seluruh dokumentasi.
+
+### 2. Detail Implementasi
+1. **Pembaruan String Sumber Daya (Bahasa Indonesia & Bahasa Inggris)**:
+   - Memperbarui berkas frameworks/base/packages/SystemUI/res/values/shinkai_strings.xml:
+     * power_menu_vip_tag: "Wowo OS"
+     * power_menu_quick_controls: "Quick System Controls"
+     * power_menu_torch: "Flashlight", power_menu_torch_on: "On", power_menu_torch_off: "Off"
+     * power_menu_airplane: "Airplane Mode", power_menu_airplane_on: "On", power_menu_airplane_off: "Off"
+   - Memperbarui berkas frameworks/base/packages/SystemUI/res/values-in/shinkai_strings.xml:
+     * power_menu_vip_tag: "Wowo OS"
+     * power_menu_quick_controls: "Kontrol Cepat Sistem"
+     * power_menu_torch: "Senter", power_menu_torch_on: "Nyala", power_menu_torch_off: "Mati"
+     * power_menu_airplane: "Mode Pesawat", power_menu_airplane_on: "Aktif", power_menu_airplane_off: "Nonaktif"
+2. **Aset Vektor & Drawable Status Aktif/Nonaktif**:
+   - ic_power_menu_torch.xml: Ikon vektor senter presisi dengan siluet tabung dan reflektor kuning cerah #FFD60A.
+   - ic_power_menu_airplane.xml: Ikon vektor pesawat terbang aero-dinamis berwarna cyan/teal #80D2DC.
+   - power_menu_control_torch_on_bg.xml: Drawable ripple berlatar hijau zaitun/amber gelap #2E3812 dengan kontur #4D5E1F saat senter aktif.
+   - power_menu_control_airplane_on_bg.xml: Drawable ripple berlatar deep teal #163A42 dengan kontur #245964 saat mode pesawat aktif.
+   - power_menu_control_off_bg.xml: Drawable ripple berlatar slate gelap netral #28322D dengan sudut membulat 18dp saat tile dalam keadaan nonaktif.
+3. **Penyempurnaan Tata Letak Antarmuka (global_actions_enhanced_menu.xml)**:
+   - Memperbarui badge tag pojok kanan atas kartu kontrol cepat bawah agar mereferensikan @string/power_menu_vip_tag (Wowo OS).
+   - Menghubungkan tombol kiri sebagai @+id/btn_torch yang memuat ikon @drawable/ic_power_menu_torch, teks judul @string/power_menu_torch, dan status @+id/txt_torch_status.
+   - Menghubungkan tombol kanan sebagai @+id/btn_airplane yang memuat ikon @drawable/ic_power_menu_airplane, teks judul @string/power_menu_airplane, dan status @+id/txt_airplane_status.
+4. **Logika Kontrol Riil & Sinkronisasi Siklus Hidup (GlobalActionsDialogLite.java)**:
+   - **FlashlightController Integration**:
+     * Mengambil instance FlashlightController melalui Dependency.get(FlashlightController.class).
+     * Menginisialisasi status senter secara riil saat menu terbuka (flashlightController.isEnabled()) dan menerapkan background aktif atau pasif serta teks "Nyala" (warna #FFD60A) atau "Mati" (warna #A6B0AA).
+     * Mendaftarkan FlashlightListener dinamis untuk memantau perubahan hardware senter secara real-time.
+     * Saat tile diketuk, mengeksekusi v.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK), memperbarui state via flashlightController.setFlashlight(!isEnabled), dan memperbarui visual tombol seketika tanpa perlu menutup menu daya.
+   - **ConnectivityManager & Settings Integration**:
+     * Memeriksa status mode pesawat riil via Settings.Global.getInt(mContext.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0) == 1.
+     * Menerapkan warna tema aktif teal #163A42 dan teks "Aktif" (#80D2DC) atau nonaktif #28322D dan teks "Nonaktif" (#A6B0AA).
+     * Mendaftarkan ContentObserver pada URI Settings.Global.AIRPLANE_MODE_ON untuk mendeteksi perubahan mode pesawat dari sumber mana pun (Quick Settings, Pengaturan, atau skrip).
+     * Saat tile diketuk, mengeksekusi feedback haptik taktil, memanggil ConnectivityManager.setAirplaneMode(!isAirplaneOn) serta broadcast ACTION_AIRPLANE_MODE_CHANGED, dan langsung merefleksikan perubahan visual di layar.
+   - **Pembersihan Bersih pada onStop**:
+     * Melepas callback mTorchListener dari FlashlightController.
+     * Menghapus mAirplaneContentObserver dari ContentResolver guna mencegah kebocoran memori (memory leak).

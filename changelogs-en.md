@@ -942,3 +942,54 @@ During testing and review sessions, several core interface discrepancies and sub
    - Added switch preference enhanced_power_menu in packages/apps/Settings/res/xml/power_menu_settings.xml directly under advanced_reboot.
    - Implemented preference listener in PowerMenuSettings.java that automatically broadcasts SysuiRestartReceiver.ACTION when toggled.
    - Fully localized all strings in Indonesian (res/values-in/shinkai_strings.xml) and English (res/values/shinkai_strings.xml).
+
+
+---
+
+## Section XXIX: Wowo OS Power Menu Update: Wowo OS Tag Rebranding and Functional Flashlight & Airplane Mode Quick Controls
+
+### 1. Requirements & Overview
+- **User Request**:
+  - Remove the "Pixel VIP" tag on the bottom quick controls card and rebrand it to "Wowo OS".
+  - Replace rarely used Home Controls and Google Wallet tiles with:
+    * Flashlight (Senter): 100% functionally wired to hardware flash control via FlashlightController, including live state synchronization (On / Off) and dynamic background state tinting.
+    * Airplane Mode (Mode Pesawat): 100% functionally wired to system radio toggling via ConnectivityManager and Settings.Global.AIRPLANE_MODE_ON, including live state synchronization (On / Off) and dynamic background state tinting.
+  - Update group title label to "Quick System Controls".
+  - Strictly maintain zero dummy features and zero emojis across all documentation.
+
+### 2. Implementation Details
+1. **Resource Strings (Indonesian & English)**:
+   - Updated frameworks/base/packages/SystemUI/res/values/shinkai_strings.xml:
+     * power_menu_vip_tag: "Wowo OS"
+     * power_menu_quick_controls: "Quick System Controls"
+     * power_menu_torch: "Flashlight", power_menu_torch_on: "On", power_menu_torch_off: "Off"
+     * power_menu_airplane: "Airplane Mode", power_menu_airplane_on: "On", power_menu_airplane_off: "Off"
+   - Updated frameworks/base/packages/SystemUI/res/values-in/shinkai_strings.xml:
+     * power_menu_vip_tag: "Wowo OS"
+     * power_menu_quick_controls: "Kontrol Cepat Sistem"
+     * power_menu_torch: "Senter", power_menu_torch_on: "Nyala", power_menu_torch_off: "Mati"
+     * power_menu_airplane: "Mode Pesawat", power_menu_airplane_on: "Aktif", power_menu_airplane_off: "Nonaktif"
+2. **Vector Icons & State-Aware Drawables**:
+   - ic_power_menu_torch.xml: Precision vector flashlight silhouette with bright amber/yellow #FFD60A reflector.
+   - ic_power_menu_airplane.xml: Aerodynamic airplane vector icon in cyan/teal #80D2DC.
+   - power_menu_control_torch_on_bg.xml: Interactive ripple drawable with dark olive/amber tint #2E3812 and stroke #4D5E1F for active flashlight state.
+   - power_menu_control_airplane_on_bg.xml: Interactive ripple drawable with deep teal tint #163A42 and stroke #245964 for active airplane mode state.
+   - power_menu_control_off_bg.xml: Interactive ripple drawable with neutral dark slate #28322D with 18dp rounded corners for idle state.
+3. **Layout Integration (global_actions_enhanced_menu.xml)**:
+   - Replaced top-right tag text with @string/power_menu_vip_tag (Wowo OS).
+   - Replaced left control tile with @+id/btn_torch featuring @drawable/ic_power_menu_torch, @string/power_menu_torch, and @+id/txt_torch_status.
+   - Replaced right control tile with @+id/btn_airplane featuring @drawable/ic_power_menu_airplane, @string/power_menu_airplane, and @+id/txt_airplane_status.
+4. **Real Platform Control Logic & Lifecycle Management (GlobalActionsDialogLite.java)**:
+   - **FlashlightController Integration**:
+     * Retrieved FlashlightController instance via Dependency.get(FlashlightController.class).
+     * Initialized live hardware state on dialog creation (flashlightController.isEnabled()), applying appropriate background drawables and status text "On" (#FFD60A) or "Off" (#A6B0AA).
+     * Added real-time FlashlightListener callback to keep UI synchronized even when toggled from outside.
+     * Handled clicks with tactile haptics (HapticFeedbackConstants.CONTEXT_CLICK), flipping state via flashlightController.setFlashlight(!isEnabled) and instantaneously refreshing the tile without dismissing the dialog.
+   - **ConnectivityManager & System Settings Integration**:
+     * Queried real airplane mode state via Settings.Global.getInt(mContext.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0) == 1.
+     * Bound active teal theme #163A42 with "On" (#80D2DC) or inactive #28322D with "Off" (#A6B0AA).
+     * Registered ContentObserver on Settings.Global.AIRPLANE_MODE_ON URI to observe changes from Quick Settings, Settings, or background services.
+     * Handled tile clicks with tactile haptics, invoking ConnectivityManager.setAirplaneMode(!isAirplaneOn) and broadcasting ACTION_AIRPLANE_MODE_CHANGED.
+   - **Lifecycle Teardown on onStop**:
+     * Cleaned up mTorchListener from FlashlightController.
+     * Unregistered mAirplaneContentObserver from ContentResolver to prevent memory leaks.

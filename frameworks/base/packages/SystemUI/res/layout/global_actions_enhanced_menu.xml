@@ -271,7 +271,7 @@
                     android:textStyle="bold" />
             </RelativeLayout>
 
-            <!-- Two Control Tiles -->
+            <!-- Two Control Tiles: Flashlight (Senter) & Airplane Mode (Mode Pesawat) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
@@ -280,14 +280,14 @@
                 android:orientation="horizontal"
                 android:weightSum="2">
 
-                <!-- Home Control Button -->
+                <!-- Flashlight (Senter) Button -->
                 <LinearLayout
-                    android:id="@+id/btn_home_control"
+                    android:id="@+id/btn_torch"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
-                    android:background="@drawable/power_menu_control_home_bg"
+                    android:background="@drawable/power_menu_control_off_bg"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center_vertical"
@@ -295,9 +295,10 @@
                     android:paddingHorizontal="12dp">
 
                     <ImageView
+                        android:id="@+id/img_torch_icon"
                         android:layout_width="26dp"
                         android:layout_height="26dp"
-                        android:src="@drawable/ic_power_menu_home" />
+                        android:src="@drawable/ic_power_menu_torch" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -306,39 +307,39 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/txt_home_title"
+                            android:id="@+id/txt_torch_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:ellipsize="end"
                             android:fontFamily="sans-serif-medium"
                             android:maxLines="1"
-                            android:text="@string/power_menu_room_light"
+                            android:text="@string/power_menu_torch"
                             android:textColor="#FFFFFF"
                             android:textSize="13sp"
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/txt_home_status"
+                            android:id="@+id/txt_torch_status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:ellipsize="end"
                             android:fontFamily="sans-serif"
                             android:maxLines="1"
-                            android:text="@string/power_menu_room_light_status"
-                            android:textColor="#9FE6B4"
+                            android:text="@string/power_menu_torch_off"
+                            android:textColor="#A6B0AA"
                             android:textSize="11sp" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Google Wallet Button -->
+                <!-- Airplane Mode (Mode Pesawat) Button -->
                 <LinearLayout
-                    android:id="@+id/btn_wallet"
+                    android:id="@+id/btn_airplane"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:background="@drawable/power_menu_control_wallet_bg"
+                    android:background="@drawable/power_menu_control_off_bg"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center_vertical"
@@ -346,9 +347,10 @@
                     android:paddingHorizontal="12dp">
 
                     <ImageView
+                        android:id="@+id/img_airplane_icon"
                         android:layout_width="26dp"
                         android:layout_height="26dp"
-                        android:src="@drawable/ic_power_menu_wallet" />
+                        android:src="@drawable/ic_power_menu_airplane" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -357,26 +359,26 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/txt_wallet_title"
+                            android:id="@+id/txt_airplane_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:ellipsize="end"
                             android:fontFamily="sans-serif-medium"
                             android:maxLines="1"
-                            android:text="@string/power_menu_google_wallet"
+                            android:text="@string/power_menu_airplane"
                             android:textColor="#FFFFFF"
                             android:textSize="13sp"
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/txt_wallet_status"
+                            android:id="@+id/txt_airplane_status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:ellipsize="end"
                             android:fontFamily="sans-serif"
                             android:maxLines="1"
-                            android:text="@string/power_menu_wallet_card"
+                            android:text="@string/power_menu_airplane_off"
                             android:textColor="#A6B0AA"
                             android:textSize="11sp" />
                     </LinearLayout>
