@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 Shinkai Project / WowoOS
+     Licensed under the Apache License, Version 2.0
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#0D2E1C" />
+    <corners android:radius="14dp" />
+</shape>

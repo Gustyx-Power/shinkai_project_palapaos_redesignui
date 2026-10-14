@@ -743,3 +743,32 @@ During testing and review sessions, several core interface discrepancies and sub
    - Connected the Stop button to native recording termination intent (`RecordingService.REQUEST_STOP`) with tactile haptic feedback on all interactions.
 5. **Multilingual Localization (`shinkai_strings.xml` & `values-in/shinkai_strings.xml`)**:
    - Added complete string entries for both English and Indonesian for all screen recording options (`screen_record_show_touches_title`, `screen_record_low_quality_title`, `screen_record_longer_duration_title`, `screen_record_hevc_title`).
+
+---
+
+## Section XXIII: Interactive Animated Refresh Rate Preview Card Integration in Display Settings
+
+### 1. Requirements & Overview
+- **User Request**:
+  - Add an animated refresh rate preview card in Settings > Display > Refresh Rate, showcasing a visual motion fluidity comparison between 60 Hz, 90 Hz, and 120 Hz according to user reference design.
+  - Position the preview card at the very top of the page above the radio buttons, featuring sliding puck animations for each refresh tier, with the active selection highlighted in a rounded dark green pill, vibrant mint text, and mint green puck.
+
+### 2. Implementation Details
+1. **Interactive Animated Preview View (`RefreshRatePreviewView.java`)**:
+   - Engineered a custom `LinearLayout` component that dynamically constructs preview rows matching the hardware-supported refresh rates (`60 Hz`, `90 Hz`, `120 Hz`).
+   - Each row features a frequency label on the left and a horizontal sliding lane with a circular puck (`20dp`) on the right.
+   - Integrated independent `ValueAnimator` instances per tier with `AccelerateDecelerateInterpolator` in continuous `REVERSE` repeat mode, pacing movement inversely to refresh rates (2200ms for 60Hz, 1500ms for 90Hz, 1100ms for 120Hz) to clearly exhibit differences in motion cadence and fluid frame pacing.
+   - The selected tier is encapsulated in a dark green pill container (`14dp` radius, `#0D2E1C`), bold mint green label (`#6BD598`), and glowing mint green puck, while unselected tiers rest in clean neutral styling with grey pucks (`#787E7A`).
+   - Horizontal dividers between tiers are intelligently hidden adjacent to the selected pill to maintain seamless visual boundaries.
+   - Added interactive touch support: tapping any tier directly inside the preview card switches the active refresh rate, syncs the radio buttons below, and triggers haptic tactile feedback.
+   - Handled comprehensive animation lifecycle management (`onAttachedToWindow`, `onDetachedFromWindow`, `onVisibilityChanged`, `onResume`, `onPause`) to pause animators when out of view or screen off, preserving battery life.
+2. **Drawable Assets & Preference Layout (`res/drawable` & `res/layout`)**:
+   - `refresh_rate_preview_card_bg.xml`: 20dp rounded dark surface card (`#131614`) with subtle outer stroke (`#1E2420`).
+   - `refresh_rate_preview_selected_pill_bg.xml`: 14dp rounded dark green pill background (`#0D2E1C`) for active selection.
+   - `refresh_rate_preview_puck_grey.xml`: Neutral solid grey circular puck for inactive tiers.
+   - `refresh_rate_preview_puck_green.xml`: Vibrant solid mint green circular puck (`#6BD598`) for active tier.
+   - `refresh_rate_preview_preference.xml`: Preference container with standardized 16dp horizontal padding.
+3. **Fragment Integration (`RefreshRateSettings.java`)**:
+   - Attached `LayoutPreference` with top priority order (`setOrder(-100)`) and disabled `orderingAsAdded`, guaranteeing the preview card always anchors at the very top above all candidate radio buttons.
+   - Synchronized radio button selections (`setDefaultKey`) with real-time visual updates on `RefreshRatePreviewView`.
+   - Wired bidirectional touch events from the preview card directly into `onRadioButtonConfirmed(key)`.

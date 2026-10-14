@@ -743,3 +743,32 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - Menghubungkan tombol Stop dengan intent penghentian rekaman bawaan (`RecordingService.REQUEST_STOP`) dan memberikan respon haptic pada setiap interaksi.
 5. **Lokalisasi Multibahasa (`shinkai_strings.xml` & `values-in/shinkai_strings.xml`)**:
    - Menambahkan string lokalisasi lengkap Bahasa Indonesia dan Bahasa Inggris untuk seluruh label opsi perekaman layar (`screen_record_show_touches_title`, `screen_record_low_quality_title`, `screen_record_longer_duration_title`, `screen_record_hevc_title`).
+
+---
+
+## Bagian XXIII: Integrasi Kartu Pratinjau Interaktif Kecepatan Refresh (Refresh Rate Animated Preview Card) pada Pengaturan Layar
+
+### 1. Kebutuhan & Gambaran Umum
+- **Permintaan Pengguna**:
+  - Menambahkan kartu pratinjau animasi kecepatan refresh layar pada menu Setelan > Layar > Kecepatan Refresh (`Settings > Display > Refresh Rate`), menampilkan visualisasi pembanding fluiditas gerakan antara 60 Hz, 90 Hz, dan 120 Hz sesuai foto referensi pengguna.
+  - Kartu pratinjau ditempatkan di bagian paling atas halaman di atas opsi radio button, menampilkan puck/lingkaran geser bergerak untuk tiap tingkatan refresh rate, dengan baris aktif yang terpilih disorot dengan kontainer pill hijau gelap, teks hijau mint cerah, dan puck hijau mint.
+
+### 2. Detail Implementasi
+1. **Komponen Visual Pratinjau Interaktif (`RefreshRatePreviewView.java`)**:
+   - Merancang custom view turunan `LinearLayout` yang secara dinamis membangun baris pratinjau sesuai refresh rate yang didukung perangkat (`60 Hz`, `90 Hz`, `120 Hz`).
+   - Setiap baris memiliki label frekuensi tebal di sisi kiri dan lintasan geser horizontal (`trackLayout`) dengan puck bundar (`20dp`) di sisi kanan.
+   - Mengimplementasikan `ValueAnimator` independen untuk tiap baris dengan interpolator `AccelerateDecelerateInterpolator` dan mode `REVERSE`, menggerakkan puck bolak-balik secara kontinu dengan durasi proporsional terhadap refresh rate (2200ms untuk 60Hz, 1500ms untuk 90Hz, 1100ms untuk 120Hz) guna mendemonstrasikan kelancaran dan kecepatan frame pacing secara nyata.
+   - Baris yang sedang aktif/dipilih otomatis dibungkus dengan latar belakang pill membulat (`14dp`, `#0D2E1C`), warna teks hijau mint (`#6BD598`), serta puck hijau mint bercahaya, sedangkan baris yang tidak dipilih menggunakan gaya minimalis dengan puck abu-abu netral (`#787E7A`).
+   - Garis pemisah horizontal antar baris disembunyikan secara cerdas pada baris yang berbatasan dengan pill aktif agar tampilan tetap bersih dan elegan.
+   - Menambahkan event listener sentuhan pada kartu: mengetuk baris mana saja di dalam kartu pratinjau akan langsung mengubah kecepatan refresh sistem, memperbarui radio button di bawahnya, dan memberikan umpan balik getar haptic.
+   - Mengelola siklus hidup animasi secara efisien (`onAttachedToWindow`, `onDetachedFromWindow`, `onVisibilityChanged`, `onResume`, `onPause`) agar animasi berhenti saat aplikasi diminimalkan atau layar mati, sehingga menghemat konsumsi daya baterai.
+2. **Aset Drawable & Tata Letak Antarmuka (`res/drawable` & `res/layout`)**:
+   - `refresh_rate_preview_card_bg.xml`: Latar kartu membulat 20dp gelap pekat (`#131614`) dengan garis tepi halus (`#1E2420`).
+   - `refresh_rate_preview_selected_pill_bg.xml`: Bentuk pill hijau gelap (`#0D2E1C`) bersudut membulat 14dp untuk menandai baris yang aktif.
+   - `refresh_rate_preview_puck_grey.xml`: Lingkaran puck abu-abu solid untuk tingkat refresh rate non-aktif.
+   - `refresh_rate_preview_puck_green.xml`: Lingkaran puck hijau mint solid (`#6BD598`) untuk tingkat refresh rate aktif.
+   - `refresh_rate_preview_preference.xml`: Tata letak kontainer preferensi dengan padding simetris 16dp.
+3. **Integrasi ke Fragment Pengaturan (`RefreshRateSettings.java`)**:
+   - Mengaitkan `LayoutPreference` dengan urutan teratas (`setOrder(-100)`) dan menyetel `setOrderingAsAdded(false)`, memastikan kartu pratinjau selalu berada di posisi paling atas di atas daftar pilihan radio button.
+   - Menghubungkan perubahan nilai refresh rate di radio button (`setDefaultKey`) dengan pembaruan visual real-time pada `RefreshRatePreviewView`.
+   - Mengintegrasikan callback pemilihan langsung dari kartu pratinjau ke alur `onRadioButtonConfirmed(key)` bawaan `RadioButtonPickerFragment`.
