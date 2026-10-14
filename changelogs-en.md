@@ -801,3 +801,29 @@ During testing and review sessions, several core interface discrepancies and sub
 4. **Asset & String Cleanup**:
    - Removed unused setting icon drawables (`ic_hevc.xml`, `ic_sr_quality.xml`, `ic_storage.xml`, `ic_touch.xml`).
    - Cleaned up obsolete string entries in `shinkai_strings.xml` and `values-in/shinkai_strings.xml`, keeping resources lightweight and uncluttered.
+---
+
+## Section XXV: Proportional Capsule Geometry and Simplified OriginOS Screen Record Card
+
+### 1. Requirements & Overview
+- **User Request**:
+  - The compact pill was previously perceived as too small and cramped. The user requested expanding the capsule to a well-proportioned size (~120dp) with a center punch-hole clearance spacer to prevent camera obstruction.
+  - The pause button and auxiliary controls were non-functional in the AOSP MediaRecorder pipeline, behaving only as dummy visual placeholders. The user chose to simplify the expanded OriginOS card to show exclusively functional controls (prominent Stop button, live timer, and recording status), eliminating all non-working dummy buttons.
+
+### 2. Implementation Details
+1. **Proportional Capsule Geometry (~120dp) (`dynamic_island_charging.xml`)**:
+   - Enforced a minimum width of `minWidth="120dp"` on both flashlight (`island_torch_content`) and screen recording (`island_record_content`) pill containers.
+   - Structured a symmetrical dual-wing layout: left wing (34dp) centering the icon or record dot, center spacer (32dp) clearing the physical punch-hole camera cutout, and right wing (34dp) centering the action text or live timer with balanced 12dp horizontal padding.
+   - Standardized the charging spacer (`island_spacer`) to 32dp for uniform geometry across all island states.
+2. **Simplified OriginOS Expanded Record Card (`dynamic_island_expanded_card.xml`)**:
+   - Removed all non-functional auxiliary rows and dummy pause controls (sound wave, microphone, pencil/draw, and pause buttons).
+   - Reorganized the expanded view into a single focused horizontal row matching the clean aesthetic of the flashlight and charging cards:
+     * Left: 48dp circular OriginOS camera badge (`dynamic_island_origin_record_badge.xml`) with the red camera icon (`ic_origin_rec_cam`) and pulsating record dot (`ic_dynamic_island_record_dot`).
+     * Middle: Title label ("Screen Recording") and elapsed duration subtext with live running timer (`expanded_record_timer`).
+     * Right: 48dp signature OriginOS circular Stop button (`dynamic_island_origin_stop_bg`) with a crisp white border ring and red square (`ic_origin_stop`) providing instant haptic stop dispatch.
+3. **Framework Controller Streamlining (`DynamicIslandChargingView.kt`)**:
+   - Removed all listeners and state tracking variables for the dummy pause feature (`isRecordPaused`, `pausedAccumulatedMs`, `pauseStartTimestamp`) and auxiliary dummy tools.
+   - Wired the Stop button directly to `stopScreenRecording()` with haptic click feedback and smooth collapse animation.
+   - Streamlined timer calculation directly from `recordingStartTimestamp` via `SystemClock.elapsedRealtime()`.
+4. **Cleanup of Deprecated Assets**:
+   - Removed 7 unused drawable files that were dedicated to dummy controls: `dynamic_island_origin_btn_circle.xml`, `dynamic_island_origin_pause_bg.xml`, `ic_origin_pause.xml`, `ic_origin_play.xml`, `ic_origin_pencil.xml`, `ic_origin_mic.xml`, and `ic_origin_sound_wave.xml`.

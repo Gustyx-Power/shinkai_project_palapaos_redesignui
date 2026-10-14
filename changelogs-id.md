@@ -801,3 +801,29 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
 4. **Pembersihan Aset & String Sumber Daya**:
    - Menghapus aset ikon sakelar yang tidak lagi digunakan (`ic_hevc.xml`, `ic_sr_quality.xml`, `ic_storage.xml`, `ic_touch.xml`).
    - Membersihkan entri string sakelar di `shinkai_strings.xml` dan `values-in/shinkai_strings.xml` sehingga sumber daya tetap ramping dan teratur.
+---
+
+## Bagian XXV: Proporsionalitas Ukuran Kapsul dan Penyederhanaan Kartu Rekam Layar OriginOS
+
+### 1. Kebutuhan & Gambaran Umum
+- **Permintaan Pengguna**:
+  - Ukuran kapsul ringkas (pill) sebelumnya terasa terlalu kecil dan terhimpit. Pengguna menginginkan ukuran kapsul diperbesar menjadi proporsional (~120dp) dengan ruang penyeimbang kamera tengah agar seimbang dan tidak terpotong.
+  - Fitur jeda (pause) serta tombol alat bantu lainnya tidak didukung pada alur perekaman MediaRecorder AOSP sehingga hanya bersifat dummy dan membingungkan pengguna. Pengguna memilih untuk menyederhanakan kartu expanded OriginOS agar hanya menampilkan elemen yang benar-benar berfungsi nyata (tombol Stop, live timer, dan status rekaman), tanpa tombol palsu.
+
+### 2. Detail Implementasi
+1. **Penyesuaian Geometri Kapsul Proporsional (~120dp) (`dynamic_island_charging.xml`)**:
+   - Menetapkan batas lebar minimum `minWidth="120dp"` pada kontainer pill senter (`island_torch_content`) dan rekam layar (`island_record_content`).
+   - Menerapkan arsitektur simetris sayap kiri (34dp) untuk ikon/titik rekam, spacer tengah (32dp) untuk clearance lubang kamera punch-hole fisik, dan sayap kanan (34dp) untuk teks status/timer berjalan dengan padding simetris 12dp.
+   - Menyelaraskan spacer pengisian daya (`island_spacer`) menjadi 32dp untuk memastikan konsistensi visual di seluruh mode Dynamic Island.
+2. **Penyederhanaan Kartu Expanded Rekam Layar OriginOS (`dynamic_island_expanded_card.xml`)**:
+   - Menghapus baris tombol alat bantu dan kontrol jeda yang tidak berfungsi di AOSP (gelombang suara, mikrofon, pena, dan tombol jeda).
+   - Menata ulang kartu menjadi tata letak satu baris terfokus yang sangat elegan dan konsisten dengan kartu senter dan pengisian daya:
+     * Kiri: Badge kamera OriginOS sirkular 48dp (`dynamic_island_origin_record_badge.xml`) dengan ikon kamera merah (`ic_origin_rec_cam`) dan titik indikator rekam berdenyut (`ic_dynamic_island_record_dot`).
+     * Tengah: Teks judul "Merekam Layar" / "Screen Recording" dan subteks durasi berjalan dengan live timer presisi (`expanded_record_timer`).
+     * Kanan: Tombol Berhenti (Stop) bundar 48dp khas OriginOS (`dynamic_island_origin_stop_bg`) dengan cincin putih elegan dan kotak merah (`ic_origin_stop`) yang responsif terhadap ketukan.
+3. **Penyederhanaan Logika Pengendali Framework (`DynamicIslandChargingView.kt`)**:
+   - Menghapus seluruh listener dan variabel status jeda (`isRecordPaused`, `pausedAccumulatedMs`, `pauseStartTimestamp`) serta tombol dummy auxiliary.
+   - Mengaitkan tombol Stop secara eksklusif ke fungsi `stopScreenRecording()` dengan respon getar haptic dan animasi dismiss mulus.
+   - Menyederhanakan kalkulasi timer rekam layar langsung dari `recordingStartTimestamp` sistem waktu nyata (`SystemClock.elapsedRealtime()`).
+4. **Pembersihan Aset Grafis Tidak Terpakai**:
+   - Menghapus 7 berkas drawable yang sebelumnya digunakan untuk tombol dummy: `dynamic_island_origin_btn_circle.xml`, `dynamic_island_origin_pause_bg.xml`, `ic_origin_pause.xml`, `ic_origin_play.xml`, `ic_origin_pencil.xml`, `ic_origin_mic.xml`, dan `ic_origin_sound_wave.xml`.

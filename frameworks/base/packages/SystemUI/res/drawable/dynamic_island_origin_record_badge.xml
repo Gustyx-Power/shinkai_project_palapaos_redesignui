@@ -3,8 +3,7 @@
   Copyright (C) 2026 Wowo OS / Shinkai Project
 -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="#28FF3B30" />
-    <corners android:radius="14dp" />
-    <stroke android:width="0.8dp" android:color="#4DFF3B30" />
+    android:shape="oval">
+    <solid android:color="#24FF3B30" />
+    <stroke android:width="1.2dp" android:color="#66FF3B30" />
 </shape>

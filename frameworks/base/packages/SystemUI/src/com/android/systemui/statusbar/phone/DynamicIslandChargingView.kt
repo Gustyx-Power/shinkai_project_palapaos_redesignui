@@ -131,9 +131,6 @@ class DynamicIslandChargingView @JvmOverloads constructor(
     private var isTorchOn: Boolean = false
     private var isRecording: Boolean = false
     private var recordingStartTimestamp: Long = 0L
-    private var isRecordPaused: Boolean = false
-    private var pausedAccumulatedMs: Long = 0L
-    private var pauseStartTimestamp: Long = 0L
 
     // Dual-island priority: true = Record is in main capsule, Torch is in meta-ball
     private var prioritizeRecord: Boolean = true
@@ -203,9 +200,6 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                 if (!isRecording) {
                     isRecording = true
                     recordingStartTimestamp = SystemClock.elapsedRealtime()
-                    isRecordPaused = false
-                    pausedAccumulatedMs = 0L
-                    pauseStartTimestamp = 0L
                     prioritizeRecord = true
                     startRecordTicker()
                     refreshIslandState(animate = true)
@@ -217,9 +211,6 @@ class DynamicIslandChargingView @JvmOverloads constructor(
             mainHandler.post {
                 if (isRecording) {
                     isRecording = false
-                    isRecordPaused = false
-                    pausedAccumulatedMs = 0L
-                    pauseStartTimestamp = 0L
                     stopRecordTicker()
                     dismissExpandedCard()
                     refreshIslandState(animate = true)
@@ -837,61 +828,12 @@ class DynamicIslandChargingView @JvmOverloads constructor(
 
             // Primary Controls
             val stopBtn: FrameLayout? = root.findViewById(R.id.expanded_record_stop_btn)
-            val pauseBtn: FrameLayout? = root.findViewById(R.id.expanded_record_pause_btn)
-            val pauseIcon: ImageView? = root.findViewById(R.id.expanded_record_pause_icon)
             val torchBtn: FrameLayout? = root.findViewById(R.id.expanded_torch_btn)
-
-            // Auxiliary Controls (Sound Wave, Mic, Pencil)
-            val audioBtn: FrameLayout? = root.findViewById(R.id.expanded_record_audio_btn)
-            val micBtn: FrameLayout? = root.findViewById(R.id.expanded_record_mic_btn)
-            val pencilBtn: FrameLayout? = root.findViewById(R.id.expanded_record_pencil_btn)
-            val audioIcon: ImageView? = root.findViewById(R.id.expanded_record_audio_icon)
-            val micIcon: ImageView? = root.findViewById(R.id.expanded_record_mic_icon)
-            val pencilIcon: ImageView? = root.findViewById(R.id.expanded_record_pencil_icon)
-
-            // Reflect current pause state in icon
-            pauseIcon?.setImageResource(if (isRecordPaused) R.drawable.ic_origin_play else R.drawable.ic_origin_pause)
 
             stopBtn?.setOnClickListener {
                 it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
                 stopScreenRecording()
                 dismissExpandedCard()
-            }
-
-            pauseBtn?.setOnClickListener {
-                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                isRecordPaused = !isRecordPaused
-                if (isRecordPaused) {
-                    pauseStartTimestamp = SystemClock.elapsedRealtime()
-                    pauseIcon?.setImageResource(R.drawable.ic_origin_play)
-                } else {
-                    if (pauseStartTimestamp > 0) {
-                        pausedAccumulatedMs += (SystemClock.elapsedRealtime() - pauseStartTimestamp)
-                        pauseStartTimestamp = 0L
-                    }
-                    pauseIcon?.setImageResource(R.drawable.ic_origin_pause)
-                }
-            }
-
-            var isMicMuted = false
-            micBtn?.setOnClickListener {
-                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                isMicMuted = !isMicMuted
-                micIcon?.alpha = if (isMicMuted) 0.35f else 1.0f
-            }
-
-            var isAudioActive = true
-            audioBtn?.setOnClickListener {
-                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                isAudioActive = !isAudioActive
-                audioIcon?.alpha = if (isAudioActive) 1.0f else 0.35f
-            }
-
-            var isPencilActive = false
-            pencilBtn?.setOnClickListener {
-                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                isPencilActive = !isPencilActive
-                pencilIcon?.alpha = if (isPencilActive) 1.0f else 0.5f
             }
 
             torchBtn?.setOnClickListener {
@@ -1194,9 +1136,7 @@ class DynamicIslandChargingView @JvmOverloads constructor(
         }
 
         isRecording = false
-        isRecordPaused = false
-        pausedAccumulatedMs = 0L
-        pauseStartTimestamp = 0L
+        recordingStartTimestamp = 0L
         refreshIslandState(animate = true)
     }
 
@@ -1210,11 +1150,8 @@ class DynamicIslandChargingView @JvmOverloads constructor(
     }
 
     private fun updateRecordTimer() {
-        if (isRecordPaused) {
-            return
-        }
         val elapsed = if (recordingStartTimestamp > 0) {
-            Math.max(0L, (SystemClock.elapsedRealtime() - recordingStartTimestamp - pausedAccumulatedMs) / 1000L)
+            Math.max(0L, (SystemClock.elapsedRealtime() - recordingStartTimestamp) / 1000L)
         } else {
             0L
         }

@@ -38,37 +38,82 @@
         android:clickable="true"
         android:focusable="true">
 
-        <!-- 1. Screen Recording Expanded Controls (OriginOS Layout) -->
+        <!-- 1. Screen Recording Expanded Controls (Simplified Authentic OriginOS Layout) -->
         <LinearLayout
             android:id="@+id/expanded_record_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:orientation="vertical"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:visibility="gone">
 
-            <!-- Top Row: [Red Badge: Camera + 00:40] .............. [Merekam layar] -->
+            <!-- Left: OriginOS Camera Badge -->
+            <FrameLayout
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/dynamic_island_origin_record_badge">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_origin_rec_cam"
+                    android:contentDescription="@null" />
+
+                <!-- Pulsating red dot indicator in top-right of badge -->
+                <ImageView
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_dynamic_island_record_dot"
+                    android:contentDescription="@null" />
+            </FrameLayout>
+
+            <!-- Middle: Title & Live Running Timer -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_weight="1"
+                android:layout_marginStart="14dp"
+                android:orientation="vertical"
                 android:gravity="center_vertical">
 
-                <!-- Red Badge: Camera Icon + Elapsed Timer -->
+                <TextView
+                    android:id="@+id/expanded_record_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dynamic_island_record_label"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:singleLine="true" />
+
                 <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="28dp"
-                    android:background="@drawable/dynamic_island_origin_record_badge"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="10dp">
+                    android:gravity="center_vertical">
 
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/ic_origin_rec_cam"
-                        android:contentDescription="@null" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dynamic_island_record_elapsed"
+                        android:textColor="#8E8E93"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:singleLine="true" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="•"
+                        android:textColor="#FF453A"
+                        android:textSize="12sp" />
 
                     <TextView
                         android:id="@+id/expanded_record_timer"
@@ -76,152 +121,31 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:text="00:00"
-                        android:textColor="#FFFFFF"
+                        android:textColor="#FF453A"
                         android:textSize="14sp"
                         android:fontFamily="sans-serif-bold"
                         android:singleLine="true" />
                 </LinearLayout>
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_weight="1" />
-
-                <!-- Title Label: Merekam layar / Screen Recording -->
-                <TextView
-                    android:id="@+id/expanded_record_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/dynamic_island_record_label"
-                    android:textColor="#F2F2F2"
-                    android:textSize="15sp"
-                    android:fontFamily="sans-serif-bold"
-                    android:singleLine="true" />
             </LinearLayout>
 
-            <!-- Bottom Row: [Audio Wave] [Mic] [Pencil] .............. [Pause] [Stop Ring] -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+            <!-- Right: Authentic OriginOS Stop Button (White Outer Ring + Red Square Center) -->
+            <FrameLayout
+                android:id="@+id/expanded_record_stop_btn"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/dynamic_island_origin_stop_bg"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="@string/dynamic_island_record_stop">
 
-                <!-- Left Group (3 Circular Buttons) -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <!-- Audio Waveform Button -->
-                    <FrameLayout
-                        android:id="@+id/expanded_record_audio_btn"
-                        android:layout_width="38dp"
-                        android:layout_height="38dp"
-                        android:background="@drawable/dynamic_island_origin_btn_circle"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <ImageView
-                            android:id="@+id/expanded_record_audio_icon"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_origin_sound_wave"
-                            android:contentDescription="@null" />
-                    </FrameLayout>
-
-                    <!-- Mic Toggle Button -->
-                    <FrameLayout
-                        android:id="@+id/expanded_record_mic_btn"
-                        android:layout_width="38dp"
-                        android:layout_height="38dp"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/dynamic_island_origin_btn_circle"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <ImageView
-                            android:id="@+id/expanded_record_mic_icon"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_origin_mic"
-                            android:contentDescription="@null" />
-                    </FrameLayout>
-
-                    <!-- Pencil / Draw Button -->
-                    <FrameLayout
-                        android:id="@+id/expanded_record_pencil_btn"
-                        android:layout_width="38dp"
-                        android:layout_height="38dp"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/dynamic_island_origin_btn_circle"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <ImageView
-                            android:id="@+id/expanded_record_pencil_icon"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_origin_pencil"
-                            android:contentDescription="@null" />
-                    </FrameLayout>
-                </LinearLayout>
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_weight="1" />
-
-                <!-- Right Group (Primary Record Actions: Pause & Stop) -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <!-- Pause / Resume Button (Solid White Circle with Black Bars) -->
-                    <FrameLayout
-                        android:id="@+id/expanded_record_pause_btn"
-                        android:layout_width="42dp"
-                        android:layout_height="42dp"
-                        android:background="@drawable/dynamic_island_origin_pause_bg"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <ImageView
-                            android:id="@+id/expanded_record_pause_icon"
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_origin_pause"
-                            android:contentDescription="@null" />
-                    </FrameLayout>
-
-                    <!-- Stop Button (White Outer Ring Border with Red Square Center) -->
-                    <FrameLayout
-                        android:id="@+id/expanded_record_stop_btn"
-                        android:layout_width="42dp"
-                        android:layout_height="42dp"
-                        android:layout_marginStart="10dp"
-                        android:background="@drawable/dynamic_island_origin_stop_bg"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:contentDescription="@string/dynamic_island_record_stop">
-
-                        <ImageView
-                            android:layout_width="15dp"
-                            android:layout_height="15dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_origin_stop"
-                            android:contentDescription="@null" />
-                    </FrameLayout>
-                </LinearLayout>
-
-            </LinearLayout>
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_origin_stop"
+                    android:contentDescription="@null" />
+            </FrameLayout>
 
         </LinearLayout>
 
