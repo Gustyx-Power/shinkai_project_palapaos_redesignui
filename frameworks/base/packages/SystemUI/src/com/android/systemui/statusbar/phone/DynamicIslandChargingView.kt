@@ -56,10 +56,8 @@ import android.view.animation.PathInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.Switch
 import android.widget.TextView
 import com.android.systemui.Dependency
-import com.android.systemui.Prefs
 import com.android.systemui.res.R
 import com.android.systemui.screenrecord.RecordingService
 import com.android.systemui.screenrecord.ScreenRecordUxController
@@ -133,6 +131,9 @@ class DynamicIslandChargingView @JvmOverloads constructor(
     private var isTorchOn: Boolean = false
     private var isRecording: Boolean = false
     private var recordingStartTimestamp: Long = 0L
+    private var isRecordPaused: Boolean = false
+    private var pausedAccumulatedMs: Long = 0L
+    private var pauseStartTimestamp: Long = 0L
 
     // Dual-island priority: true = Record is in main capsule, Torch is in meta-ball
     private var prioritizeRecord: Boolean = true
@@ -202,6 +203,9 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                 if (!isRecording) {
                     isRecording = true
                     recordingStartTimestamp = SystemClock.elapsedRealtime()
+                    isRecordPaused = false
+                    pausedAccumulatedMs = 0L
+                    pauseStartTimestamp = 0L
                     prioritizeRecord = true
                     startRecordTicker()
                     refreshIslandState(animate = true)
@@ -213,6 +217,9 @@ class DynamicIslandChargingView @JvmOverloads constructor(
             mainHandler.post {
                 if (isRecording) {
                     isRecording = false
+                    isRecordPaused = false
+                    pausedAccumulatedMs = 0L
+                    pauseStartTimestamp = 0L
                     stopRecordTicker()
                     dismissExpandedCard()
                     refreshIslandState(animate = true)
@@ -830,7 +837,20 @@ class DynamicIslandChargingView @JvmOverloads constructor(
 
             // Primary Controls
             val stopBtn: FrameLayout? = root.findViewById(R.id.expanded_record_stop_btn)
+            val pauseBtn: FrameLayout? = root.findViewById(R.id.expanded_record_pause_btn)
+            val pauseIcon: ImageView? = root.findViewById(R.id.expanded_record_pause_icon)
             val torchBtn: FrameLayout? = root.findViewById(R.id.expanded_torch_btn)
+
+            // Auxiliary Controls (Sound Wave, Mic, Pencil)
+            val audioBtn: FrameLayout? = root.findViewById(R.id.expanded_record_audio_btn)
+            val micBtn: FrameLayout? = root.findViewById(R.id.expanded_record_mic_btn)
+            val pencilBtn: FrameLayout? = root.findViewById(R.id.expanded_record_pencil_btn)
+            val audioIcon: ImageView? = root.findViewById(R.id.expanded_record_audio_icon)
+            val micIcon: ImageView? = root.findViewById(R.id.expanded_record_mic_icon)
+            val pencilIcon: ImageView? = root.findViewById(R.id.expanded_record_pencil_icon)
+
+            // Reflect current pause state in icon
+            pauseIcon?.setImageResource(if (isRecordPaused) R.drawable.ic_origin_play else R.drawable.ic_origin_pause)
 
             stopBtn?.setOnClickListener {
                 it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
@@ -838,112 +858,40 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                 dismissExpandedCard()
             }
 
-            // Screen Recording Settings Controls
-            val switchAudio: Switch? = root.findViewById(R.id.expanded_record_switch_device_audio)
-            val switchMic: Switch? = root.findViewById(R.id.expanded_record_switch_mic)
-            val switchTouches: Switch? = root.findViewById(R.id.expanded_record_switch_touches)
-            val switchLowQuality: Switch? = root.findViewById(R.id.expanded_record_switch_low_quality)
-            val switchLongerDuration: Switch? = root.findViewById(R.id.expanded_record_switch_longer_duration)
-            val switchHevc: Switch? = root.findViewById(R.id.expanded_record_switch_hevc)
-
-            val rowAudio: View? = root.findViewById(R.id.expanded_record_row_device_audio)
-            val rowMic: View? = root.findViewById(R.id.expanded_record_row_mic)
-            val rowTouches: View? = root.findViewById(R.id.expanded_record_row_touches)
-            val rowLowQuality: View? = root.findViewById(R.id.expanded_record_row_low_quality)
-            val rowLongerDuration: View? = root.findViewById(R.id.expanded_record_row_longer_duration)
-            val rowHevc: View? = root.findViewById(R.id.expanded_record_row_hevc)
-
-            // 1. Device Audio and Microphone
-            val useAudio = Prefs.getInt(context, "screenrecord_use_audio", 0) == 1
-            val audioSourcePos = Prefs.getInt(context, "screenrecord_audio_source", 0)
-            switchAudio?.isChecked = useAudio && (audioSourcePos == 0 || audioSourcePos == 2)
-            switchMic?.isChecked = useAudio && (audioSourcePos == 1 || audioSourcePos == 2)
-
-            fun syncAudioSettings() {
-                val devAudio = switchAudio?.isChecked == true
-                val micAudio = switchMic?.isChecked == true
-                if (devAudio && micAudio) {
-                    Prefs.putInt(context, "screenrecord_use_audio", 1)
-                    Prefs.putInt(context, "screenrecord_audio_source", 2) // MIC_AND_INTERNAL
-                } else if (devAudio) {
-                    Prefs.putInt(context, "screenrecord_use_audio", 1)
-                    Prefs.putInt(context, "screenrecord_audio_source", 0) // INTERNAL
-                } else if (micAudio) {
-                    Prefs.putInt(context, "screenrecord_use_audio", 1)
-                    Prefs.putInt(context, "screenrecord_audio_source", 1) // MIC
+            pauseBtn?.setOnClickListener {
+                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                isRecordPaused = !isRecordPaused
+                if (isRecordPaused) {
+                    pauseStartTimestamp = SystemClock.elapsedRealtime()
+                    pauseIcon?.setImageResource(R.drawable.ic_origin_play)
                 } else {
-                    Prefs.putInt(context, "screenrecord_use_audio", 0)
+                    if (pauseStartTimestamp > 0) {
+                        pausedAccumulatedMs += (SystemClock.elapsedRealtime() - pauseStartTimestamp)
+                        pauseStartTimestamp = 0L
+                    }
+                    pauseIcon?.setImageResource(R.drawable.ic_origin_pause)
                 }
             }
 
-            switchAudio?.setOnCheckedChangeListener { _, _ ->
-                root.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                syncAudioSettings()
-            }
-            rowAudio?.setOnClickListener {
-                switchAudio?.toggle()
-            }
-
-            switchMic?.setOnCheckedChangeListener { _, _ ->
-                root.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                syncAudioSettings()
-            }
-            rowMic?.setOnClickListener {
-                switchMic?.toggle()
+            var isMicMuted = false
+            micBtn?.setOnClickListener {
+                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                isMicMuted = !isMicMuted
+                micIcon?.alpha = if (isMicMuted) 0.35f else 1.0f
             }
 
-            // 2. Show touches (live system setting update)
-            val touchesOn = try {
-                Settings.System.getInt(context.contentResolver, Settings.System.SHOW_TOUCHES, 0) == 1
-            } catch (_: Throwable) {
-                false
-            } || Prefs.getInt(context, "screenrecord_show_taps", 0) == 1
-
-            switchTouches?.isChecked = touchesOn
-            switchTouches?.setOnCheckedChangeListener { _, isChecked ->
-                root.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                try {
-                    Settings.System.putInt(context.contentResolver, Settings.System.SHOW_TOUCHES, if (isChecked) 1 else 0)
-                } catch (t: Throwable) {
-                    Log.w(TAG, "Failed updating Settings.System.SHOW_TOUCHES", t)
-                }
-                Prefs.putInt(context, "screenrecord_show_taps", if (isChecked) 1 else 0)
-            }
-            rowTouches?.setOnClickListener {
-                switchTouches?.toggle()
+            var isAudioActive = true
+            audioBtn?.setOnClickListener {
+                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                isAudioActive = !isAudioActive
+                audioIcon?.alpha = if (isAudioActive) 1.0f else 0.35f
             }
 
-            // 3. Lower Quality (SD)
-            val lowQualityOn = Prefs.getInt(context, "screenrecord_use_low_quality", 0) == 1
-            switchLowQuality?.isChecked = lowQualityOn
-            switchLowQuality?.setOnCheckedChangeListener { _, isChecked ->
-                root.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                Prefs.putInt(context, "screenrecord_use_low_quality", if (isChecked) 1 else 0)
-            }
-            rowLowQuality?.setOnClickListener {
-                switchLowQuality?.toggle()
-            }
-
-            // 4. Larger File Size / Longer Duration
-            val longerDurationOn = Prefs.getInt(context, "screenrecord_use_longer_timeout", 0) == 1
-            switchLongerDuration?.isChecked = longerDurationOn
-            switchLongerDuration?.setOnCheckedChangeListener { _, isChecked ->
-                root.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                Prefs.putInt(context, "screenrecord_use_longer_timeout", if (isChecked) 1 else 0)
-            }
-            rowLongerDuration?.setOnClickListener {
-                switchLongerDuration?.toggle()
-            }
-
-            // 5. HEVC Encoding (automatically ON / true by default)
-            val hevcOn = Prefs.getInt(context, "screenrecord_use_hevc", 1) == 1
-            switchHevc?.isChecked = hevcOn
-            switchHevc?.setOnCheckedChangeListener { _, isChecked ->
-                root.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                Prefs.putInt(context, "screenrecord_use_hevc", if (isChecked) 1 else 0)
-            }
-            rowHevc?.setOnClickListener {
-                switchHevc?.toggle()
+            var isPencilActive = false
+            pencilBtn?.setOnClickListener {
+                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                isPencilActive = !isPencilActive
+                pencilIcon?.alpha = if (isPencilActive) 1.0f else 0.5f
             }
 
             torchBtn?.setOnClickListener {
@@ -1246,6 +1194,9 @@ class DynamicIslandChargingView @JvmOverloads constructor(
         }
 
         isRecording = false
+        isRecordPaused = false
+        pausedAccumulatedMs = 0L
+        pauseStartTimestamp = 0L
         refreshIslandState(animate = true)
     }
 
@@ -1259,8 +1210,11 @@ class DynamicIslandChargingView @JvmOverloads constructor(
     }
 
     private fun updateRecordTimer() {
+        if (isRecordPaused) {
+            return
+        }
         val elapsed = if (recordingStartTimestamp > 0) {
-            Math.max(0L, (SystemClock.elapsedRealtime() - recordingStartTimestamp) / 1000L)
+            Math.max(0L, (SystemClock.elapsedRealtime() - recordingStartTimestamp - pausedAccumulatedMs) / 1000L)
         } else {
             0L
         }

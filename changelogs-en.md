@@ -772,3 +772,32 @@ During testing and review sessions, several core interface discrepancies and sub
    - Attached `LayoutPreference` with top priority order (`setOrder(-100)`) and disabled `orderingAsAdded`, guaranteeing the preview card always anchors at the very top above all candidate radio buttons.
    - Synchronized radio button selections (`setDefaultKey`) with real-time visual updates on `RefreshRatePreviewView`.
    - Wired bidirectional touch events from the preview card directly into `onRadioButtonConfirmed(key)`.
+
+---
+
+## Section XXIV: Rollback Dynamic Island Screen Recording Design to Pure OriginOS Aesthetic
+
+### 1. Requirements & Overview
+- **User Request**:
+  - Roll back the integration of 6 AOSP screen recording setting toggles on the expanded Dynamic Island card, as they compromised and deviated from the clean visual concept.
+  - Restore the pure OriginOS design style for screen recording, keeping it elegant, minimal, and authentic.
+  - Return the compact pill to a sleek form factor and restore the expanded card layout featuring the camera badge, recording timer, pause/resume button, white-bordered stop button, and the 3 circular tool buttons on the bottom row.
+
+### 2. Implementation Details
+1. **Restoration of OriginOS Expanded Card Layout (`dynamic_island_expanded_card.xml`)**:
+   - Removed the 6 AOSP recording setting toggle rows that overcrowded the expanded card.
+   - Restored the authentic 2-row OriginOS layout:
+     * Top Row: OriginOS camera badge with a pulsing red recording dot and live elapsed timer on the left; Pause/Resume button (solid white circle with black bars) and Stop button (white outer ring container with a red square center) on the right.
+     * Bottom Row: Three 36dp circular tool buttons with subtle translucent dark backgrounds (`#1AFFFFFF`) featuring modern bespoke vector icons (microphone, touch/stylus indicator, and audio sound wave).
+   - Maintained proportional expanded card height (92dp) with 28dp corner curvature (`dynamic_island_expanded_bg.xml`) and edge-to-edge margins aligning cleanly with the screen borders.
+2. **Restoration of Compact Capsule Layout (`dynamic_island_charging.xml`)**:
+   - Reverted the primary compact capsule to its refined, compact dimensions (`paddingStart="12dp"`, `paddingEnd="14dp"`), matching the minimalist flashlight pill without artificial excess width.
+   - Preserved the organic liquid metaball positioning on the left side in accordance with user preferences.
+3. **Logic Cleanup & State Handling (`DynamicIslandChargingView.kt`)**:
+   - Removed AOSP setting switch listeners and restored OriginOS interactive control states.
+   - Re-enabled pause state management (`isRecordPaused`) with accumulated pause duration calculation (`pausedAccumulatedMs`) so the elapsed timer remains strictly synchronous upon resuming.
+   - Retained the multi-layered 5-tier stop dispatch mechanism to reliably stop screen recording.
+   - Retained native status bar chip suppression so redundant recording chips remain hidden when Dynamic Island is active.
+4. **Asset & String Cleanup**:
+   - Removed unused setting icon drawables (`ic_hevc.xml`, `ic_sr_quality.xml`, `ic_storage.xml`, `ic_touch.xml`).
+   - Cleaned up obsolete string entries in `shinkai_strings.xml` and `values-in/shinkai_strings.xml`, keeping resources lightweight and uncluttered.

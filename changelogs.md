@@ -772,3 +772,32 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - Mengaitkan `LayoutPreference` dengan urutan teratas (`setOrder(-100)`) dan menyetel `setOrderingAsAdded(false)`, memastikan kartu pratinjau selalu berada di posisi paling atas di atas daftar pilihan radio button.
    - Menghubungkan perubahan nilai refresh rate di radio button (`setDefaultKey`) dengan pembaruan visual real-time pada `RefreshRatePreviewView`.
    - Mengintegrasikan callback pemilihan langsung dari kartu pratinjau ke alur `onRadioButtonConfirmed(key)` bawaan `RadioButtonPickerFragment`.
+
+---
+
+## Bagian XXIV: Rollback Desain Dynamic Island Rekam Layar ke Gaya Asli OriginOS
+
+### 1. Kebutuhan & Gambaran Umum
+- **Permintaan Pengguna**:
+  - Membatalkan (rollback) integrasi 6 sakelar pengaturan perekaman bawaan AOSP pada kartu expanded Dynamic Island karena membuat desain melenceng dari konsep estetika aslinya.
+  - Mengembalikan seluruh tata letak Dynamic Island perekaman layar ke gaya murni OriginOS yang presisi, minimalis, dan elegan.
+  - Memastikan kapsul ringkas (pill) tetap kompak dan kartu expanded menampilkan tata letak kamera badge, penghitung durasi rekam, tombol jeda/lanjutkan, tombol berhenti cincin putih beraksen merah, serta 3 tombol alat bantu bundar di baris bawah.
+
+### 2. Detail Implementasi
+1. **Pemulihan Tata Letak Expanded Card OriginOS (`dynamic_island_expanded_card.xml`)**:
+   - Menghapus 6 baris sakelar konfigurasi perekaman bawaan AOSP yang memadati kartu expanded.
+   - Mengembalikan tata letak 2 baris murni OriginOS:
+     * Baris Atas: Badge kamera OriginOS dengan titik merah berdenyut halus dan teks penghitung waktu durasi berjalan di sisi kiri; tombol Jeda/Lanjutkan (lingkaran putih solid dengan ikon bar hitam) dan tombol Berhenti (bingkai cincin putih membulat dengan kotak merah di tengah) di sisi kanan.
+     * Baris Bawah: Tiga tombol alat bantu bundar berdiameter 36dp berlatar belakang gelap transparan (`#1AFFFFFF`) dengan ikon kustom modern (mikrofon, indikator sentuhan/pena, dan gelombang suara audio).
+   - Menjaga tinggi kartu expanded tetap proporsional (92dp) dengan sudut melengkung 28dp (`dynamic_island_expanded_bg.xml`) dan margin simetris yang mepet rapi ke tepi kiri-kanan layar.
+2. **Pemulihan Kapsul Ringkas (`dynamic_island_charging.xml`)**:
+   - Mengembalikan ukuran kapsul utama yang ringkas dan pas (`paddingStart="12dp"`, `paddingEnd="14dp"`), sejajar dengan tampilan senter tanpa pelebaran berlebih.
+   - Menjaga posisi metaball cairan organik tetap di sebelah kiri sesuai preferensi pengguna sebelumnya.
+3. **Pembersihan Logika & Handler Pengendali (`DynamicIslandChargingView.kt`)**:
+   - Menghapus listener sakelar pengaturan AOSP dan mengembalikan logika status kontrol OriginOS.
+   - Memulihkan manajemen status jeda (`isRecordPaused`) dengan penghitungan akumulasi jeda (`pausedAccumulatedMs`) agar waktu yang ditampilkan tetap sinkron dan akurat saat rekaman dilanjutkan.
+   - Mempertahankan sistem multi-layer dispatch (5 layer) untuk penghentian perekaman layar yang andal dan tuntas.
+   - Mempertahankan supresi otomatis chip status bar bawaan AOSP agar tidak terjadi duplikasi indikator visual saat Dynamic Island aktif.
+4. **Pembersihan Aset & String Sumber Daya**:
+   - Menghapus aset ikon sakelar yang tidak lagi digunakan (`ic_hevc.xml`, `ic_sr_quality.xml`, `ic_storage.xml`, `ic_touch.xml`).
+   - Membersihkan entri string sakelar di `shinkai_strings.xml` dan `values-in/shinkai_strings.xml` sehingga sumber daya tetap ramping dan teratur.

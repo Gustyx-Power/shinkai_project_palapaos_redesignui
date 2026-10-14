@@ -87,7 +87,7 @@
 
                 <View
                     android:id="@+id/island_spacer"
-                    android:layout_width="36dp"
+                    android:layout_width="28dp"
                     android:layout_height="1dp" />
 
                 <TextView
@@ -109,102 +109,64 @@
                     android:contentDescription="@null" />
             </LinearLayout>
 
-            <!-- 2. Flashlight Content (Main Pill - Symmetrical Wings around Punch-Hole) -->
+            <!-- 2. Flashlight Content (Main Pill) -->
             <LinearLayout
                 android:id="@+id/island_torch_content"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:minWidth="142dp"
-                android:paddingStart="14dp"
+                android:paddingStart="12dp"
                 android:paddingEnd="14dp"
                 android:visibility="gone">
 
-                <FrameLayout
+                <ImageView
+                    android:id="@+id/island_torch_icon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_origin_torch"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/island_torch_action_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minWidth="38dp">
-
-                    <ImageView
-                        android:id="@+id/island_torch_icon"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_origin_torch"
-                        android:contentDescription="@null" />
-                </FrameLayout>
-
-                <View
-                    android:id="@+id/island_torch_spacer"
-                    android:layout_width="38dp"
-                    android:layout_height="1dp" />
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minWidth="38dp">
-
-                    <TextView
-                        android:id="@+id/island_torch_action_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/dynamic_island_torch_on"
-                        android:textColor="#FFD60A"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif-bold"
-                        android:singleLine="true" />
-                </FrameLayout>
+                    android:layout_marginStart="8dp"
+                    android:text="@string/dynamic_island_torch_on"
+                    android:textColor="#FFD60A"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:singleLine="true" />
             </LinearLayout>
 
-            <!-- 3. Screen Recording Content (Main Pill - Symmetrical Wings around Punch-Hole) -->
+            <!-- 3. Screen Recording Content (Main Pill - Compact Size matching Torch) -->
             <LinearLayout
                 android:id="@+id/island_record_content"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:minWidth="142dp"
-                android:paddingStart="14dp"
+                android:paddingStart="12dp"
                 android:paddingEnd="14dp"
                 android:visibility="gone">
 
-                <FrameLayout
+                <ImageView
+                    android:id="@+id/island_record_dot"
+                    android:layout_width="11dp"
+                    android:layout_height="11dp"
+                    android:src="@drawable/ic_dynamic_island_record_dot"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/island_record_timer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minWidth="38dp">
-
-                    <ImageView
-                        android:id="@+id/island_record_dot"
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_dynamic_island_record_dot"
-                        android:contentDescription="@null" />
-                </FrameLayout>
-
-                <View
-                    android:id="@+id/island_record_spacer"
-                    android:layout_width="38dp"
-                    android:layout_height="1dp" />
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minWidth="38dp">
-
-                    <TextView
-                        android:id="@+id/island_record_timer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="00:00"
-                        android:textColor="#FF453A"
-                        android:textSize="13.5sp"
-                        android:fontFamily="sans-serif-bold"
-                        android:singleLine="true" />
-                </FrameLayout>
+                    android:layout_marginStart="8dp"
+                    android:text="00:00"
+                    android:textColor="#FF453A"
+                    android:textSize="13.5sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:singleLine="true" />
             </LinearLayout>
 
         </FrameLayout>
