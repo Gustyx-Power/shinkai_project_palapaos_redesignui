@@ -311,9 +311,14 @@ class DynamicIslandChargingView @JvmOverloads constructor(
         }
     }
 
-    // --- Gesture Detection for Pill Swipe & Click ---
+    // --- Gesture Detection for Pill & Meta-Ball Swipe & Click ---
+    private var isSwappingDualIsland = false
+
     private val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+        private var hasTriggeredScrollSwap = false
+
         override fun onDown(e: MotionEvent): Boolean {
+            hasTriggeredScrollSwap = false
             return true
         }
 
@@ -322,15 +327,67 @@ class DynamicIslandChargingView @JvmOverloads constructor(
             return true
         }
 
+        override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+            if (isTorchOn && isRecording && !hasTriggeredScrollSwap && !isSwappingDualIsland && e1 != null) {
+                val totalDeltaX = e2.x - e1.x
+                val totalDeltaY = Math.abs(e2.y - e1.y)
+                val density = resources.displayMetrics.density
+                // Sensitive horizontal drag threshold: 18dp horizontal, < 28dp vertical
+                if (Math.abs(totalDeltaX) > 18f * density && totalDeltaY < 28f * density) {
+                    hasTriggeredScrollSwap = true
+                    swapDualIslandPriority()
+                    return true
+                }
+            }
+            return false
+        }
+
         override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-            if (isTorchOn && isRecording) {
-                // Horizontal swipe swaps primary pill and meta-ball!
+            if (isTorchOn && isRecording && !hasTriggeredScrollSwap && !isSwappingDualIsland) {
                 swapDualIslandPriority()
                 return true
             }
             return false
         }
     })
+
+    private val metaGestureDetector by lazy {
+        GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+            private var hasTriggeredScrollSwap = false
+
+            override fun onDown(e: MotionEvent): Boolean {
+                hasTriggeredScrollSwap = false
+                return true
+            }
+
+            override fun onSingleTapUp(e: MotionEvent): Boolean {
+                onMetaBallClicked()
+                return true
+            }
+
+            override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+                if (isTorchOn && isRecording && !hasTriggeredScrollSwap && !isSwappingDualIsland && e1 != null) {
+                    val totalDeltaX = e2.x - e1.x
+                    val totalDeltaY = Math.abs(e2.y - e1.y)
+                    val density = resources.displayMetrics.density
+                    if (Math.abs(totalDeltaX) > 16f * density && totalDeltaY < 28f * density) {
+                        hasTriggeredScrollSwap = true
+                        swapDualIslandPriority()
+                        return true
+                    }
+                }
+                return false
+            }
+
+            override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+                if (isTorchOn && isRecording && !hasTriggeredScrollSwap && !isSwappingDualIsland) {
+                    swapDualIslandPriority()
+                    return true
+                }
+                return false
+            }
+        })
+    }
 
     override fun onFinishInflate() {
         super.onFinishInflate()
@@ -371,8 +428,9 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                 true
             }
 
-            metaBallView?.setOnClickListener {
-                onMetaBallClicked()
+            metaBallView?.setOnTouchListener { _, event ->
+                metaGestureDetector.onTouchEvent(event)
+                true
             }
         } catch (t: Throwable) {
             Log.e(TAG, "Failed to inflate DynamicIslandChargingView", t)
@@ -744,56 +802,77 @@ class DynamicIslandChargingView @JvmOverloads constructor(
 
     /**
      * Swaps priorities between Main Capsule and Meta-Ball when swiped horizontally.
-     * Uses fluid horizontal displacement and elastic recovery for liquid physics.
+     * Uses authentic OriginOS liquid physics: squash & stretch, full displacement merge,
+     * tactile haptic feedback, and elastic spring recovery.
      */
     private fun swapDualIslandPriority() {
-        if (!isTorchOn || !isRecording) return
+        if (!isTorchOn || !isRecording || isSwappingDualIsland) return
+        isSwappingDualIsland = true
 
         val density = resources.displayMetrics.density
 
-        // Phase 1: Fluid anticipation & merge (glide towards each other and compress)
-        capsuleView?.animate()
-            ?.translationX(-12f * density)
-            ?.scaleX(0.85f)
-            ?.scaleY(0.85f)
-            ?.alpha(0.45f)
-            ?.setDuration(130L)
-            ?.setInterpolator(AccelerateDecelerateInterpolator())
+        // Phase 1: Magnetic Attraction, Liquid Squash & Stretch, and Absorption
+        metaBallView?.animate()?.cancel()
+        capsuleView?.animate()?.cancel()
+
+        // Meta-Ball (on the left) stretches horizontally along movement axis and glides into the capsule
+        metaBallView?.animate()
+            ?.translationX(38f * density) // Full displacement directly into the capsule
+            ?.scaleX(1.36f)             // Liquid stretch along direction of motion
+            ?.scaleY(0.70f)             // Vertical compression (volume-preserving liquid squash)
+            ?.alpha(0.35f)
+            ?.setDuration(190L)
+            ?.setInterpolator(PathInterpolator(0.35f, 0.0f, 0.15f, 1.0f))
             ?.withEndAction {
+                // Tactile haptic click at the exact moment of liquid merger
+                try {
+                    performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                } catch (_: Throwable) {}
+
                 prioritizeRecord = !prioritizeRecord
                 refreshIslandState(animate = false)
 
-                // Phase 2: Settle with elastic overshoot back to neutral
-                capsuleView?.translationX = 10f * density
+                // Phase 2: Elastic Spring Ejection of new secondary droplet & capsule recovery
+                // Capsule rebounds slightly to the right, then settles with smooth liquid damping
+                capsuleView?.translationX = 14f * density
+                capsuleView?.scaleX = 1.05f
+                capsuleView?.scaleY = 0.95f
                 capsuleView?.animate()
                     ?.translationX(0f)
                     ?.scaleX(1.0f)
                     ?.scaleY(1.0f)
                     ?.alpha(1.0f)
-                    ?.setDuration(280L)
-                    ?.setInterpolator(OvershootInterpolator(1.25f))
+                    ?.setDuration(380L)
+                    ?.setInterpolator(PathInterpolator(0.18f, 1.0f, 0.35f, 1.0f))
                     ?.start()
-            }
-            ?.start()
 
-        metaBallView?.animate()
-            ?.translationX(14f * density)
-            ?.scaleX(0.7f)
-            ?.scaleY(0.7f)
-            ?.alpha(0.45f)
-            ?.setDuration(130L)
-            ?.setInterpolator(AccelerateDecelerateInterpolator())
-            ?.withEndAction {
-                metaBallView?.translationX = -10f * density
+                // New Meta-Ball droplet emerges from the capsule on the left with vertical stretch wobble
+                metaBallView?.translationX = -22f * density
+                metaBallView?.scaleX = 0.72f
+                metaBallView?.scaleY = 1.28f
+                metaBallView?.alpha = 0.85f
                 metaBallView?.animate()
                     ?.translationX(0f)
                     ?.scaleX(1.0f)
                     ?.scaleY(1.0f)
                     ?.alpha(1.0f)
-                    ?.setDuration(280L)
+                    ?.setDuration(400L)
                     ?.setInterpolator(OvershootInterpolator(1.35f))
+                    ?.withEndAction {
+                        isSwappingDualIsland = false
+                    }
                     ?.start()
             }
+            ?.start()
+
+        // Capsule compresses slightly on the left edge as it absorbs the incoming metaball
+        capsuleView?.animate()
+            ?.translationX(-14f * density)
+            ?.scaleX(0.92f)
+            ?.scaleY(1.06f)
+            ?.alpha(0.75f)
+            ?.setDuration(190L)
+            ?.setInterpolator(PathInterpolator(0.35f, 0.0f, 0.15f, 1.0f))
             ?.start()
     }
 
@@ -801,6 +880,25 @@ class DynamicIslandChargingView @JvmOverloads constructor(
      * Interacting with the Meta-Ball bubble.
      */
     private fun onMetaBallClicked() {
+        metaBallView?.let { ball ->
+            try {
+                ball.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+            } catch (_: Throwable) {}
+            ball.animate()
+                .scaleX(0.85f)
+                .scaleY(0.85f)
+                .setDuration(100L)
+                .withEndAction {
+                    ball.animate()
+                        .scaleX(1.0f)
+                        .scaleY(1.0f)
+                        .setDuration(220L)
+                        .setInterpolator(OvershootInterpolator(1.4f))
+                        .start()
+                }
+                .start()
+        }
+
         if (prioritizeRecord) {
             // Torch is inside the meta-ball -> tapping toggles torch off!
             toggleTorch()

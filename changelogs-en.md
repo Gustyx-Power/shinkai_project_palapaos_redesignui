@@ -858,3 +858,30 @@ During testing and review sessions, several core interface discrepancies and sub
    - Softened card expansion (`expandedCardContainer`) with a 440ms duration (previously 320ms) using an organic liquid curve `PathInterpolator(0.22f, 1.0f, 0.36f, 1.0f)` blooming from the top punch-hole cutout (`pivotY = 0f`, scaling from 0.32x to 1.0x).
    - Softened card collapse with a 380ms duration (previously 240ms) using suction curve `PathInterpolator(0.38f, 0.0f, 0.2f, 1.0f)`.
    - Extended compact pill (`capsuleView`) and liquid metaball (`metaBallView`) return transitions from 260ms to 400ms with smooth spring damping.
+---
+
+## Section XXVII: Enhanced Liquid Squash & Stretch Physics and Smooth Gesture Detection on Meta-Ball
+
+### 1. Requirements & Overview
+- **User Request**:
+  - The swap/displacement animation between the primary capsule and the meta-ball previously felt too brief (130ms) with minimal travel distance (12dp), appearing like a rigid jump rather than organic liquid.
+  - The user requested enhancing the meta-ball swipe/drag animation to embody the living liquid physics of OriginOS.
+  - Integrate liquid volume-preserving squash & stretch, full displacement merge into the capsule (~38dp), tactile haptic click feedback upon fusion, and sensitive casual drag/scroll gesture detection.
+
+### 2. Implementation Details
+1. **Responsive Drag & Swipe Gesture Handling (`onScroll` & `onFling`)**:
+   - Extended gesture detectors on both the main capsule (`gestureDetector`) and the meta-ball bubble (`metaGestureDetector`) to handle continuous horizontal drag events via `onScroll`.
+   - Enabled priority swapping upon crossing a sensitive 16dp-18dp horizontal drag threshold, allowing casual slow drags to trigger the swap seamlessly without requiring a rapid fling.
+   - Added `isSwappingDualIsland` state lock to ensure clean atomic execution without erratic multi-triggers.
+2. **Phase 1: Magnetic Attraction, Liquid Squash & Stretch, and Fusion**:
+   - Propelled the meta-ball bubble 38dp across the status bar gap directly into the primary capsule over 190ms with an acceleration curve `PathInterpolator(0.35f, 0.0f, 0.15f, 1.0f)`.
+   - Applied realistic fluid droplet deformation: the meta-ball stretches horizontally along its motion vector (`scaleX = 1.36x`) while squashing vertically (`scaleY = 0.70x`), simulating a liquid droplet drawn by magnetic surface tension.
+   - The primary capsule reciprocates by gliding outward (-14dp) and compressing (`scaleX = 0.92x`, `scaleY = 1.06x`) upon absorbing the incoming droplet.
+3. **Tactile Haptic Click at Fusion Point**:
+   - Dispatched a crisp tactile haptic pulse (`HapticFeedbackConstants.CONTEXT_CLICK`) at the exact millisecond of droplet coalescence, providing immediate physical confirmation in hand.
+4. **Phase 2: Secondary Droplet Ejection & Elastic Spring Recovery**:
+   - The new secondary droplet bubble emerges from the capsule toward the left with vertical elastic wobble (`scaleX = 0.72x`, `scaleY = 1.28x`) from -22dp.
+   - Settled the bubble back into neutral resting geometry over 400ms using an organic spring curve `OvershootInterpolator(1.35f)`.
+   - Rebounded the primary capsule back to its resting coordinates and scale over 380ms with fluid deceleration `PathInterpolator(0.18f, 1.0f, 0.35f, 1.0f)`.
+5. **Tactile Tap Animation on Meta-Ball (`onMetaBallClicked`)**:
+   - Added an organic squash-and-rebound ripple when the meta-ball is tapped (squashing to 0.85x over 100ms and springing back to 1.0x with `OvershootInterpolator(1.4f)` over 220ms) accompanied by instantaneous haptic click feedback.

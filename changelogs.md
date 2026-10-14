@@ -858,3 +858,30 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - Memperhalus animasi pembukaan kartu (`expandedCardContainer`) dengan durasi 440ms (sebelumnya 320ms) dan interpolator kurva cairan elastis `PathInterpolator(0.22f, 1.0f, 0.36f, 1.0f)` berpangkal dari cutout punch-hole kamera (`pivotY = 0f`, `scale` 0.32x ke 1.0x).
    - Memperhalus animasi penutupan kartu dengan durasi 380ms (sebelumnya 240ms) dan kurva hisap `PathInterpolator(0.38f, 0.0f, 0.2f, 1.0f)`.
    - Memperhalus animasi pemulihan kapsul ringkas (`capsuleView`) dan metaball cairan (`metaBallView`) dari 260ms menjadi 400ms dengan interpolator redaman lembut.
+---
+
+## Bagian XXVII: Peningkatan Fisika Fluida Squash & Stretch dan Deteksi Gestur Geser pada Meta-Ball
+
+### 1. Kebutuhan & Gambaran Umum
+- **Permintaan Pengguna**:
+  - Animasi perpindahan (swap/geser) antara kapsul utama dan meta-ball sebelumnya masih terlalu singkat (130ms) dengan jarak perpindahan yang minim (12dp), sehingga terkesan melompat kaku tanpa sensasi cairan.
+  - Pengguna menginginkan peningkatan (enhancement) animasi geser meta-ball agar terasa seperti cairan hidup (liquid physics) khas OriginOS.
+  - Mengintegrasikan efek renggang-pipih cairan (squash & stretch), jarak luncur penuh ke dalam kapsul (~38dp), umpan balik getar haptic yang renyah saat melebur, serta deteksi geser santai (drag/scroll) yang lebih peka.
+
+### 2. Detail Implementasi
+1. **Deteksi Gestur Geser Responsif (`onScroll` & `onFling`)**:
+   - Memperluas detektor gestur pada kapsul utama (`gestureDetector`) dan meta-ball (`metaGestureDetector`) dengan penanganan `onScroll`.
+   - Mengaktifkan pertukaran prioritas saat terdeteksi geseran horizontal santai melebihi ambang batas 16dp-18dp tanpa harus melakukan kibasan cepat (`fling`), sehingga pengguna dapat menggeser gelembung dengan santai dan presisi.
+   - Mengunci status `isSwappingDualIsland` selama animasi berlangsung untuk mencegah pemicuan ganda yang tidak diinginkan.
+2. **Fase 1: Tarikan Magnetik, Renggang-Pipih Cairan (Squash & Stretch), dan Peleburan**:
+   - Menggerakkan gelembung meta-ball sejauh 38dp langsung melebur ke dalam kapsul utama selama 190ms dengan kurva percepatan fluida `PathInterpolator(0.35f, 0.0f, 0.15f, 1.0f)`.
+   - Menerapkan deformasi cairan realistis: meta-ball merenggang secara horizontal (`scaleX = 1.36x`) dan memipih secara vertikal (`scaleY = 0.70x`) di sepanjang sumbu gerak, mensimulasikan tetesan cairan (droplet) yang ditarik gaya gravitasi/magnetik kapsul.
+   - Kapsul utama bereaksi timbal balik dengan bergerak ke arah meta-ball (-14dp) dan memampat (`scaleX = 0.92x`, `scaleY = 1.06x`) saat menyerap tetesan cairan.
+3. **Umpan Balik Taktil Haptic di Titik Fusi**:
+   - Memicu getaran haptic yang renyah (`HapticFeedbackConstants.CONTEXT_CLICK`) tepat pada milidetik ketika meta-ball menyatu sepenuhnya ke dalam kapsul, memberikan umpan balik fisik yang memuaskan di tangan.
+4. **Fase 2: Pelepasan Tetesan Baru & Pemulihan Elastis Pegas**:
+   - Tetesan meta-ball sekunder yang baru memancar keluar dari kapsul ke arah kiri dengan lonjakan vertikal elastis (`scaleX = 0.72x`, `scaleY = 1.28x`) dari posisi -22dp.
+   - Menstabilkan tetesan ke bentuk bulat sempurna (1.0x) selama 400ms menggunakan kurva redaman pegas `OvershootInterpolator(1.35f)`.
+   - Mengembalikan kapsul utama ke posisi netral dan skala normal selama 380ms dengan kurva fluida `PathInterpolator(0.18f, 1.0f, 0.35f, 1.0f)`.
+5. **Animasi Ketukan Taktil pada Meta-Ball (`onMetaBallClicked`)**:
+   - Menambahkan efek denyut kenyal saat meta-ball diketuk (memampat ke 0.85x selama 100ms dan memantul kembali ke 1.0x dengan `OvershootInterpolator(1.4f)` selama 220ms) disertai respon getar haptic instan.
