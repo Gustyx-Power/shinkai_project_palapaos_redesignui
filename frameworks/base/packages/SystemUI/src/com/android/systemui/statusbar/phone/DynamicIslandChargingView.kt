@@ -98,7 +98,6 @@ class DynamicIslandChargingView @JvmOverloads constructor(
     private var batteryTextView: TextView? = null
     private var boltIconView: ImageView? = null
 
-    private var torchTextView: TextView? = null
     private var torchActionTextView: TextView? = null
     private var torchIconView: ImageView? = null
 
@@ -346,7 +345,6 @@ class DynamicIslandChargingView @JvmOverloads constructor(
             batteryTextView = findViewById(R.id.island_battery_text)
             boltIconView = findViewById(R.id.island_bolt_icon)
 
-            torchTextView = findViewById(R.id.island_torch_text)
             torchActionTextView = findViewById(R.id.island_torch_action_text)
             torchIconView = findViewById(R.id.island_torch_icon)
 

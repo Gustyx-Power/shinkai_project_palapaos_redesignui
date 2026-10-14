@@ -6,7 +6,7 @@
     <!-- Dynamic Island Strings -->
     <string name="dynamic_island_charging">Mengisi daya</string>
     <string name="dynamic_island_torch_label">Senter</string>
-    <string name="dynamic_island_torch_on">Menyala</string>
+    <string name="dynamic_island_torch_on">On</string>
     <string name="dynamic_island_torch_subtext">Ketuk untuk mematikan</string>
     <string name="dynamic_island_record_label">Perekam Layar</string>
     <string name="dynamic_island_record_elapsed">Waktu Berjalan</string>

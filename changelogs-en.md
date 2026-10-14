@@ -17,11 +17,11 @@ This update delivers a complete overhaul of the user interface (UI Redesign) ins
 
 1. Interactive Dynamic Island (POCO F5 Punch-Hole)
    - Charging Indicator: Displays an animated green lightning bolt and live battery percentage for 7.8 seconds when plugged in.
-   - Flashlight Indicator: Persistent pill display while the flashlight remains on. Tap once to instantly toggle off the torch.
-   - Screen Recording Indicator: Symmetrical pill (~200dp) with a running digital timer matching iOS proportions.
-   - Dual-Island (Meta-Ball): When recording and flashlight run simultaneously, recording occupies the main capsule and flashlight forms a circular bubble (meta-ball) beside it.
+   - Flashlight Indicator: Minimalist compact pill (strictly flashlight icon and bold "On" status) active while torch is on. Tap once to instantly toggle off.
+   - Screen Recording Indicator: Compact pill matching flashlight dimensions with pulsing red record dot and running digital timer.
+   - Dual-Island (Meta-Ball): When recording and flashlight run simultaneously, the secondary circular meta-ball bubble docks cleanly on the LEFT side of the main capsule.
    - Swipe to Swap: Swipe left or right on the Dynamic Island to seamlessly swap roles between screen recording and flashlight.
-   - Floating Expanded Card: Tap the Dynamic Island to open an expanded control panel with stop, pause, or torch extinguish buttons.
+   - Floating Expanded Card: Tap the Dynamic Island to open an expanded control panel with an enlarged 44dp red stop button or torch toggle.
 
 2. Redesigned Quick Settings (One UI 9 Style)
    - Single-Pull View (QQS): A clean layout featuring 6 circular toggles at the top, a flicker-free brightness slider in the middle, and 2 large pill buttons (Wi-Fi and Bluetooth) at the bottom.
@@ -647,3 +647,26 @@ During testing and review sessions, several core interface discrepancies and sub
      * Layer 5: Fallback dispatch via `screenRecordController?.stopRecording(...)`.
 4. **Expanded Card Streamlining (iOS Authentic Form Factor)**:
    - `dynamic_island_expanded_card.xml`: Eliminated the non-functional pause button (unsupported by AOSP MediaProjection architecture) and enlarged the red Stop button (44dp with 18dp square icon), matching authentic iOS Dynamic Island design.
+
+---
+
+## Section XX: Dynamic Island Form-Factor Refinement (Compact Record Pill, Minimalist Flashlight Pill, and Left-Aligned Meta-Ball)
+
+### 1. Requirements & Overview
+- **User Request**:
+  1. Resize the screen recording capsule to match the compact dimensions of the flashlight pill so it is not overly elongated.
+  2. Remove the flashlight label text ("Flashlight" / "Senter") from the compact Dynamic Island pill, showing strictly the flashlight vector logo and "On" status text.
+  3. Relocate the secondary meta-ball circular bubble to the LEFT of the main capsule instead of the right.
+
+### 2. Implementation Details
+1. **Left-Side Meta-Ball Relocation (`dynamic_island_charging.xml`)**:
+   - Reordered `island_meta_ball` FrameLayout to precede `island_capsule` inside `island_root_container`.
+   - Adjusted separator margin from `android:layout_marginStart="8dp"` to `android:layout_marginEnd="8dp"`. In dual-activity mode (such as flashlight and screen recording running at the same time), the secondary meta-ball bubble now naturally anchors to the left of the main capsule.
+2. **Streamlining Flashlight Pill to Minimal Form**:
+   - `dynamic_island_charging.xml`: Removed `island_torch_text` and the 24dp center spacer, leaving only the amber flashlight icon (`16dp`, `#FFD60A`) and bold "On" status label (`island_torch_action_text`, 13sp) with 8dp start margin and 12dp/14dp side padding.
+   - `values-in/shinkai_strings.xml`: Updated `dynamic_island_torch_on` from "Menyala" to "On" to guarantee a concise and uniform UI appearance.
+3. **Compact Screen Record Pill Form Factor**:
+   - `dynamic_island_charging.xml`: Removed `minWidth="200dp"`, the 36dp camera clearance spacer, and the 0dp weight=1 dual-wing container. Replaced them with an inline compact horizontal layout holding the pulsing red indicator dot (`11dp`) and bold digital elapsed timer (`00:00`) with matching 12dp/14dp padding, achieving a compact and visually symmetrical capsule alongside the flashlight pill.
+4. **Framework Code Clean-Up (`DynamicIslandChargingView.kt`)**:
+   - Removed deprecated `torchTextView` (`R.id.island_torch_text`) field declaration and `findViewById` assignment, keeping code clean with zero orphaned references.
+

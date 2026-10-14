@@ -17,11 +17,11 @@ Pembaruan ini membawa perombakan menyeluruh pada antarmuka pengguna (UI Redesign
 
 1. Dynamic Island Interaktif (Punch-Hole POCO F5)
    - Indikator Pengisian Daya: Menampilkan animasi petir hijau dan persentase baterai selama 7.8 detik saat ponsel dicolokkan ke pengisi daya.
-   - Indikator Senter: Kapsul senter tetap aktif selama lampu senter menyala. Ketuk sekali untuk langsung mematikan senter.
-   - Indikator Perekam Layar (Screen Recording): Menampilkan timer digital berjalan dengan lebar kapsul seimbang (~200dp) ala iOS.
-   - Dual-Island (Meta-Ball): Jika perekam layar dan senter menyala bersamaan, perekam layar menjadi pulau utama dan senter menjadi gelembung bundar di sampingnya.
+   - Indikator Senter: Kapsul senter ringkas minimalis (hanya menampilkan logo senter dan status "On") yang tetap aktif selama senter menyala. Ketuk sekali untuk langsung mematikan senter.
+   - Indikator Perekam Layar (Screen Recording): Kapsul ringkas serasi dengan senter yang memuat titik rekam merah berdenyut dan penghitung waktu digital.
+   - Dual-Island (Meta-Ball): Jika perekam layar dan senter menyala bersamaan, gelembung bundar (meta-ball) tampil di sebelah KIRI kapsul utama.
    - Geser untuk Tukar Posisi: Usap Dynamic Island ke kiri atau kanan untuk menukar posisi antara perekam layar dan senter.
-   - Kartu Kontrol Mengambang (Expanded Island): Ketuk Dynamic Island untuk membuka panel kontrol dengan tombol stop, pause, atau matikan senter.
+   - Kartu Kontrol Mengambang (Expanded Island): Ketuk Dynamic Island untuk membuka panel kontrol dengan tombol stop (44dp) atau matikan senter.
 
 2. Tampilan Baru Quick Settings (One UI 9 Style)
    - Tampilan Tarik Satu Kali (QQS): Susunan rapi berisi 6 tombol lingkaran di atas, slider kecerahan tanpa flicker di tengah, dan 2 tombol pill besar (Wi-Fi dan Bluetooth) di bawah.
@@ -647,3 +647,26 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
      * Lapisan 5: Menjalankan `screenRecordController?.stopRecording(...)` sebagai cadangan framework.
 4. **Penyederhanaan Kartu Diperluas Rekam Layar (Gaya Asli iOS)**:
    - `dynamic_island_expanded_card.xml`: Menghapus tombol jeda (`pause`) yang tidak didukung secara native oleh arsitektur AOSP MediaProjection, dan membesarkan tombol Stop lingkaran merah (44dp dengan ikon kotak 18dp) sehingga fokus kontrol menjadi jelas, responsif, dan sesuai dengan Dynamic Island asli iOS.
+
+---
+
+## Bagian XX: Penyempurnaan Form Factor Dynamic Island (Kapsul Rekam Kompak, Senter Minimalis, dan Meta-Ball Sisi Kiri)
+
+### 1. Kebutuhan & Gambaran Umum
+- **Permintaan Pengguna**:
+  1. Ukuran kapsul perekam layar (Screen Record) dibuat ringkas seperti senter agar tidak terlalu panjang.
+  2. Teks label senter ("Senter" / "Flashlight") dihapus pada kapsul compact Dynamic Island, sehingga hanya menampilkan logo senter dan teks status "On" saja.
+  3. Posisi gelembung sekunder meta-ball dipindahkan ke sebelah KIRI kapsul utama (bukan di sebelah kanan).
+
+### 2. Detail Implementasi
+1. **Relokasi Meta-Ball ke Sisi Kiri (`dynamic_island_charging.xml`)**:
+   - Memindahkan kontainer FrameLayout `island_meta_ball` ke urutan pertama di dalam `island_root_container`, mendahului `island_capsule`.
+   - Mengubah margin pemisah dari `android:layout_marginStart="8dp"` menjadi `android:layout_marginEnd="8dp"`, sehingga saat mode dual-aktivitas aktif (misalnya senter dan rekam layar berjalan bersamaan), gelembung bundar meta-ball otomatis berlabuh di sebelah kiri kapsul utama.
+2. **Penyederhanaan Kapsul Senter Menjadi Minimalis**:
+   - `dynamic_island_charging.xml`: Menghapus teks judul senter (`island_torch_text`) dan spacer pemisah tengah 24dp. Menyisakan ikon vektor senter (`16dp`, warna amber `#FFD60A`) dan teks status "On" (`island_torch_action_text`, tebal, 13sp) dengan margin awal 8dp serta padding samping 12dp/14dp.
+   - `values-in/shinkai_strings.xml`: Memperbarui nilai string `dynamic_island_torch_on` dari "Menyala" menjadi "On" untuk menghasilkan tampilan antarmuka yang seragam dan bersih.
+3. **Kapsul Perekam Layar Kompak (Compact Sizing)**:
+   - `dynamic_island_charging.xml`: Menghilangkan atribut lebar paksa `minWidth="200dp"`, spacer tengah lubang kamera 36dp, dan struktur sayap ganda. Menggantikannya dengan tata letak horizontal ringkas sejajar yang memuat titik rekam merah berdenyut (`11dp`) dan penghitung waktu digital tebal (`00:00`) dengan padding simetris 12dp/14dp. Hal ini menghasilkan kapsul perekam yang ringkas dan seimbang secara visual dengan kapsul senter.
+4. **Pembersihan Kode Framework (`DynamicIslandChargingView.kt`)**:
+   - Menghapus referensi deklarasi dan inisialisasi `torchTextView` (`R.id.island_torch_text`) yang sudah tidak lagi digunakan pada tata letak kapsul ringkas.
+
