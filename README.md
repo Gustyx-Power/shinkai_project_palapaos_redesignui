@@ -1,62 +1,64 @@
 # Shinkai Project - WowoOS Redesign UI (POCO F5 & Generic Android 17)
 
-Repositori ini berisi kode sumber antarmuka, layout XML, aset drawable, skrip kernel, dan konfigurasi sistem untuk desain ulang antarmuka terinspirasi One UI 9 serta fitur Dynamic Island pada Shinkai Project / WowoOS Android 17 (POCO F5 / marble dan perangkat AOSP lainnya).
+This repository contains the complete user interface source code, XML layouts, drawable assets, kernel scripts, and system configurations for the One UI 9-inspired redesign and interactive Dynamic Island implemented for Shinkai Project / WowoOS on Android 17 (POCO F5 / marble and generic AOSP devices).
 
 ---
 
-## Ikhtisar Komponen & Fitur
+## Overview of Components & Features
 
-### 1. Dynamic Island Interaktif
-- **Penyelarasan Punch-Hole POCO F5**: Disesuaikan dengan posisi kamera depan tengah perangkat POCO F5 (`device/xiaomi/marble`).
-- **Fisika Pegas (Spring Overshoot)**: Animasi ekspansi horizontal dan retraksi elastis dua fase saat muncul dan menghilang.
-- **Tiga Peristiwa Utama**:
-  - **Pengisian Daya (Charging)**: Tampilan persentase baterai real-time dan animasi petir hijau neon (durasi 7.8 detik).
-  - **Senter (Flashlight)**: Kapsul aktif selama senter menyala. Ketuk sekali untuk mematikan senter.
-  - **Perekam Layar (Screen Record)**: Kapsul simetris (~200dp) dengan indikator titik merah berkedip di kiri, spacer bebas kamera punch-hole di tengah, dan digital timer berjalan di kanan.
-- **Dual-Island Meta-Ball**: Saat senter dan perekam layar aktif bersamaan, perekam layar menjadi pulau utama dan senter menjadi gelembung bundar di sampingnya.
-- **Gestur Usap (Swipe to Swap)**: Usap horizontal pada pulau untuk menukar prioritas antara perekam layar dan senter.
-- **Kartu Mengambang (Expanded Island Card)**: Ketukan pada kapsul membuka kartu kontrol mengambang dengan tombol tindakan cepat (Stop, Pause, Matikan Senter) dan timer digital besar.
+### 1. Interactive Dynamic Island
+- **POCO F5 Punch-Hole Alignment**: Geometrically tailored for the centered camera cutout of POCO F5 (`device/xiaomi/marble`).
+- **Spring Overshoot Physics**: Smooth horizontal expansion and two-phase elastic recoil when expanding and dismissing.
+- **Three Core System Events**:
+  - **Charging**: Real-time battery percentage indicator with an animated neon green lightning bolt (7.8s presentation duration).
+  - **Flashlight**: Persistent pill display while the flashlight is active. Tapping toggles off the torch instantly.
+  - **Screen Recording**: Symmetrical capsule (~200dp) with a pulsing red indicator dot on the left, a 36dp camera clearance spacer in the center, and a running elapsed digital timer on the right.
+- **Dual-Island Meta-Ball Architecture**: When screen recording and flashlight run concurrently, recording takes the main capsule and the flashlight becomes a secondary circular bubble (meta-ball) to the right.
+- **Swipe-to-Swap Priority**: Horizontal swipe gesture smoothly swaps roles between the main capsule and the meta-ball.
+- **Expanded Island Card**: Tapping the compact pill opens a floating expanded control card with quick action buttons (Stop, Pause, Toggle Flashlight) and a large digital readout.
 
 ### 2. Quick Settings One UI 9 (Jetpack Compose)
-- **Tampilan Tarik Satu Kali (QQS / 1-Pull)**:
-  - Baris 1: 6 tombol cepat berbentuk lingkaran (1x1).
-  - Baris 2: Slider kecerahan halus tanpa flicker.
-  - Baris 3: 2 tombol pill besar (2x1) untuk Wi-Fi dan Bluetooth.
-  - Pemutar media terintegrasi saat audio aktif.
-- **Tampilan Tarik Penuh (Expanded QS / 2-Pull)**:
-  - Kartu kontainer kaca buram (frosted glass) untuk tombol cepat.
-  - Slider volume media terintegrasi dan tombol pemilih mode suara (Dering, Getar, Hening).
-  - Pemutar musik responsif dan pintasan daya serta pengaturan.
-- **Mode Edit 2D Bebas**:
-  - Seret dan susun ulang posisi tombol secara bebas (horizontal maupun vertikal).
-  - Tombol 'Selesai' mengambang di bagian bawah layar untuk kemudahan jangkauan satu tangan.
+- **Single-Pull View (QQS / 1-Pull)**:
+  - Row 1: 6 circular quick setting buttons (1x1 format).
+  - Row 2: Smooth brightness slider without touch flicker.
+  - Row 3: 2 large pill buttons (2x1 format) for Wi-Fi and Bluetooth.
+  - Live media player integration when audio is actively playing.
+- **Expanded Shade View (Expanded QS / 2-Pull)**:
+  - Frosted glass container hosting circular quick tiles.
+  - Integrated media volume slider and sound mode selector (Ring, Vibrate, Silent).
+  - Clean placement for power menu and settings shortcuts.
+- **Free 2D Tile Reordering (Edit Mode)**:
+  - Long-press and drag tiles freely in any direction (horizontal or vertical).
+  - Floating 'Done' button at the bottom center of the screen for one-handed reachability.
 
-### 3. Desain Ulang Menu Pengaturan (Settings)
-- **Dashboard Beranda Cepat (Quick Dashboard)**:
-  - Kartu pemantau status cepat: Baterai, Penyimpanan, RAM, Tampilan, dan Suara.
-  - Tombol Notifikasi: Panel akses cepat langsung ke pengaturan notifikasi.
-  - Menu Aksesibilitas: Tetap tersedia utuh pada daftar pengaturan utama.
+### 3. Settings Redesign
+- **Homepage Quick Dashboard**:
+  - Interactive resource monitor cards for Battery, Storage, RAM, Display, and Sound.
+  - Notification Panel Button: Direct quick access to Notification Settings on the homepage dashboard.
+  - Accessibility Menu: Preserved in the primary settings list under the support category.
 - **Colored Notification Icons**:
-  - Opsi untuk menampilkan ikon asli aplikasi yang berwarna penuh pada status bar dan panel notifikasi.
-- **Halaman Tentang Ponsel (About Phone)**:
-  - Banner visual bertema Shinkai Project dengan kartu spesifikasi real-time (prosesor, arsitektur CPU, refresh rate layar, kamera) dan kredit kontributor.
+  - Toggle in Notification Settings to display authentic, full-color application logos across status bar icons and shade notification cards instead of monochrome silhouettes.
+- **About Phone Dashboard**:
+  - Shinkai Project visual banner with real-time hardware spec meters (SoC, CPU architecture, display refresh rate, cameras) and community credits.
 
-### 4. Performa Sistem, Kernel & Audio
+### 4. System, Kernel & Audio Optimizations
 - **Dynamic RAM Expansion (zRAM)**:
-  - Pengaturan ukuran swap zRAM nyata yang terhubung langsung ke kernel Linux (Pilihan: Nonaktif/0 GB, 2 GB, 4 GB, 8 GB, 16 GB).
-- **Hardware Dolby Atmos Asli**:
-  - Integrasi DSP perangkat keras bawaan dengan aplikasi kontrol MarbleDolby (AutoEQ dan 10-band equalizer) tanpa memerlukan root atau modul KernelSU.
-- **Kustomisasi Navigasi**:
-  - Opsi untuk menyembunyikan pill bilah navigasi bawah dan menghilangkan jarak kosong di bawah keyboard.
+  - Real Linux kernel zRAM reallocation directly configurable via Settings (Options: Disabled/0 GB, 2 GB, 4 GB, 8 GB, 16 GB).
+- **Native Hardware Dolby Atmos**:
+  - Hardware DSP offload with built-in MarbleDolby control application (AutoEQ and 10-band equalizer) without requiring root or KernelSU modules.
+- **Clean Navigation Customizations**:
+  - Toggles to hide the bottom navigation pill and remove bottom keyboard insets.
 
 ---
 
-## Struktur Repositori
+## Repository Structure
 
 ```
 .
 |-- README.md
 |-- changelogs.md
+|-- changelogs-en.md
+|-- changelogs-id.md
 |-- apply.sh
 |-- temp.sh
 |-- build/
@@ -84,87 +86,89 @@ Repositori ini berisi kode sumber antarmuka, layout XML, aset drawable, skrip ke
 
 ---
 
-## Panduan Pemasangan
+## Installation Guide
 
-### Metode 1: Skrip Otomatis (apply.sh)
+### Method 1: Automated Script (apply.sh)
 
-Gunakan skrip `apply.sh` untuk menerapkan perubahan secara otomatis:
+Use the provided `apply.sh` script to apply the changes automatically:
 
-1. **Masuk ke direktori repositori**:
+1. **Navigate to the repository directory**:
    ```bash
    cd shinkai_project_wowoos_redesignui
    chmod +x apply.sh
    ```
 
-2. **Jalankan sesuai target yang diinginkan**:
+2. **Run according to your target**:
 
-   - **A. Untuk Perangkat Lain (Hanya UI / Tanpa Device Tree)**:  
-     Gunakan mode ini jika Anda mengompilasi untuk perangkat selain POCO F5 agar device tree bawaan perangkat Anda tidak tertimpa:
+   - **A. For Any Other Device (UI Redesign Only)**:  
+     Use this mode when porting the interface to devices other than POCO F5 to ensure your device tree is preserved:
      ```bash
      ./apply.sh /path/to/rom --ui-only
      ```
 
-   - **B. Untuk POCO F5 (marble) Setup Lengkap**:  
-     Menerapkan UI Redesign, Device Tree Marble, perbaikan Kernel zRAM, dan SELinux policy:
+   - **B. For POCO F5 (marble) Full Setup**:  
+     Applies UI Redesign, Marble Device Tree, Kernel zRAM fix, and SELinux policies:
      ```bash
      ./apply.sh /path/to/rom --all
      ```
 
-   - **C. Mode Interaktif**:  
-     Jalankan tanpa argumen untuk memilih opsi melalui dialog interaktif:
+   - **C. Interactive Mode**:  
+     Run without arguments to select options interactively:
      ```bash
      ./apply.sh
      ```
 
 ---
 
-### Metode 2: Pemasangan Manual
+### Method 2: Manual Installation
 
-Jika ingin menyalin berkas secara mandiri:
+If you prefer copying files manually:
 
-#### A. Hanya Desain Antarmuka (Kompatibel untuk Semua Perangkat):
+#### A. UI Redesign Only (Compatible with Any Device):
 ```bash
 cp -rf packages/apps/Settings/* /path/to/rom/packages/apps/Settings/
 cp -rf frameworks/base/packages/* /path/to/rom/frameworks/base/packages/
 ```
 
-#### B. Setup Lengkap POCO F5 (marble):
+#### B. Full Setup for POCO F5 (marble):
 ```bash
-# 1. Desain Antarmuka
+# 1. Interface Redesign
 cp -rf packages/apps/Settings/* /path/to/rom/packages/apps/Settings/
 cp -rf frameworks/base/packages/* /path/to/rom/frameworks/base/packages/
 
-# 2. Device Tree Marble (RAM Expansion & SELinux)
+# 2. Marble Device Tree (RAM Expansion & SELinux)
 cp -rf device/xiaomi/marble/* /path/to/rom/device/xiaomi/marble/
 
-# 3. Skrip Build
+# 3. Build Script
 cp -f temp.sh /path/to/rom/
 ```
 
 ---
 
-## Panduan Kompilasi ROM
+## Compilation Guide
 
-Setelah berkas disinkronkan ke direktori source ROM Anda:
+Once files are synchronized into your ROM directory:
 
 ```bash
 cd /path/to/rom
 
-# 1. Setup environment build Android
+# 1. Initialize Android build environment
 source build/envsetup.sh
 
-# 2. Tentukan target perangkat
-breakfast marble # atau lunch target perangkat Anda
+# 2. Select build target
+breakfast marble # or lunch your specific device target
 
-# 3. Jalankan build ROM
-./temp.sh # atau m shinkai -j$(nproc)
+# 3. Compile full ROM
+./temp.sh # or m shinkai -j$(nproc)
 
-# Alternatif: Kompilasi SystemUI saja untuk pengetesan cepat
+# Alternative: Compile SystemUI independently for quick testing
 m SystemUI -j$(nproc)
 ```
 
 ---
 
-## Catatan Perubahan (Changelog)
+## Changelog & Release Notes
 
-Detail teknis lengkap per sesi pengembangan dapat dilihat pada berkas [changelogs.md](changelogs.md).
+Detailed technical notes and changelogs are available in:
+- English: [changelogs-en.md](changelogs-en.md)
+- Indonesian: [changelogs-id.md](changelogs-id.md)
