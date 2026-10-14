@@ -186,5 +186,9 @@
     <string name="home_notification_sub">Bilah status, gelembung &amp; lainnya</string>
     <string name="notification_colored_icons_title">Ikon notifikasi berwarna</string>
     <string name="notification_colored_icons_summary">Tampilkan logo asli berwarna dari aplikasi untuk ikon notifikasi</string>
+
+    <!-- Enhanced Power Menu -->
+    <string name="enhanced_power_menu_title">Enhanced Power Menu</string>
+    <string name="enhanced_power_menu_summary">Gunakan menu daya modern Material 3 Expressive dengan kontrol cepat dan mulai ulang lanjutan (memerlukan restart SystemUI)</string>
 </resources>
 

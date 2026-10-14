@@ -885,3 +885,60 @@ During testing and review sessions, several core interface discrepancies and sub
    - Rebounded the primary capsule back to its resting coordinates and scale over 380ms with fluid deceleration `PathInterpolator(0.18f, 1.0f, 0.35f, 1.0f)`.
 5. **Tactile Tap Animation on Meta-Ball (`onMetaBallClicked`)**:
    - Added an organic squash-and-rebound ripple when the meta-ball is tapped (squashing to 0.85x over 100ms and springing back to 1.0x with `OvershootInterpolator(1.4f)` over 220ms) accompanied by instantaneous haptic click feedback.
+
+
+---
+
+## Section XXVIII: Material 3 Expressive Power Menu Redesign (Pixel 9 Pro XL) and Enhanced Power Menu Advanced Reboot
+
+### 1. Requirements & Overview
+- **User Request**:
+  - Completely redesign the System Power Menu (GlobalActions) following the provided Material 3 Expressive mockup for Pixel 9 Pro XL with pixel-perfect precision.
+  - UI components implemented:
+    * Top Capsule Tag: Material 3 Expressive • Pixel 9 Pro XL and Header: Menu Daya Sistem.
+    * Power Off Slider: Crimson red rounded pill Geser untuk Mematikan Daya with subtitle Tetap terlacak oleh Find My Device and a circular blush pink puck draggable/tappable to power down.
+    * Three Squircle Cards Row: Mulai Ulang (pastel mint green card), Lockdown (dark olive card), and Darurat (dark teal card).
+    * Quick Controls Bottom Card: Dark container Kontrol Cepat Rumah & Dompet with Pixel VIP tag housing Home Controls (Lampu Kamar / Menyala • 80%) and Google Wallet (Google Wallet / Visa •••• 4821).
+  - No Dummy Functions: Every button and action is wired to actual Android system APIs and Intents without placeholder behaviors.
+  - Advanced Reboot Integration: Full advanced reboot support including System, Recovery Mode, Bootloader/Fastboot, and SystemUI restart.
+  - Settings Integration: Add a switch preference named Enhanced Power Menu directly under Aktifkan mulai ulang lanjutan in the Power button settings menu, with broadcast trigger to cleanly restart SystemUI.
+
+### 2. Implementation Details
+1. **Material 3 Expressive Layout & Vector Assets**:
+   - Created primary layout global_actions_enhanced_menu.xml faithfully replicating the Pixel 9 Pro XL layout architecture.
+   - Crafted 18 custom vector drawables and ripple backgrounds:
+     * power_menu_tag_pill_bg.xml: Dark green pill capsule with subtle border stroke.
+     * power_menu_slider_bg.xml: Crimson red #78000C pill background for shutdown slider track.
+     * power_menu_slider_puck_bg.xml: Cream/blush pink circular puck with touch ripple feedback.
+     * power_menu_card_restart_bg.xml: Pastel mint #9EE4B4 squircle with 26dp rounded corners.
+     * power_menu_card_lockdown_bg.xml: Dark olive #2B3830 squircle with 26dp rounded corners.
+     * power_menu_card_emergency_bg.xml: Deep teal #1E3F45 squircle with 26dp rounded corners.
+     * power_menu_card_quick_controls_bg.xml: Deep dark slate #181E1B container for quick affordances.
+     * power_menu_control_home_bg.xml & power_menu_control_wallet_bg.xml: Specialized tile backgrounds for smart home and wallet.
+     * Clean vector icons: ic_power_menu_power.xml, ic_power_menu_restart.xml, ic_power_menu_lockdown.xml, ic_power_menu_emergency.xml, ic_power_menu_home.xml, ic_power_menu_wallet.xml, and ic_power_menu_quick_controls.xml.
+2. **Tactile Power Slider Gesture Physics**:
+   - Developed dynamic touch and drag physics for the power off slider puck:
+     * Calculates maximum travel distance (maxSlide) dynamically from track width and paddings.
+     * Seamlessly tracks leftward finger movement with 1.08x touch scaling and smooth label text alpha fading.
+     * Passing 42% of travel distance triggers confirmation haptic feedback (HapticFeedbackConstants.CONFIRM), snaps puck to the left, and invokes mWindowManagerFuncs.shutdown().
+     * Tapping without dragging plays tactile feedback and animates the full slide sequence before powering off.
+     * Releasing before threshold triggers an organic bounce back using OvershootInterpolator(1.2f).
+3. **In-Place Advanced Reboot Container**:
+   - Connected Mulai Ulang card: if advanced reboot is enabled, seamlessly swaps power menu content with the Advanced Reboot panel via a fluid cross-fade transition:
+     * System Reboot: Dispatches mWindowManagerFuncs.reboot(false, null).
+     * Recovery Mode: Dispatches mWindowManagerFuncs.reboot(false, PowerManager.REBOOT_RECOVERY).
+     * Bootloader Mode: Dispatches mWindowManagerFuncs.reboot(false, PowerManager.REBOOT_BOOTLOADER).
+     * Restart SystemUI: Dismisses dialog and immediately restarts the SystemUI process via Process.killProcess(Process.myPid()).
+     * Cancel/Back Button: Instantly animates back to the main power menu.
+   - If advanced reboot is disabled, Mulai Ulang executes a standard reboot, with long-press support for safe mode boot.
+4. **Real Platform Wiring for Lockdown, Emergency, Home Controls, and Wallet**:
+   - Lockdown: Locks the device immediately and enforces credential entry via mLockPatternUtils.requireCredentialEntry() and WindowManagerGlobal.getWindowManagerService().lockNow().
+   - Emergency: Dispatches emergency intent via mTelecomManager.createLaunchEmergencyDialerIntent() or EmergencyAffordanceManager.
+   - Quick Home Controls: Launches Android native device controls com.android.systemui.controls.ui.ControlsActivity.
+   - Google Wallet: Launches Google Wallet package (com.google.android.apps.walletnfcrel) with fallback to WalletActivity or NFC payment settings.
+5. **Settings Configuration & Provider Registration**:
+   - Declared Settings.System.ENHANCED_POWER_MENU constant in Settings.java.
+   - Added boolean validator in SystemSettingsValidators.java and backup inclusion in SystemSettings.java.
+   - Added switch preference enhanced_power_menu in packages/apps/Settings/res/xml/power_menu_settings.xml directly under advanced_reboot.
+   - Implemented preference listener in PowerMenuSettings.java that automatically broadcasts SysuiRestartReceiver.ACTION when toggled.
+   - Fully localized all strings in Indonesian (res/values-in/shinkai_strings.xml) and English (res/values/shinkai_strings.xml).

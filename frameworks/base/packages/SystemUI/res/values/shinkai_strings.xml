@@ -11,4 +11,28 @@
     <string name="dynamic_island_record_label">Screen Recording</string>
     <string name="dynamic_island_record_elapsed">Elapsed Time</string>
     <string name="dynamic_island_record_stop">Stop</string>
+
+    <!-- Enhanced Power Menu Strings -->
+    <string name="power_menu_tag_pill">Material 3 Expressive • Pixel 9 Pro XL</string>
+    <string name="power_menu_header_title">System Power Menu</string>
+    <string name="power_menu_slide_to_power_off">Slide to Power Off</string>
+    <string name="power_menu_find_my_device">Still trackable by Find My Device</string>
+    <string name="power_menu_restart">Restart</string>
+    <string name="power_menu_lockdown">Lockdown</string>
+    <string name="power_menu_emergency">Emergency</string>
+    <string name="power_menu_quick_controls">Quick Home &amp; Wallet Controls</string>
+    <string name="power_menu_vip_tag">Pixel VIP</string>
+    <string name="power_menu_room_light">Room Light</string>
+    <string name="power_menu_room_light_status">On • 80%</string>
+    <string name="power_menu_google_wallet">Google Wallet</string>
+    <string name="power_menu_wallet_card">Visa •••• 4821</string>
+    <string name="power_menu_advanced_reboot_title">Advanced Reboot</string>
+    <string name="power_menu_advanced_system">Restart System</string>
+    <string name="power_menu_advanced_system_sub">Normal Android reboot</string>
+    <string name="power_menu_advanced_recovery">Recovery Mode</string>
+    <string name="power_menu_advanced_recovery_sub">Reboot to custom recovery / TWRP</string>
+    <string name="power_menu_advanced_bootloader">Bootloader / Fastboot</string>
+    <string name="power_menu_advanced_bootloader_sub">Reboot to bootloader / fastboot</string>
+    <string name="power_menu_advanced_systemui">Restart SystemUI</string>
+    <string name="power_menu_advanced_systemui_sub">Soft restart system interface</string>
 </resources>

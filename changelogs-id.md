@@ -885,3 +885,60 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - Mengembalikan kapsul utama ke posisi netral dan skala normal selama 380ms dengan kurva fluida `PathInterpolator(0.18f, 1.0f, 0.35f, 1.0f)`.
 5. **Animasi Ketukan Taktil pada Meta-Ball (`onMetaBallClicked`)**:
    - Menambahkan efek denyut kenyal saat meta-ball diketuk (memampat ke 0.85x selama 100ms dan memantul kembali ke 1.0x dengan `OvershootInterpolator(1.4f)` selama 220ms) disertai respon getar haptic instan.
+
+
+---
+
+## Bagian XXVIII: Redesain Menu Daya Sistem Material 3 Expressive (Pixel 9 Pro XL) dan Mulai Ulang Lanjutan (Enhanced Power Menu)
+
+### 1. Kebutuhan & Gambaran Umum
+- **Permintaan Pengguna**:
+  - Melakukan redesain menyeluruh pada Menu Daya Sistem (GlobalActions / Power Menu) mengikuti mockup visual Material 3 Expressive bergaya Pixel 9 Pro XL secara presisi.
+  - Komponen antarmuka yang diwujudkan:
+    * Kapsul Header: Material 3 Expressive • Pixel 9 Pro XL dan Judul: Menu Daya Sistem.
+    * Slider Daya Merah (Power Off Slider): Kapsul merah crimson Geser untuk Mematikan Daya disertai subteks Tetap terlacak oleh Find My Device dan puck bulat bundar merah muda/krem yang dapat digeser atau diketuk untuk mematikan daya.
+    * Baris Tiga Kartu Squircle: Mulai Ulang (kartu hijau mint lembut), Lockdown (kartu hijau zaitun gelap), dan Darurat (kartu teal gelap).
+    * Kartu Kontrol Cepat: Kontainer gelap Kontrol Cepat Rumah & Dompet dengan badge Pixel VIP yang memuat dua tombol: Kontrol Rumah (Lampu Kamar / Menyala • 80%) dan Google Wallet (Google Wallet / Visa •••• 4821).
+  - Ketentuan Tanpa Fitur Dummy: Setiap tombol dan aksi terhubung secara nyata ke API dan Intent sistem Android tanpa elemen tiruan.
+  - Menu Mulai Ulang Lanjutan (Advanced Reboot): Menampilkan opsi lengkap mencakup Sistem, Mode Recovery, Mode Bootloader/Fastboot, dan Muat Ulang SystemUI (Restart SystemUI).
+  - Integrasi Menu Pengaturan: Menambahkan switch preference bertuliskan Enhanced Power Menu tepat di bawah menu Aktifkan mulai ulang lanjutan pada menu tombol daya di Pengaturan, disertai trigger broadcast untuk memuat ulang SystemUI secara bersih.
+
+### 2. Detail Implementasi
+1. **Tata Letak & Aset Vektor Material 3 Expressive**:
+   - Membuat layout utama global_actions_enhanced_menu.xml yang mengimplementasikan hierarki visual Pixel 9 Pro XL secara proporsional.
+   - Merancang 18 berkas drawable vektor dan ripple interaktif:
+     * power_menu_tag_pill_bg.xml: Kapsul hijau gelap dengan bingkai kontras untuk tag header.
+     * power_menu_slider_bg.xml: Kapsul merah crimson #78000C untuk lintasan slider pematian daya.
+     * power_menu_slider_puck_bg.xml: Puck bundar krem/merah muda dengan efek ripple sentuh.
+     * power_menu_card_restart_bg.xml: Squircle hijau mint pastel #9EE4B4 dengan sudut membulat 26dp.
+     * power_menu_card_lockdown_bg.xml: Squircle hijau zaitun #2B3830 dengan sudut membulat 26dp.
+     * power_menu_card_emergency_bg.xml: Squircle teal gelap #1E3F45 dengan sudut membulat 26dp.
+     * power_menu_card_quick_controls_bg.xml: Kontainer berlatar gelap #181E1B untuk kontrol cepat.
+     * power_menu_control_home_bg.xml & power_menu_control_wallet_bg.xml: Kartu kontrol pintar dan Google Wallet.
+     * Ikon-ikon vektor presisi: ic_power_menu_power.xml, ic_power_menu_restart.xml, ic_power_menu_lockdown.xml, ic_power_menu_emergency.xml, ic_power_menu_home.xml, ic_power_menu_wallet.xml, dan ic_power_menu_quick_controls.xml.
+2. **Logika Fisika Gestur Slider Daya (Power Off Slider)**:
+   - Mengimplementasikan deteksi sentuhan dan geseran interaktif pada puck tombol daya:
+     * Menghitung jarak geser maksimum (maxSlide) secara dinamis berdasarkan lebar lintasan.
+     * Mengikuti pergerakan jari secara halus ke arah kiri (translationX = -clampedDx) dengan skala sentuh dinamis 1.08x dan pemudaran bertahap pada label teks.
+     * Jika digeser melebihi 42% lintasan, slider memicu getaran haptic konfirmasi (HapticFeedbackConstants.CONFIRM), meluncur mulus ke ujung kiri, dan memanggil fungsi shutdown sistem mWindowManagerFuncs.shutdown().
+     * Jika diketuk langsung tanpa geser, puck memberikan getaran klik taktil, meluncur otomatis ke kiri, dan mematikan perangkat secara aman.
+     * Jika dilepas sebelum ambang batas, puck memantul kembali ke posisi awal secara elastis menggunakan OvershootInterpolator(1.2f).
+3. **Mulai Ulang Lanjutan In-Place (Advanced Reboot Container)**:
+   - Menghubungkan kartu Mulai Ulang: jika opsi mulai ulang lanjutan aktif di sistem, menukar kontainer menu daya ke panel Mulai Ulang Lanjutan secara in-place dengan transisi cross-fade lembut:
+     * Mulai Ulang Sistem: Mengeksekusi mWindowManagerFuncs.reboot(false, null).
+     * Mode Recovery: Mengeksekusi mWindowManagerFuncs.reboot(false, PowerManager.REBOOT_RECOVERY).
+     * Mode Bootloader: Mengeksekusi mWindowManagerFuncs.reboot(false, PowerManager.REBOOT_BOOTLOADER).
+     * Muat Ulang SystemUI: Menutup dialog dan merestart proses SystemUI secara langsung melalui Process.killProcess(Process.myPid()).
+     * Tombol Batal / Kembali: Mengembalikan tampilan ke menu daya utama secara instan.
+   - Jika mulai ulang lanjutan dinonaktifkan, kartu Mulai Ulang langsung menjalankan reboot standar, dengan dukungan safe-boot saat ditekan lama.
+4. **Fungsi Riil pada Lockdown, Darurat, Kontrol Rumah, dan Google Wallet**:
+   - Lockdown: Mengunci perangkat seketika dan menonaktifkan smart lock/biometrik melalui mLockPatternUtils.requireCredentialEntry() serta WindowManagerGlobal.getWindowManagerService().lockNow().
+   - Darurat: Menghubungkan panggilan darurat melalui mTelecomManager.createLaunchEmergencyDialerIntent() atau EmergencyAffordanceManager.
+   - Kontrol Cepat Rumah: Meluncurkan aktivitas antarmuka perangkat pintar asli com.android.systemui.controls.ui.ControlsActivity.
+   - Google Wallet: Meluncurkan aplikasi Google Wallet (com.google.android.apps.walletnfcrel) dengan fallback ke WalletActivity atau pengaturan pembayaran NFC sistem.
+5. **Konfigurasi Pengaturan & Sinkronisasi Provider**:
+   - Menambahkan konstanta Settings.System.ENHANCED_POWER_MENU pada Settings.java.
+   - Mendaftarkan validator boolean pada SystemSettingsValidators.java dan cadangan setelan pada SystemSettings.java.
+   - Menambahkan opsi switch enhanced_power_menu pada packages/apps/Settings/res/xml/power_menu_settings.xml tepat di bawah advanced_reboot.
+   - Menyediakan handler otomatis pada PowerMenuSettings.java yang mengirimkan broadcast pemuatan ulang SystemUI saat switch diubah.
+   - Melokalkan seluruh string pendukung dalam Bahasa Indonesia (res/values-in/shinkai_strings.xml) dan Bahasa Inggris (res/values/shinkai_strings.xml).
