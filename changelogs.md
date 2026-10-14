@@ -554,5 +554,38 @@ During testing and review sessions, several core interface discrepancies and sub
    - `IconManager.kt`:
      * In `attach()`: Registered a `ContentObserver` on `Settings.System.getUriFor("notification_colored_icons")` that dynamically re-renders all existing notification icons via `updateIconsSafe(entry)` in real time when toggled, without requiring a SystemUI reboot.
 
+---
+
+## Section XVIII: Restore Accessibility to Home Settings List & Dynamic Island Dual-Slot / Expanded Card Fixes
+
+### 1. Requirements & Overview
+- **User Request**:
+  1. Return Accessibility (`top_level_accessibility`) back to the standard Home Settings list (since the quick dashboard panel was replaced with Notification).
+  2. Fix Dynamic Island bug in Photo 1: Tapping the island (flashlight or screen record) caused an empty/blank black expanded rounded card to appear without any buttons or indicators.
+  3. Fix Dynamic Island bug in Photo 2: When both flashlight (senter) and screen recording were active simultaneously, the secondary circular meta-ball bubble failed to appear beside the main capsule.
+
+### 2. Implementation Details
+1. **Home Settings Accessibility Restoration (`packages/apps/Settings`)**:
+   - `top_level_settings.xml`: Re-added `<com.android.settings.widget.HomepagePreference>` with key `top_level_accessibility`, icon `@drawable/ic_settings_accessibility_filled`, and controller `TopLevelAccessibilityPreferenceController` inside `top_level_support_category` at order `-20`.
+   - `top_level_settings_expressive.xml`: Re-added `top_level_accessibility` with icon `@drawable/ic_homepage_accessibility` inside `top_level_support_category`.
+2. **Dynamic Island Expanded Card Fix (`frameworks/base/packages/SystemUI`)**:
+   - `DynamicIslandChargingView.kt`:
+     * Fixed critical initialization order in `showExpandedCard()`: Extracted `populateExpandedCard(slot)`, and guaranteed `isExpandedCardShowing = true` before making child layouts visible. Previously, `updateExpandedCardIfShowing()` aborted early via `if (!isExpandedCardShowing) return`, leaving all three sub-views (`expandedRecordContent`, `expandedTorchContent`, `expandedChargingContent`) set to `View.GONE` and producing an empty black box.
+     * Hidden compact pill views (`capsuleView` and `metaBallView`) while the expanded floating card is displayed, smoothly restoring them upon dismissal.
+     * Improved `stopScreenRecording()` using `PendingIntent.getService(...)` with `FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE` fallback.
+   - `dynamic_island_expanded_card.xml`:
+     * Changed `expanded_card_container` from `LinearLayout` to `FrameLayout` with `android:layout_gravity="center_vertical"` on all child layouts to eliminate horizontal measurement collapses and ensure clean full-width presentation.
+3. **Dynamic Island Dual-Slot Meta-Ball & Flashlight Detection Fix**:
+   - `DynamicIslandChargingView.kt`:
+     * Fixed meta-ball visibility bug: Dismissal animation previously omitted `alpha = 1.0f` reset in `withEndAction`, leaving the meta-ball permanently transparent at `alpha = 0f` once dismissed. Now explicitly guarantees `alpha = 1.0f`, `scaleX = 1.0f`, and `scaleY = 1.0f` whenever `metaSlot != IslandSlot.NONE`.
+     * Added triple-redundancy flashlight state tracking:
+       1. `FlashlightController.addCallback(flashlightListener)`
+       2. Direct `CameraManager.registerTorchCallback(cameraTorchCallback, mainHandler)` for all camera IDs
+       3. `ContentObserver` on `Settings.Secure.getUriFor(Settings.Secure.FLASHLIGHT_ENABLED)`
+       4. Direct synchronous evaluation in `refreshIslandState()`: `isTorchOn || controllerTorch || secureTorch`.
+     * Fixed `GestureDetector` touch handling by overriding `onDown(e: MotionEvent): Boolean = true` and `onSingleTapUp(e: MotionEvent): Boolean` to guarantee instant responsiveness without tap lag.
+   - `status_bar.xml`:
+     * Added `android:clipChildren="false"` and `android:clipToPadding="false"` to `PhoneStatusBarView` to ensure multi-bubble islands never get clipped at the status bar boundaries.
+
 
 

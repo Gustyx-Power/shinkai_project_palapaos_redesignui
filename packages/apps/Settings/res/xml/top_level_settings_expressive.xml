@@ -152,6 +152,15 @@
         android:key="top_level_support_category"
         android:layout="@layout/settingslib_expressive_untitled_preference_category">
 
+        <com.android.settings.widget.HomepagePreference
+            android:fragment="com.android.settings.accessibility.AccessibilitySettings"
+            android:icon="@drawable/ic_homepage_accessibility"
+            android:key="top_level_accessibility"
+            android:order="-20"
+            android:title="@string/accessibility_settings"
+            android:summary="@string/accessibility_settings_summary"
+            settings:highlightableMenuKey="@string/menu_key_accessibility"
+            settings:controller="com.android.settings.accessibility.TopLevelAccessibilityPreferenceController"/>
 
         <com.android.settings.widget.HomepagePreference
             android:icon="@drawable/ic_homepage_support"

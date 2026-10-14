@@ -23,13 +23,11 @@
     android:padding="4dp">
 
     <!-- Card Body (Smooth Rounded Floating Island) -->
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/expanded_card_container"
         android:layout_width="326dp"
         android:layout_height="wrap_content"
         android:minHeight="82dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
         android:background="@drawable/dynamic_island_expanded_bg"
         android:paddingStart="16dp"
         android:paddingEnd="18dp"
@@ -43,6 +41,7 @@
             android:id="@+id/expanded_record_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:visibility="gone">
@@ -137,6 +136,7 @@
             android:id="@+id/expanded_torch_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:visibility="gone">
@@ -213,6 +213,7 @@
             android:id="@+id/expanded_charging_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:visibility="gone">
@@ -268,6 +269,6 @@
 
         </LinearLayout>
 
-    </LinearLayout>
+    </FrameLayout>
 
 </FrameLayout>

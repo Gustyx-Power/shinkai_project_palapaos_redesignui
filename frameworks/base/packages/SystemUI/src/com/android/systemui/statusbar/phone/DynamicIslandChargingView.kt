@@ -20,6 +20,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -75,6 +76,11 @@ class DynamicIslandChargingView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
+    init {
+        clipChildren = false
+        clipToPadding = false
+    }
+
     private val mainHandler = Handler(Looper.getMainLooper())
 
     // --- Compact Views ---
@@ -101,7 +107,7 @@ class DynamicIslandChargingView @JvmOverloads constructor(
 
     // --- Expanded Card Views (Floating Window) ---
     private var expandedWindowView: View? = null
-    private var expandedCardContainer: LinearLayout? = null
+    private var expandedCardContainer: FrameLayout? = null
     private var expandedRecordContent: LinearLayout? = null
     private var expandedTorchContent: LinearLayout? = null
     private var expandedChargingContent: LinearLayout? = null
@@ -208,12 +214,19 @@ class DynamicIslandChargingView @JvmOverloads constructor(
 
     private val cameraTorchCallback = object : CameraManager.TorchCallback() {
         override fun onTorchModeChanged(cameraId: String, enabled: Boolean) {
-            if (rearCameraId == null || cameraId == rearCameraId) {
-                mainHandler.post {
-                    if (isTorchOn != enabled) {
-                        isTorchOn = enabled
-                        refreshIslandState(animate = true)
-                    }
+            mainHandler.post {
+                if (isTorchOn != enabled) {
+                    isTorchOn = enabled
+                    refreshIslandState(animate = true)
+                }
+            }
+        }
+
+        override fun onTorchModeUnavailable(cameraId: String) {
+            mainHandler.post {
+                if (isTorchOn) {
+                    isTorchOn = false
+                    refreshIslandState(animate = true)
                 }
             }
         }
@@ -289,7 +302,11 @@ class DynamicIslandChargingView @JvmOverloads constructor(
 
     // --- Gesture Detection for Pill Swipe & Click ---
     private val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
-        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+        override fun onDown(e: MotionEvent): Boolean {
+            return true
+        }
+
+        override fun onSingleTapUp(e: MotionEvent): Boolean {
             showExpandedCard()
             return true
         }
@@ -307,9 +324,15 @@ class DynamicIslandChargingView @JvmOverloads constructor(
     override fun onFinishInflate() {
         super.onFinishInflate()
         try {
+            clipChildren = false
+            clipToPadding = false
+
             LayoutInflater.from(context).inflate(R.layout.dynamic_island_charging, this, true)
 
             rootContainer = findViewById(R.id.island_root_container)
+            rootContainer?.clipChildren = false
+            rootContainer?.clipToPadding = false
+
             capsuleView = findViewById(R.id.island_capsule)
             chargingContentView = findViewById(R.id.island_charging_content)
             torchContentView = findViewById(R.id.island_torch_content)
@@ -383,9 +406,10 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                 flashlightController = Dependency.get(FlashlightController::class.java)
                 flashlightController?.addCallback(flashlightListener)
                 isTorchOn = flashlightController?.isEnabled == true
-            } catch (_: Throwable) {
-                initCameraTorchFallback()
-            }
+            } catch (_: Throwable) {}
+
+            // Always init Camera Torch Callback as well for dual assurance
+            initCameraTorchCallback()
 
             // Initialize ScreenRecord Controller / Listener
             try {
@@ -400,9 +424,14 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                 Log.w(TAG, "ScreenRecordUxController not yet initialized in Dependency", t)
             }
 
-            // Observe Dynamic Island toggle changes
+            // Observe Dynamic Island toggle & Torch setting changes
             context.contentResolver.registerContentObserver(
                 Settings.System.getUriFor("dynamic_island_charging"),
+                false,
+                settingsObserver
+            )
+            context.contentResolver.registerContentObserver(
+                Settings.Secure.getUriFor(Settings.Secure.FLASHLIGHT_ENABLED),
                 false,
                 settingsObserver
             )
@@ -433,7 +462,7 @@ class DynamicIslandChargingView @JvmOverloads constructor(
         dismissExpandedCard()
     }
 
-    private fun initCameraTorchFallback() {
+    private fun initCameraTorchCallback() {
         try {
             cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as? CameraManager
             cameraManager?.let { cm ->
@@ -449,7 +478,7 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                 cm.registerTorchCallback(cameraTorchCallback, mainHandler)
             }
         } catch (t: Throwable) {
-            Log.w(TAG, "CameraManager fallback init failed", t)
+            Log.w(TAG, "CameraManager callback init failed", t)
         }
     }
 
@@ -471,8 +500,15 @@ class DynamicIslandChargingView @JvmOverloads constructor(
         }
 
         val hasCharging = isCharging
-        val hasTorch = isTorchOn
-        val hasRecord = isRecording
+        val secureTorch = try {
+            Settings.Secure.getInt(context.contentResolver, Settings.Secure.FLASHLIGHT_ENABLED, 0) == 1
+        } catch (_: Throwable) { false }
+        val controllerTorch = flashlightController?.isEnabled == true
+        val hasTorch = isTorchOn || controllerTorch || secureTorch
+        isTorchOn = hasTorch
+
+        val hasRecord = isRecording || screenRecordController?.isRecording == true
+        isRecording = hasRecord
 
         if (!hasCharging && !hasTorch && !hasRecord) {
             dismissIsland()
@@ -536,7 +572,12 @@ class DynamicIslandChargingView @JvmOverloads constructor(
 
         // Toggle Meta-Ball View
         if (metaSlot != IslandSlot.NONE) {
+            val wasGone = metaBallView?.visibility != View.VISIBLE
             metaBallView?.visibility = View.VISIBLE
+            metaBallView?.alpha = 1.0f
+            metaBallView?.scaleX = 1.0f
+            metaBallView?.scaleY = 1.0f
+
             if (metaSlot == IslandSlot.TORCH) {
                 metaIconView?.setImageResource(R.drawable.qs_flashlight_icon_on)
                 metaIconView?.imageTintList = android.content.res.ColorStateList.valueOf(0xFFFFD60A.toInt())
@@ -547,7 +588,7 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                 metaRecordDotView?.visibility = View.VISIBLE
             }
 
-            if (animate && metaBallView?.scaleX != 1.0f) {
+            if (animate && wasGone) {
                 metaBallView?.scaleX = 0.2f
                 metaBallView?.scaleY = 0.2f
                 metaBallView?.alpha = 0f
@@ -570,10 +611,14 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                         metaBallView?.visibility = View.GONE
                         metaBallView?.scaleX = 1.0f
                         metaBallView?.scaleY = 1.0f
+                        metaBallView?.alpha = 1.0f
                     }
                     ?.start()
             } else {
                 metaBallView?.visibility = View.GONE
+                metaBallView?.scaleX = 1.0f
+                metaBallView?.scaleY = 1.0f
+                metaBallView?.alpha = 1.0f
             }
         }
 
@@ -664,6 +709,10 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                                 capsule.scaleX = 1.0f
                                 capsule.scaleY = 1.0f
                                 alpha = 1.0f
+                                metaBallView?.visibility = View.GONE
+                                metaBallView?.scaleX = 1.0f
+                                metaBallView?.scaleY = 1.0f
+                                metaBallView?.alpha = 1.0f
                                 isCompactExpanded = false
                             }
                         })
@@ -673,6 +722,10 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                 .start()
         } ?: run {
             visibility = View.GONE
+            metaBallView?.visibility = View.GONE
+            metaBallView?.scaleX = 1.0f
+            metaBallView?.scaleY = 1.0f
+            metaBallView?.alpha = 1.0f
             isCompactExpanded = false
         }
     }
@@ -764,7 +817,6 @@ class DynamicIslandChargingView @JvmOverloads constructor(
             }
 
             pauseBtn?.setOnClickListener {
-                // Pause recording or trigger stop
                 stopScreenRecording()
                 dismissExpandedCard()
             }
@@ -790,8 +842,7 @@ class DynamicIslandChargingView @JvmOverloads constructor(
 
             // Determine active mode to display inside the expanded card
             val activeMode = when {
-                isRecording && prioritizeRecord -> IslandSlot.RECORD
-                isTorchOn && !prioritizeRecord -> IslandSlot.TORCH
+                isRecording && isTorchOn -> if (prioritizeRecord) IslandSlot.RECORD else IslandSlot.TORCH
                 isRecording -> IslandSlot.RECORD
                 isTorchOn -> IslandSlot.TORCH
                 isCharging -> IslandSlot.CHARGING
@@ -800,7 +851,8 @@ class DynamicIslandChargingView @JvmOverloads constructor(
 
             if (activeMode == IslandSlot.NONE) return
 
-            updateExpandedCardIfShowing(activeMode)
+            isExpandedCardShowing = true
+            populateExpandedCard(activeMode)
 
             val lp = WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -817,7 +869,10 @@ class DynamicIslandChargingView @JvmOverloads constructor(
             }
 
             wm.addView(root, lp)
-            isExpandedCardShowing = true
+
+            // Hide compact pill while expanded card is active
+            capsuleView?.visibility = View.INVISIBLE
+            metaBallView?.visibility = View.INVISIBLE
 
             // Spring animate expand
             expandedCardContainer?.let { container ->
@@ -843,9 +898,7 @@ class DynamicIslandChargingView @JvmOverloads constructor(
         }
     }
 
-    private fun updateExpandedCardIfShowing(slot: IslandSlot) {
-        if (!isExpandedCardShowing) return
-
+    private fun populateExpandedCard(slot: IslandSlot) {
         expandedRecordContent?.visibility = if (slot == IslandSlot.RECORD) View.VISIBLE else View.GONE
         expandedTorchContent?.visibility = if (slot == IslandSlot.TORCH) View.VISIBLE else View.GONE
         expandedChargingContent?.visibility = if (slot == IslandSlot.CHARGING) View.VISIBLE else View.GONE
@@ -855,7 +908,11 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                 updateRecordTimer()
             }
             IslandSlot.TORCH -> {
-                expandedTorchStatus?.setText(if (isTorchOn) R.string.dynamic_island_torch_on else R.string.dynamic_island_torch_label)
+                val secureTorch = try {
+                    Settings.Secure.getInt(context.contentResolver, Settings.Secure.FLASHLIGHT_ENABLED, 0) == 1
+                } catch (_: Throwable) { false }
+                val torchOn = isTorchOn || flashlightController?.isEnabled == true || secureTorch
+                expandedTorchStatus?.setText(if (torchOn) R.string.dynamic_island_torch_on else R.string.dynamic_island_torch_label)
             }
             IslandSlot.CHARGING -> {
                 expandedBatteryText?.text = if (lastBatteryLevel >= 0) "$lastBatteryLevel%" else ""
@@ -864,6 +921,11 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                 dismissExpandedCard()
             }
         }
+    }
+
+    private fun updateExpandedCardIfShowing(slot: IslandSlot) {
+        if (!isExpandedCardShowing) return
+        populateExpandedCard(slot)
     }
 
     fun dismissExpandedCard() {
@@ -889,6 +951,8 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                     } catch (_: Throwable) {}
                     expandedWindowView = null
                     isExpandedCardShowing = false
+                    capsuleView?.visibility = View.VISIBLE
+                    refreshIslandState(animate = false)
                 }
                 .start()
         } ?: run {
@@ -899,6 +963,8 @@ class DynamicIslandChargingView @JvmOverloads constructor(
             } catch (_: Throwable) {}
             expandedWindowView = null
             isExpandedCardShowing = false
+            capsuleView?.visibility = View.VISIBLE
+            refreshIslandState(animate = false)
         }
     }
 
@@ -906,16 +972,24 @@ class DynamicIslandChargingView @JvmOverloads constructor(
 
     private fun toggleTorch() {
         try {
+            val secureTorch = try {
+                Settings.Secure.getInt(context.contentResolver, Settings.Secure.FLASHLIGHT_ENABLED, 0) == 1
+            } catch (_: Throwable) { false }
+            val currentOn = isTorchOn || flashlightController?.isEnabled == true || secureTorch
+            val targetState = !currentOn
+
             flashlightController?.let { controller ->
-                controller.setFlashlight(!controller.isEnabled)
+                controller.setFlashlight(targetState)
             } ?: run {
                 cameraManager?.let { cm ->
-                    val id = rearCameraId
+                    val id = rearCameraId ?: cm.cameraIdList.firstOrNull()
                     if (id != null) {
-                        cm.setTorchMode(id, !isTorchOn)
+                        cm.setTorchMode(id, targetState)
                     }
                 }
             }
+            isTorchOn = targetState
+            refreshIslandState(animate = true)
         } catch (t: Throwable) {
             Log.e(TAG, "Failed to toggle flashlight", t)
         }
@@ -926,9 +1000,19 @@ class DynamicIslandChargingView @JvmOverloads constructor(
             screenRecordController?.stopRecording(StopReason.STOP_HOST_APP)
         } catch (_: Throwable) {
             try {
-                context.startService(RecordingService.getStopIntent(context))
+                val stopIntent = RecordingService.getStopIntent(context)
+                PendingIntent.getService(
+                    context,
+                    RecordingService.REQUEST_CODE,
+                    stopIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                ).send()
             } catch (t: Throwable) {
-                Log.e(TAG, "Failed to stop screen recording via service", t)
+                try {
+                    context.startService(RecordingService.getStopIntent(context))
+                } catch (e: Throwable) {
+                    Log.e(TAG, "Failed to stop screen recording via service", e)
+                }
             }
         }
     }

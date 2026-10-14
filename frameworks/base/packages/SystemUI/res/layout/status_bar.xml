@@ -28,6 +28,8 @@
     android:focusable="false"
     android:descendantFocusability="afterDescendants"
     android:accessibilityPaneTitle="@string/status_bar"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     >
 
     <ImageView
