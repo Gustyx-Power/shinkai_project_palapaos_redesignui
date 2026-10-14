@@ -827,3 +827,34 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - Menyederhanakan kalkulasi timer rekam layar langsung dari `recordingStartTimestamp` sistem waktu nyata (`SystemClock.elapsedRealtime()`).
 4. **Pembersihan Aset Grafis Tidak Terpakai**:
    - Menghapus 7 berkas drawable yang sebelumnya digunakan untuk tombol dummy: `dynamic_island_origin_btn_circle.xml`, `dynamic_island_origin_pause_bg.xml`, `ic_origin_pause.xml`, `ic_origin_play.xml`, `ic_origin_pencil.xml`, `ic_origin_mic.xml`, dan `ic_origin_sound_wave.xml`.
+
+---
+
+## Bagian XXVI: Fisika Animasi Evasif Status Bar dan Transisi Fluida Asli OriginOS
+
+### 1. Kebutuhan & Gambaran Umum
+- **Permintaan Pengguna**:
+  - Animasi ekspansi (expand) dan penutupan (dismiss) kartu Dynamic Island sebelumnya terasa terlalu statis, cepat, dan kaku (hanya menimpa status bar secara langsung).
+  - Pada perangkat asli OriginOS, status bar memiliki perilaku animasi fisik yang sangat lembut dan organik:
+    * Saat island mengembang (expand), konten status bar di sisi kiri (jam dan ikon notifikasi) meluncur halus keluar ke arah kiri (`translationX < 0` dan fade out), sedangkan konten status bar di sisi kanan (baterai, sinyal seluler, dan Wi-Fi) meluncur halus keluar ke arah kanan (`translationX > 0` dan fade out).
+    * Saat island ditutup kembali (dismiss), kedua sisi status bar meluncur kembali ke posisi semula secara anggun dan alami.
+  - Memperhalus kurva fisika dan memperpanjang durasi animasi ekspansi/penutupan kartu agar terasa lembut, elastis, dan mengalir seperti cairan (liquid physics) khas OriginOS.
+
+### 2. Detail Implementasi
+1. **Penemuan & Pengikatan Sisi Status Bar (`DynamicIslandChargingView.kt`)**:
+   - Menambahkan pengikatan dinamis ke kontainer status bar bawaan AOSP melalui hierarki `PhoneStatusBarView`:
+     * Sisi Kiri / Start: `status_bar_start_side_content` (membungkus jam dan area ikon notifikasi).
+     * Sisi Kanan / End: `status_bar_end_side_content` (membungkus indikator baterai, sinyal jaringan, dan Wi-Fi).
+   - Menyediakan metode `ensureStatusBarSideViews()` yang aman dan reaktif untuk menjamin referensi elemen status bar selalu siap kapan pun island berinteraksi.
+2. **Animasi Evasif Status Bar Saat Expand (`animateStatusBarSidesOnExpand`)**:
+   - Menggeser kontainer sisi kiri sejauh 56dp ke arah kiri (`translationX = -56dp`) disertai fade out halus (`alpha = 0f`) selama 420ms dengan kurva percepatan fluida `PathInterpolator(0.32f, 0.0f, 0.12f, 1.0f)`.
+   - Menggeser kontainer sisi kanan sejauh 56dp ke arah kanan (`translationX = +56dp`) disertai fade out halus (`alpha = 0f`) selama 420ms dengan kurva yang sama.
+   - Efek ini memberikan ilusi optik seolah-olah pulau Dynamic Island yang membesar secara fisik mendorong dan menyisihkan konten status bar ke tepian layar.
+3. **Animasi Pemulihan Status Bar Saat Dismiss (`animateStatusBarSidesOnCollapse`)**:
+   - Mengembalikan kontainer sisi kiri dari -56dp kembali ke posisi normal (`translationX = 0f`) dengan fade in (`alpha = 1f`) selama 440ms menggunakan kurva redaman pegas lembut `PathInterpolator(0.18f, 1.0f, 0.35f, 1.0f)`.
+   - Mengembalikan kontainer sisi kanan dari +56dp kembali ke posisi normal (`translationX = 0f`) dengan fade in (`alpha = 1f`) secara serempak.
+   - Menambahkan metode pengaman `resetStatusBarSides()` pada siklus hidup `onDetachedFromWindow()` dan skenario pembatalan darurat agar status bar sistem tidak pernah tertinggal dalam kondisi tersembunyi.
+4. **Penyempurnaan Fisika Fluida Kartu Expanded & Kapsul**:
+   - Memperhalus animasi pembukaan kartu (`expandedCardContainer`) dengan durasi 440ms (sebelumnya 320ms) dan interpolator kurva cairan elastis `PathInterpolator(0.22f, 1.0f, 0.36f, 1.0f)` berpangkal dari cutout punch-hole kamera (`pivotY = 0f`, `scale` 0.32x ke 1.0x).
+   - Memperhalus animasi penutupan kartu dengan durasi 380ms (sebelumnya 240ms) dan kurva hisap `PathInterpolator(0.38f, 0.0f, 0.2f, 1.0f)`.
+   - Memperhalus animasi pemulihan kapsul ringkas (`capsuleView`) dan metaball cairan (`metaBallView`) dari 260ms menjadi 400ms dengan interpolator redaman lembut.

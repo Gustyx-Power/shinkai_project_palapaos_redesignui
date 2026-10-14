@@ -139,6 +139,10 @@ class DynamicIslandChargingView @JvmOverloads constructor(
     private var currentCompactAnimSet: AnimatorSet? = null
     private var isReceiverRegistered: Boolean = false
 
+    // Status Bar Sides for OriginOS fluid expand/collapse evasion physics
+    private var statusBarStartSide: View? = null
+    private var statusBarEndSide: View? = null
+
     // --- Controllers ---
     private var flashlightController: FlashlightController? = null
     private var screenRecordController: ScreenRecordUxController? = null
@@ -443,6 +447,7 @@ class DynamicIslandChargingView @JvmOverloads constructor(
             )
 
             refreshIslandState(animate = false)
+            ensureStatusBarSideViews()
         } catch (t: Throwable) {
             Log.e(TAG, "Failed in onAttachedToWindow", t)
         }
@@ -466,6 +471,7 @@ class DynamicIslandChargingView @JvmOverloads constructor(
         mainHandler.removeCallbacks(expandedAutoCollapseRunnable)
         currentCompactAnimSet?.cancel()
         dismissExpandedCard()
+        resetStatusBarSides()
     }
 
     private fun initCameraTorchCallback() {
@@ -886,40 +892,43 @@ class DynamicIslandChargingView @JvmOverloads constructor(
 
             wm.addView(root, lp)
 
+            // Animate native status bar content sliding out to left and right (OriginOS physics)
+            animateStatusBarSidesOnExpand()
+
             // Hide compact pill with smooth scale & fade
             capsuleView?.animate()
-                ?.scaleX(0.7f)
-                ?.scaleY(0.7f)
+                ?.scaleX(0.5f)
+                ?.scaleY(0.5f)
                 ?.alpha(0f)
-                ?.setDuration(160L)
+                ?.setDuration(240L)
                 ?.withEndAction { capsuleView?.visibility = View.INVISIBLE }
                 ?.start()
 
             metaBallView?.animate()
-                ?.scaleX(0.5f)
-                ?.scaleY(0.5f)
+                ?.scaleX(0.4f)
+                ?.scaleY(0.4f)
                 ?.alpha(0f)
-                ?.setDuration(160L)
+                ?.setDuration(240L)
                 ?.withEndAction { metaBallView?.visibility = View.INVISIBLE }
                 ?.start()
 
-            // Spring animate expand from top punch-hole center
+            // Fluid spring animate expand from top punch-hole center
             expandedCardContainer?.let { container ->
                 val displayWidth = resources.displayMetrics.widthPixels.toFloat()
                 container.pivotX = displayWidth / 2f
                 container.pivotY = 0f
-                container.scaleX = 0.35f
-                container.scaleY = 0.2f
+                container.scaleX = 0.32f
+                container.scaleY = 0.22f
                 container.alpha = 0f
-                container.translationY = -12f * resources.displayMetrics.density
+                container.translationY = -14f * resources.displayMetrics.density
 
                 container.animate()
                     .scaleX(1.0f)
                     .scaleY(1.0f)
                     .alpha(1.0f)
                     .translationY(0f)
-                    .setDuration(320L)
-                    .setInterpolator(OvershootInterpolator(1.18f))
+                    .setDuration(440L)
+                    .setInterpolator(PathInterpolator(0.22f, 1.0f, 0.36f, 1.0f))
                     .start()
             }
 
@@ -967,18 +976,21 @@ class DynamicIslandChargingView @JvmOverloads constructor(
         val wm = context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
         val view = expandedWindowView
 
+        // Animate native status bar content sliding back in smoothly (OriginOS physics)
+        animateStatusBarSidesOnCollapse()
+
         expandedCardContainer?.let { container ->
             val displayWidth = resources.displayMetrics.widthPixels.toFloat()
             container.pivotX = displayWidth / 2f
             container.pivotY = 0f
 
             container.animate()
-                .scaleX(0.35f)
-                .scaleY(0.2f)
+                .scaleX(0.32f)
+                .scaleY(0.22f)
                 .alpha(0f)
-                .translationY(-12f * resources.displayMetrics.density)
-                .setDuration(240L)
-                .setInterpolator(PathInterpolator(0.4f, 0f, 0.2f, 1f))
+                .translationY(-14f * resources.displayMetrics.density)
+                .setDuration(380L)
+                .setInterpolator(PathInterpolator(0.38f, 0.0f, 0.2f, 1.0f))
                 .withEndAction {
                     try {
                         if (view != null && view.isAttachedToWindow) {
@@ -988,30 +1000,30 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                     expandedWindowView = null
                     isExpandedCardShowing = false
 
-                    // Smooth restore entrance for compact capsule and meta-ball (no sudden jarring pop!)
+                    // Fluid restore entrance for compact capsule and meta-ball
                     capsuleView?.visibility = View.VISIBLE
                     capsuleView?.alpha = 0f
-                    capsuleView?.scaleX = 0.75f
-                    capsuleView?.scaleY = 0.75f
+                    capsuleView?.scaleX = 0.65f
+                    capsuleView?.scaleY = 0.65f
                     capsuleView?.animate()
                         ?.scaleX(1.0f)
                         ?.scaleY(1.0f)
                         ?.alpha(1.0f)
-                        ?.setDuration(260L)
-                        ?.setInterpolator(OvershootInterpolator(1.2f))
+                        ?.setDuration(400L)
+                        ?.setInterpolator(PathInterpolator(0.18f, 1.0f, 0.35f, 1.0f))
                         ?.start()
 
                     if (isTorchOn && isRecording) {
                         metaBallView?.visibility = View.VISIBLE
                         metaBallView?.alpha = 0f
-                        metaBallView?.scaleX = 0.6f
-                        metaBallView?.scaleY = 0.6f
+                        metaBallView?.scaleX = 0.5f
+                        metaBallView?.scaleY = 0.5f
                         metaBallView?.animate()
                             ?.scaleX(1.0f)
                             ?.scaleY(1.0f)
                             ?.alpha(1.0f)
-                            ?.setDuration(260L)
-                            ?.setInterpolator(OvershootInterpolator(1.3f))
+                            ?.setDuration(400L)
+                            ?.setInterpolator(PathInterpolator(0.18f, 1.0f, 0.35f, 1.0f))
                             ?.start()
                     }
                     refreshIslandState(animate = false)
@@ -1029,7 +1041,83 @@ class DynamicIslandChargingView @JvmOverloads constructor(
             capsuleView?.alpha = 1.0f
             capsuleView?.scaleX = 1.0f
             capsuleView?.scaleY = 1.0f
+            resetStatusBarSides()
             refreshIslandState(animate = false)
+        }
+    }
+
+    private fun ensureStatusBarSideViews() {
+        if (statusBarStartSide != null && statusBarEndSide != null) return
+        val rootBar = (parent as? ViewGroup) ?: (rootView as? ViewGroup)
+        if (rootBar != null) {
+            statusBarStartSide = rootBar.findViewById(R.id.status_bar_start_side_content)
+                ?: rootBar.findViewById(R.id.status_bar_start_side_container)
+            statusBarEndSide = rootBar.findViewById(R.id.status_bar_end_side_content)
+                ?: rootBar.findViewById(R.id.status_bar_end_side_container)
+        }
+    }
+
+    private fun animateStatusBarSidesOnExpand() {
+        ensureStatusBarSideViews()
+        val density = resources.displayMetrics.density
+        val shiftDistance = 56f * density // 56dp slide outwards
+
+        statusBarStartSide?.let { startSide ->
+            startSide.animate().cancel()
+            startSide.animate()
+                .translationX(-shiftDistance)
+                .alpha(0.0f)
+                .setDuration(420L)
+                .setInterpolator(PathInterpolator(0.32f, 0.0f, 0.12f, 1.0f))
+                .start()
+        }
+
+        statusBarEndSide?.let { endSide ->
+            endSide.animate().cancel()
+            endSide.animate()
+                .translationX(shiftDistance)
+                .alpha(0.0f)
+                .setDuration(420L)
+                .setInterpolator(PathInterpolator(0.32f, 0.0f, 0.12f, 1.0f))
+                .start()
+        }
+    }
+
+    private fun animateStatusBarSidesOnCollapse() {
+        ensureStatusBarSideViews()
+
+        statusBarStartSide?.let { startSide ->
+            startSide.animate().cancel()
+            startSide.animate()
+                .translationX(0f)
+                .alpha(1.0f)
+                .setDuration(440L)
+                .setInterpolator(PathInterpolator(0.18f, 1.0f, 0.35f, 1.0f))
+                .start()
+        }
+
+        statusBarEndSide?.let { endSide ->
+            endSide.animate().cancel()
+            endSide.animate()
+                .translationX(0f)
+                .alpha(1.0f)
+                .setDuration(440L)
+                .setInterpolator(PathInterpolator(0.18f, 1.0f, 0.35f, 1.0f))
+                .start()
+        }
+    }
+
+    private fun resetStatusBarSides() {
+        ensureStatusBarSideViews()
+        statusBarStartSide?.let {
+            it.animate().cancel()
+            it.translationX = 0f
+            it.alpha = 1.0f
+        }
+        statusBarEndSide?.let {
+            it.animate().cancel()
+            it.translationX = 0f
+            it.alpha = 1.0f
         }
     }
 

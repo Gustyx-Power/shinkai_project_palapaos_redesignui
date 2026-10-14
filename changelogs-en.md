@@ -827,3 +827,34 @@ During testing and review sessions, several core interface discrepancies and sub
    - Streamlined timer calculation directly from `recordingStartTimestamp` via `SystemClock.elapsedRealtime()`.
 4. **Cleanup of Deprecated Assets**:
    - Removed 7 unused drawable files that were dedicated to dummy controls: `dynamic_island_origin_btn_circle.xml`, `dynamic_island_origin_pause_bg.xml`, `ic_origin_pause.xml`, `ic_origin_play.xml`, `ic_origin_pencil.xml`, `ic_origin_mic.xml`, and `ic_origin_sound_wave.xml`.
+
+---
+
+## Section XXVI: OriginOS Native Status Bar Evasion Physics and Fluid Spring Transitions
+
+### 1. Requirements & Overview
+- **User Request**:
+  - The expansion and dismiss animations of the Dynamic Island card previously felt too static, fast, and abrupt (simply overlaying the status bar directly).
+  - On authentic OriginOS devices, the status bar exhibits a deeply organic and fluid physical behavior:
+    * When the island expands, the left-side status bar content (clock and notification icons) smoothly glides away to the left (`translationX < 0` with fade out), while the right-side status bar content (battery, cellular signal, and Wi-Fi) smoothly glides away to the right (`translationX > 0` with fade out).
+    * When the island collapses (dismisses), both status bar sides glide gracefully back into their original resting positions.
+  - Soften the physical interpolation curves and extend the transition durations to reproduce the authentic, silky-smooth liquid spring physics of OriginOS.
+
+### 2. Implementation Details
+1. **Status Bar Side Binding (`DynamicIslandChargingView.kt`)**:
+   - Wired dynamic hooks into the native AOSP status bar view hierarchy within `PhoneStatusBarView`:
+     * Left / Start Side: `status_bar_start_side_content` (housing the clock and notification icon area).
+     * Right / End Side: `status_bar_end_side_content` (housing network traffic, battery, cellular, and Wi-Fi system icons).
+   - Implemented `ensureStatusBarSideViews()` to guarantee references are safely resolved upon window attachment and interaction.
+2. **Status Bar Evasion Animation on Expand (`animateStatusBarSidesOnExpand`)**:
+   - Translated the left-side container 56dp outward to the left (`translationX = -56dp`) with a gentle fade out (`alpha = 0f`) over 420ms using an acceleration curve `PathInterpolator(0.32f, 0.0f, 0.12f, 1.0f)`.
+   - Translated the right-side container 56dp outward to the right (`translationX = +56dp`) with a gentle fade out (`alpha = 0f`) over 420ms.
+   - This creates a realistic physical illusion of the blossoming Dynamic Island expanding outward and displacing status bar elements toward the screen edges.
+3. **Status Bar Restoration Animation on Collapse (`animateStatusBarSidesOnCollapse`)**:
+   - Restored the left-side container from -56dp back to its baseline position (`translationX = 0f`) and full opacity (`alpha = 1f`) over 440ms using a gentle spring deceleration curve `PathInterpolator(0.18f, 1.0f, 0.35f, 1.0f)`.
+   - Restored the right-side container from +56dp back to its baseline position (`translationX = 0f`) with full opacity (`alpha = 1f`) synchronously.
+   - Added `resetStatusBarSides()` to `onDetachedFromWindow()` and fallback error paths to guarantee system status bar icons are never left in a hidden or offset state.
+4. **Refined Fluid Physics for Expanded Card & Pill Transitions**:
+   - Softened card expansion (`expandedCardContainer`) with a 440ms duration (previously 320ms) using an organic liquid curve `PathInterpolator(0.22f, 1.0f, 0.36f, 1.0f)` blooming from the top punch-hole cutout (`pivotY = 0f`, scaling from 0.32x to 1.0x).
+   - Softened card collapse with a 380ms duration (previously 240ms) using suction curve `PathInterpolator(0.38f, 0.0f, 0.2f, 1.0f)`.
+   - Extended compact pill (`capsuleView`) and liquid metaball (`metaBallView`) return transitions from 260ms to 400ms with smooth spring damping.
