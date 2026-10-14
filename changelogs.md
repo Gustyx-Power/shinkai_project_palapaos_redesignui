@@ -586,6 +586,10 @@ During testing and review sessions, several core interface discrepancies and sub
      * Fixed `GestureDetector` touch handling by overriding `onDown(e: MotionEvent): Boolean = true` and `onSingleTapUp(e: MotionEvent): Boolean` to guarantee instant responsiveness without tap lag.
    - `status_bar.xml`:
      * Added `android:clipChildren="false"` and `android:clipToPadding="false"` to `PhoneStatusBarView` to ensure multi-bubble islands never get clipped at the status bar boundaries.
+4. **Dynamic Island Screen Recording Pill Length & Symmetry (iOS Style 200dp)**:
+   - `dynamic_island_charging.xml`:
+     * Redesigned `island_record_content` with `minWidth="200dp"`, eliminating the cramped/short appearance and matching the balanced width of the charging capsule.
+     * Symmetrical dual-wing architecture: Left wing hosts the pulsing red indicator dot (`gravity="start"`), center features a 36dp clearance spacer positioned directly across the camera punch-hole, and right wing houses the bold red digital timer (`00:00`) and record icon (`gravity="end"`). This ensures the punch-hole never occludes content and maintains iOS Dynamic Island symmetry.
 
 
 

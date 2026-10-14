@@ -129,44 +129,62 @@
                 android:id="@+id/island_record_content"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:minWidth="200dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:visibility="gone">
 
-                <!-- Red Pulsing Dot -->
-                <ImageView
-                    android:id="@+id/island_record_dot"
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
-                    android:src="@drawable/ic_dynamic_island_record_dot"
-                    android:contentDescription="@null" />
+                <!-- Left Wing: Red Pulsing Indicator Dot -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="start|center_vertical">
 
-                <!-- Running Elapsed Timer (00:00) -->
-                <TextView
-                    android:id="@+id/island_record_timer"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="00:00"
-                    android:textColor="#FF453A"
-                    android:textSize="13.5sp"
-                    android:fontFamily="sans-serif-bold"
-                    android:singleLine="true" />
+                    <ImageView
+                        android:id="@+id/island_record_dot"
+                        android:layout_width="11dp"
+                        android:layout_height="11dp"
+                        android:src="@drawable/ic_dynamic_island_record_dot"
+                        android:contentDescription="@null" />
+                </LinearLayout>
 
+                <!-- Center Clearance for Camera Punch-Hole -->
                 <View
-                    android:layout_width="20dp"
+                    android:id="@+id/island_record_spacer"
+                    android:layout_width="36dp"
                     android:layout_height="1dp" />
 
-                <!-- Waveform / Record Icon -->
-                <ImageView
-                    android:id="@+id/island_record_stop_icon"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/qs_screen_record_icon_on"
-                    android:tint="#FF453A"
-                    android:contentDescription="@null" />
+                <!-- Right Wing: Elapsed Timer + Waveform / Record Icon -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="end|center_vertical">
+
+                    <TextView
+                        android:id="@+id/island_record_timer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="00:00"
+                        android:textColor="#FF453A"
+                        android:textSize="13.5sp"
+                        android:fontFamily="sans-serif-bold"
+                        android:singleLine="true" />
+
+                    <ImageView
+                        android:id="@+id/island_record_stop_icon"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginStart="7dp"
+                        android:src="@drawable/qs_screen_record_icon_on"
+                        android:tint="#FF453A"
+                        android:contentDescription="@null" />
+                </LinearLayout>
             </LinearLayout>
 
         </FrameLayout>
