@@ -124,8 +124,7 @@
                     android:id="@+id/island_torch_icon"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
-                    android:src="@drawable/qs_flashlight_icon_on"
-                    android:tint="#FFD60A"
+                    android:src="@drawable/ic_origin_torch"
                     android:contentDescription="@null" />
 
                 <TextView

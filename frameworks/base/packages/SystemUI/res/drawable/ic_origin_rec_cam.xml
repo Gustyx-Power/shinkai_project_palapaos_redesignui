@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2026 Wowo OS / Shinkai Project
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Camera Body with rounded corners -->
+    <path
+        android:fillColor="#FF3B30"
+        android:pathData="M 3,7.5 C 3,5.8 4.3,4.5 6,4.5 L 13.5,4.5 C 15.2,4.5 16.5,5.8 16.5,7.5 L 16.5,16.5 C 16.5,18.2 15.2,19.5 13.5,19.5 L 6,19.5 C 4.3,19.5 3,18.2 3,16.5 Z" />
+    <!-- Camera Lens with rounded tip -->
+    <path
+        android:fillColor="#FF3B30"
+        android:pathData="M 18,9.8 L 21.2,7.4 C 21.8,6.95 22.5,7.4 22.5,8.15 L 22.5,15.85 C 22.5,16.6 21.8,17.05 21.2,16.6 L 18,14.2 Z" />
+</vector>

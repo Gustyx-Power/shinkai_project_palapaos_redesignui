@@ -43,12 +43,16 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.GestureDetector
 import android.view.Gravity
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
+import android.view.animation.PathInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -127,6 +131,9 @@ class DynamicIslandChargingView @JvmOverloads constructor(
     private var isTorchOn: Boolean = false
     private var isRecording: Boolean = false
     private var recordingStartTimestamp: Long = 0L
+    private var isRecordPaused: Boolean = false
+    private var pausedAccumulatedMs: Long = 0L
+    private var pauseStartTimestamp: Long = 0L
 
     // Dual-island priority: true = Record is in main capsule, Torch is in meta-ball
     private var prioritizeRecord: Boolean = true
@@ -196,6 +203,9 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                 if (!isRecording) {
                     isRecording = true
                     recordingStartTimestamp = SystemClock.elapsedRealtime()
+                    isRecordPaused = false
+                    pausedAccumulatedMs = 0L
+                    pauseStartTimestamp = 0L
                     prioritizeRecord = true
                     startRecordTicker()
                     refreshIslandState(animate = true)
@@ -207,6 +217,9 @@ class DynamicIslandChargingView @JvmOverloads constructor(
             mainHandler.post {
                 if (isRecording) {
                     isRecording = false
+                    isRecordPaused = false
+                    pausedAccumulatedMs = 0L
+                    pauseStartTimestamp = 0L
                     stopRecordTicker()
                     dismissExpandedCard()
                     refreshIslandState(animate = true)
@@ -581,8 +594,8 @@ class DynamicIslandChargingView @JvmOverloads constructor(
             metaBallView?.scaleY = 1.0f
 
             if (metaSlot == IslandSlot.TORCH) {
-                metaIconView?.setImageResource(R.drawable.qs_flashlight_icon_on)
-                metaIconView?.imageTintList = android.content.res.ColorStateList.valueOf(0xFFFFD60A.toInt())
+                metaIconView?.setImageResource(R.drawable.ic_origin_torch)
+                metaIconView?.imageTintList = null
                 metaIconView?.visibility = View.VISIBLE
                 metaRecordDotView?.visibility = View.GONE
             } else if (metaSlot == IslandSlot.RECORD) {
@@ -734,44 +747,57 @@ class DynamicIslandChargingView @JvmOverloads constructor(
 
     /**
      * Swaps priorities between Main Capsule and Meta-Ball when swiped horizontally.
+     * Uses fluid horizontal displacement and elastic recovery for liquid physics.
      */
     private fun swapDualIslandPriority() {
         if (!isTorchOn || !isRecording) return
 
-        prioritizeRecord = !prioritizeRecord
+        val density = resources.displayMetrics.density
 
-        capsuleView?.let { capsule ->
-            capsule.animate()
-                .scaleX(0.86f)
-                .scaleY(0.86f)
-                .setDuration(110L)
-                .withEndAction {
-                    refreshIslandState(animate = false)
-                    capsule.animate()
-                        .scaleX(1.0f)
-                        .scaleY(1.0f)
-                        .setInterpolator(OvershootInterpolator(1.3f))
-                        .setDuration(240L)
-                        .start()
-                }
-                .start()
-        }
+        // Phase 1: Fluid anticipation & merge (glide towards each other and compress)
+        capsuleView?.animate()
+            ?.translationX(-12f * density)
+            ?.scaleX(0.85f)
+            ?.scaleY(0.85f)
+            ?.alpha(0.45f)
+            ?.setDuration(130L)
+            ?.setInterpolator(AccelerateDecelerateInterpolator())
+            ?.withEndAction {
+                prioritizeRecord = !prioritizeRecord
+                refreshIslandState(animate = false)
 
-        metaBallView?.let { meta ->
-            meta.animate()
-                .scaleX(0.7f)
-                .scaleY(0.7f)
-                .setDuration(110L)
-                .withEndAction {
-                    meta.animate()
-                        .scaleX(1.0f)
-                        .scaleY(1.0f)
-                        .setInterpolator(OvershootInterpolator(1.4f))
-                        .setDuration(240L)
-                        .start()
-                }
-                .start()
-        }
+                // Phase 2: Settle with elastic overshoot back to neutral
+                capsuleView?.translationX = 10f * density
+                capsuleView?.animate()
+                    ?.translationX(0f)
+                    ?.scaleX(1.0f)
+                    ?.scaleY(1.0f)
+                    ?.alpha(1.0f)
+                    ?.setDuration(280L)
+                    ?.setInterpolator(OvershootInterpolator(1.25f))
+                    ?.start()
+            }
+            ?.start()
+
+        metaBallView?.animate()
+            ?.translationX(14f * density)
+            ?.scaleX(0.7f)
+            ?.scaleY(0.7f)
+            ?.alpha(0.45f)
+            ?.setDuration(130L)
+            ?.setInterpolator(AccelerateDecelerateInterpolator())
+            ?.withEndAction {
+                metaBallView?.translationX = -10f * density
+                metaBallView?.animate()
+                    ?.translationX(0f)
+                    ?.scaleX(1.0f)
+                    ?.scaleY(1.0f)
+                    ?.alpha(1.0f)
+                    ?.setDuration(280L)
+                    ?.setInterpolator(OvershootInterpolator(1.35f))
+                    ?.start()
+            }
+            ?.start()
     }
 
     /**
@@ -787,7 +813,7 @@ class DynamicIslandChargingView @JvmOverloads constructor(
         }
     }
 
-    // --- Expanded Floating Card Logic ---
+    // --- Expanded Floating Card Logic (OriginOS Aesthetic) ---
 
     fun showExpandedCard() {
         if (isExpandedCardShowing) {
@@ -809,15 +835,67 @@ class DynamicIslandChargingView @JvmOverloads constructor(
             expandedBatteryText = root.findViewById(R.id.expanded_battery_text)
             expandedTorchStatus = root.findViewById(R.id.expanded_torch_status)
 
+            // Primary Controls
             val stopBtn: FrameLayout? = root.findViewById(R.id.expanded_record_stop_btn)
+            val pauseBtn: FrameLayout? = root.findViewById(R.id.expanded_record_pause_btn)
+            val pauseIcon: ImageView? = root.findViewById(R.id.expanded_record_pause_icon)
             val torchBtn: FrameLayout? = root.findViewById(R.id.expanded_torch_btn)
 
+            // Auxiliary Controls (Sound Wave, Mic, Pencil)
+            val audioBtn: FrameLayout? = root.findViewById(R.id.expanded_record_audio_btn)
+            val micBtn: FrameLayout? = root.findViewById(R.id.expanded_record_mic_btn)
+            val pencilBtn: FrameLayout? = root.findViewById(R.id.expanded_record_pencil_btn)
+            val audioIcon: ImageView? = root.findViewById(R.id.expanded_record_audio_icon)
+            val micIcon: ImageView? = root.findViewById(R.id.expanded_record_mic_icon)
+            val pencilIcon: ImageView? = root.findViewById(R.id.expanded_record_pencil_icon)
+
+            // Reflect current pause state in icon
+            pauseIcon?.setImageResource(if (isRecordPaused) R.drawable.ic_origin_play else R.drawable.ic_origin_pause)
+
             stopBtn?.setOnClickListener {
+                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
                 stopScreenRecording()
                 dismissExpandedCard()
             }
 
+            pauseBtn?.setOnClickListener {
+                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                isRecordPaused = !isRecordPaused
+                if (isRecordPaused) {
+                    pauseStartTimestamp = SystemClock.elapsedRealtime()
+                    pauseIcon?.setImageResource(R.drawable.ic_origin_play)
+                } else {
+                    if (pauseStartTimestamp > 0) {
+                        pausedAccumulatedMs += (SystemClock.elapsedRealtime() - pauseStartTimestamp)
+                        pauseStartTimestamp = 0L
+                    }
+                    pauseIcon?.setImageResource(R.drawable.ic_origin_pause)
+                }
+            }
+
+            var isMicMuted = false
+            micBtn?.setOnClickListener {
+                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                isMicMuted = !isMicMuted
+                micIcon?.alpha = if (isMicMuted) 0.35f else 1.0f
+            }
+
+            var isAudioActive = true
+            audioBtn?.setOnClickListener {
+                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                isAudioActive = !isAudioActive
+                audioIcon?.alpha = if (isAudioActive) 1.0f else 0.35f
+            }
+
+            var isPencilActive = false
+            pencilBtn?.setOnClickListener {
+                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                isPencilActive = !isPencilActive
+                pencilIcon?.alpha = if (isPencilActive) 1.0f else 0.5f
+            }
+
             torchBtn?.setOnClickListener {
+                it.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
                 toggleTorch()
                 dismissExpandedCard()
             }
@@ -851,7 +929,7 @@ class DynamicIslandChargingView @JvmOverloads constructor(
             populateExpandedCard(activeMode)
 
             val lp = WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.TYPE_STATUS_BAR_SUB_PANEL,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
@@ -861,29 +939,45 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                 PixelFormat.TRANSLUCENT
             ).apply {
                 gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-                y = (resources.getDimensionPixelSize(com.android.internal.R.dimen.status_bar_height) * 0.12f).toInt()
+                y = (resources.getDimensionPixelSize(com.android.internal.R.dimen.status_bar_height) * 0.10f).toInt()
             }
 
             wm.addView(root, lp)
 
-            // Hide compact pill while expanded card is active
-            capsuleView?.visibility = View.INVISIBLE
-            metaBallView?.visibility = View.INVISIBLE
+            // Hide compact pill with smooth scale & fade
+            capsuleView?.animate()
+                ?.scaleX(0.7f)
+                ?.scaleY(0.7f)
+                ?.alpha(0f)
+                ?.setDuration(160L)
+                ?.withEndAction { capsuleView?.visibility = View.INVISIBLE }
+                ?.start()
 
-            // Spring animate expand
+            metaBallView?.animate()
+                ?.scaleX(0.5f)
+                ?.scaleY(0.5f)
+                ?.alpha(0f)
+                ?.setDuration(160L)
+                ?.withEndAction { metaBallView?.visibility = View.INVISIBLE }
+                ?.start()
+
+            // Spring animate expand from top punch-hole center
             expandedCardContainer?.let { container ->
-                container.scaleX = 0.65f
-                container.scaleY = 0.4f
+                val displayWidth = resources.displayMetrics.widthPixels.toFloat()
+                container.pivotX = displayWidth / 2f
+                container.pivotY = 0f
+                container.scaleX = 0.35f
+                container.scaleY = 0.2f
                 container.alpha = 0f
-                container.translationY = -25f * resources.displayMetrics.density
+                container.translationY = -12f * resources.displayMetrics.density
 
                 container.animate()
                     .scaleX(1.0f)
                     .scaleY(1.0f)
                     .alpha(1.0f)
                     .translationY(0f)
-                    .setDuration(340L)
-                    .setInterpolator(OvershootInterpolator(1.22f))
+                    .setDuration(320L)
+                    .setInterpolator(OvershootInterpolator(1.18f))
                     .start()
             }
 
@@ -932,13 +1026,17 @@ class DynamicIslandChargingView @JvmOverloads constructor(
         val view = expandedWindowView
 
         expandedCardContainer?.let { container ->
+            val displayWidth = resources.displayMetrics.widthPixels.toFloat()
+            container.pivotX = displayWidth / 2f
+            container.pivotY = 0f
+
             container.animate()
-                .scaleX(0.7f)
-                .scaleY(0.4f)
+                .scaleX(0.35f)
+                .scaleY(0.2f)
                 .alpha(0f)
-                .translationY(-25f * resources.displayMetrics.density)
-                .setDuration(220L)
-                .setInterpolator(AccelerateInterpolator(1.4f))
+                .translationY(-12f * resources.displayMetrics.density)
+                .setDuration(240L)
+                .setInterpolator(PathInterpolator(0.4f, 0f, 0.2f, 1f))
                 .withEndAction {
                     try {
                         if (view != null && view.isAttachedToWindow) {
@@ -947,7 +1045,33 @@ class DynamicIslandChargingView @JvmOverloads constructor(
                     } catch (_: Throwable) {}
                     expandedWindowView = null
                     isExpandedCardShowing = false
+
+                    // Smooth restore entrance for compact capsule and meta-ball (no sudden jarring pop!)
                     capsuleView?.visibility = View.VISIBLE
+                    capsuleView?.alpha = 0f
+                    capsuleView?.scaleX = 0.75f
+                    capsuleView?.scaleY = 0.75f
+                    capsuleView?.animate()
+                        ?.scaleX(1.0f)
+                        ?.scaleY(1.0f)
+                        ?.alpha(1.0f)
+                        ?.setDuration(260L)
+                        ?.setInterpolator(OvershootInterpolator(1.2f))
+                        ?.start()
+
+                    if (isTorchOn && isRecording) {
+                        metaBallView?.visibility = View.VISIBLE
+                        metaBallView?.alpha = 0f
+                        metaBallView?.scaleX = 0.6f
+                        metaBallView?.scaleY = 0.6f
+                        metaBallView?.animate()
+                            ?.scaleX(1.0f)
+                            ?.scaleY(1.0f)
+                            ?.alpha(1.0f)
+                            ?.setDuration(260L)
+                            ?.setInterpolator(OvershootInterpolator(1.3f))
+                            ?.start()
+                    }
                     refreshIslandState(animate = false)
                 }
                 .start()
@@ -960,6 +1084,9 @@ class DynamicIslandChargingView @JvmOverloads constructor(
             expandedWindowView = null
             isExpandedCardShowing = false
             capsuleView?.visibility = View.VISIBLE
+            capsuleView?.alpha = 1.0f
+            capsuleView?.scaleX = 1.0f
+            capsuleView?.scaleY = 1.0f
             refreshIslandState(animate = false)
         }
     }
@@ -1067,6 +1194,9 @@ class DynamicIslandChargingView @JvmOverloads constructor(
         }
 
         isRecording = false
+        isRecordPaused = false
+        pausedAccumulatedMs = 0L
+        pauseStartTimestamp = 0L
         refreshIslandState(animate = true)
     }
 
@@ -1080,8 +1210,11 @@ class DynamicIslandChargingView @JvmOverloads constructor(
     }
 
     private fun updateRecordTimer() {
+        if (isRecordPaused) {
+            return
+        }
         val elapsed = if (recordingStartTimestamp > 0) {
-            Math.max(0L, (SystemClock.elapsedRealtime() - recordingStartTimestamp) / 1000L)
+            Math.max(0L, (SystemClock.elapsedRealtime() - recordingStartTimestamp - pausedAccumulatedMs) / 1000L)
         } else {
             0L
         }

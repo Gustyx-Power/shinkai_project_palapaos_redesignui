@@ -17,11 +17,10 @@ Pembaruan ini membawa perombakan menyeluruh pada antarmuka pengguna (UI Redesign
 
 1. Dynamic Island Interaktif (Punch-Hole POCO F5)
    - Indikator Pengisian Daya: Menampilkan animasi petir hijau dan persentase baterai selama 7.8 detik saat ponsel dicolokkan ke pengisi daya.
-   - Indikator Senter: Kapsul senter ringkas minimalis (hanya menampilkan logo senter dan status "On") yang tetap aktif selama senter menyala. Ketuk sekali untuk langsung mematikan senter.
-   - Indikator Perekam Layar (Screen Recording): Kapsul ringkas serasi dengan senter yang memuat titik rekam merah berdenyut dan penghitung waktu digital.
-   - Dual-Island (Meta-Ball): Jika perekam layar dan senter menyala bersamaan, gelembung bundar (meta-ball) tampil di sebelah KIRI kapsul utama.
-   - Geser untuk Tukar Posisi: Usap Dynamic Island ke kiri atau kanan untuk menukar posisi antara perekam layar dan senter.
-   - Kartu Kontrol Mengambang (Expanded Island): Ketuk Dynamic Island untuk membuka panel kontrol dengan tombol stop (44dp) atau matikan senter.
+   - Indikator Senter: Kapsul senter ringkas minimalis dengan ikon kustom modern dan status "On". Ketuk sekali untuk langsung mematikan senter.
+   - Indikator Perekam Layar (Screen Recording): Kapsul ringkas serasi dengan titik merah berdenyut dan penghitung waktu digital.
+   - Dual-Island (Meta-Ball): Jika perekam layar dan senter menyala bersamaan, gelembung bundar (meta-ball) tampil di sebelah KIRI kapsul utama dengan transisi fisika fluida saat diusap (swap).
+   - Kartu Kontrol Mengambang (Expanded Island): Desain lebar penuh bergaya OriginOS yang mepet ke tepi layar, dilengkapi lencana kamera rekam, tombol gelombang audio, mikrofon, pena, tombol pause putih, dan tombol stop berlingkar putih.
 
 2. Tampilan Baru Quick Settings (One UI 9 Style)
    - Tampilan Tarik Satu Kali (QQS): Susunan rapi berisi 6 tombol lingkaran di atas, slider kecerahan tanpa flicker di tengah, dan 2 tombol pill besar (Wi-Fi dan Bluetooth) di bawah.
@@ -669,4 +668,40 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - `dynamic_island_charging.xml`: Menghilangkan atribut lebar paksa `minWidth="200dp"`, spacer tengah lubang kamera 36dp, dan struktur sayap ganda. Menggantikannya dengan tata letak horizontal ringkas sejajar yang memuat titik rekam merah berdenyut (`11dp`) dan penghitung waktu digital tebal (`00:00`) dengan padding simetris 12dp/14dp. Hal ini menghasilkan kapsul perekam yang ringkas dan seimbang secara visual dengan kapsul senter.
 4. **Pembersihan Kode Framework (`DynamicIslandChargingView.kt`)**:
    - Menghapus referensi deklarasi dan inisialisasi `torchTextView` (`R.id.island_torch_text`) yang sudah tidak lagi digunakan pada tata letak kapsul ringkas.
+
+---
+
+## Bagian XXI: Desain Kartu Dynamic Island OriginOS (Lebar Penuh Layar, Ikon Vektor Kustom, dan Transisi Fisika Mulus)
+
+### 1. Kebutuhan & Gambaran Umum
+- **Permintaan Pengguna**:
+  1. Desain kartu mengambang (expanded) Dynamic Island saat perekaman layar dirombak menyerupai gaya antarmuka OriginOS (sesuai foto referensi pengguna).
+  2. Kartu diperlebar agar mepet dengan sisi kanan dan kiri layar (menghilangkan lebar kaku 326dp dan menggantinya dengan lebar adaptif penuh layar bersisi margin 10dp).
+  3. Mengganti semua ikon bawaan Material dengan ikon vektor buatan sendiri yang lebih modern dan orisinal.
+  4. Menghaluskan animasi transisi saat menutup kartu diperluas dan saat melakukan penukaran prioritas kapsul (swap).
+
+### 2. Detail Implementasi
+1. **Tata Letak Kartu Lebar Penuh Bergaya OriginOS (`dynamic_island_expanded_card.xml`)**:
+   - Mengubah kontainer `expanded_island_root` dan `expanded_card_container` menjadi `match_parent` dengan margin sisi 10dp, menempel presisi di dekat tepi layar ponsel.
+   - Mengatur ulang tata letak rekam layar menjadi 2 baris bergaya OriginOS:
+     * Baris atas: Lencana merah transparan di kiri berisi ikon kamera perekam kustom (`16dp`, `#FF3B30`) dan penghitung waktu digital (`00:00`), serta judul "Merekam layar" di sisi kanan.
+     * Baris bawah: Kelompok kiri berisi 3 tombol melingkar kaca buram (Gelombang Suara Sistem, Mikrofon, dan Pena Anotasi) berukuran 38dp; kelompok kanan berisi tombol Putar/Jeda melingkar putih solid (`42dp`, bilah vertikal hitam ganda) dan tombol Berhenti berlingkar tepi putih dengan kotak merah di tengahnya (`42dp`).
+   - Kartu Senter dan Pengisian Daya juga diselaraskan menjadi lebar penuh yang proporsional.
+2. **Aset Ikon Vektor Kustom Mandiri (`res/drawable`)**:
+   - `ic_origin_rec_cam.xml`: Ikon kamera video modern dengan sudut bodi membulat dan lensa trapesium.
+   - `ic_origin_sound_wave.xml`: Ikon gelombang spektrum suara 5-batang vertikal dengan ujung melengkung.
+   - `ic_origin_mic.xml`: Ikon kapsul mikrofon elegan dengan penyangga melingkar.
+   - `ic_origin_pencil.xml`: Ikon stylus pena gambar modern miring 45 derajat.
+   - `ic_origin_pause.xml`: Ikon dua bilah jeda hitam solid.
+   - `ic_origin_play.xml`: Ikon segitiga putar hitam solid untuk melanjutkan perekaman yang dijeda.
+   - `ic_origin_stop.xml`: Ikon kotak merah membulat (`#FF3B30`).
+   - `ic_origin_torch.xml`: Ikon senter modern amber kustom dengan sakelar tengah.
+   - `dynamic_island_origin_stop_bg.xml`: Latar tombol stop lingkaran gelap dengan garis batas cincin putih solid 2.2dp.
+   - `dynamic_island_origin_btn_circle.xml`: Latar lingkaran kaca buram semi-transparan untuk kontrol pendukung.
+   - `dynamic_island_origin_record_badge.xml`: Lencana kapsul merah semi-transparan berpenanda waktu.
+3. **Peningkatan Kelancaran Transisi (`DynamicIslandChargingView.kt`)**:
+   - **Transisi Menutup (Dismiss)**: Menetapkan titik tumpu animasi (`pivotX = displayWidth / 2f`, `pivotY = 0f`) tepat di tengah kamera punch-hole. Kartu menyusut secara mulus ke atas dengan kurva `PathInterpolator(0.4f, 0f, 0.2f, 1f)`. Pada saat bersamaan, kapsul ringkas dan meta-ball dipulihkan dengan animasi muncul lembut berskala (`scaleX 0.75f -> 1.0f`) dan interpolator elastis (`OvershootInterpolator`), menghilangkan sentakan/kedipan mendadak secara permanen.
+   - **Transisi Tukar Posisi (Swap)**: Mengimplementasikan simulasi fisika fluida metaball 2-fase. Saat digeser, kapsul dan meta-ball meluncur saling mendekati secara horizontal (`translationX`), mengecil dan melembutkan transparansi secara simultan selama 130ms, lalu bertukar status dan meluncur kembali ke posisi netral dengan pantulan elastis (`OvershootInterpolator`), menghasilkan gerakan organik seperti cairan yang menyatu dan memisah.
+   - **Interaktivitas Perekaman**: Menghubungkan tombol jeda dengan status pembekuan waktu langsung serta respon getar haptic pada semua tombol kontrol.
+
 

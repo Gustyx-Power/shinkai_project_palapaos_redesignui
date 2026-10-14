@@ -17,11 +17,10 @@ This update delivers a complete overhaul of the user interface (UI Redesign) ins
 
 1. Interactive Dynamic Island (POCO F5 Punch-Hole)
    - Charging Indicator: Displays an animated green lightning bolt and live battery percentage for 7.8 seconds when plugged in.
-   - Flashlight Indicator: Minimalist compact pill (strictly flashlight icon and bold "On" status) active while torch is on. Tap once to instantly toggle off.
+   - Flashlight Indicator: Minimalist compact pill with modern bespoke torch icon and bold "On" status. Tap once to toggle off.
    - Screen Recording Indicator: Compact pill matching flashlight dimensions with pulsing red record dot and running digital timer.
-   - Dual-Island (Meta-Ball): When recording and flashlight run simultaneously, the secondary circular meta-ball bubble docks cleanly on the LEFT side of the main capsule.
-   - Swipe to Swap: Swipe left or right on the Dynamic Island to seamlessly swap roles between screen recording and flashlight.
-   - Floating Expanded Card: Tap the Dynamic Island to open an expanded control panel with an enlarged 44dp red stop button or torch toggle.
+   - Dual-Island (Meta-Ball): When recording and flashlight run simultaneously, the secondary circular meta-ball bubble docks cleanly on the LEFT side of the main capsule with fluid liquid physics swap animations.
+   - Floating Expanded Card: Edge-to-edge OriginOS layout with custom video camera badge, audio wave, mic, pencil annotation tools, solid white pause button, and white-ringed stop button.
 
 2. Redesigned Quick Settings (One UI 9 Style)
    - Single-Pull View (QQS): A clean layout featuring 6 circular toggles at the top, a flicker-free brightness slider in the middle, and 2 large pill buttons (Wi-Fi and Bluetooth) at the bottom.
@@ -669,4 +668,40 @@ During testing and review sessions, several core interface discrepancies and sub
    - `dynamic_island_charging.xml`: Removed `minWidth="200dp"`, the 36dp camera clearance spacer, and the 0dp weight=1 dual-wing container. Replaced them with an inline compact horizontal layout holding the pulsing red indicator dot (`11dp`) and bold digital elapsed timer (`00:00`) with matching 12dp/14dp padding, achieving a compact and visually symmetrical capsule alongside the flashlight pill.
 4. **Framework Code Clean-Up (`DynamicIslandChargingView.kt`)**:
    - Removed deprecated `torchTextView` (`R.id.island_torch_text`) field declaration and `findViewById` assignment, keeping code clean with zero orphaned references.
+
+---
+
+## Section XXI: OriginOS-Inspired Dynamic Island Card (Edge-to-Edge Span, Custom Modern Vector Icons, and Fluid Physics Transitions)
+
+### 1. Requirements & Overview
+- **User Request**:
+  1. Revamp the expanded Dynamic Island screen recording card to mirror OriginOS styling (based on user reference photo).
+  2. Widen the card to anchor closely against the left and right edges of the screen (eliminating fixed 326dp width in favor of screen-matching width with slim 10dp margins).
+  3. Replace stock Material icon dependencies with bespoke custom-crafted modern vector icons.
+  4. Smooth out dismiss and dual-island priority swap transitions for fluid motion.
+
+### 2. Implementation Details
+1. **Edge-to-Edge OriginOS Floating Card Architecture (`dynamic_island_expanded_card.xml`)**:
+   - Expanded `expanded_island_root` and `expanded_card_container` to `match_parent` with 10dp side padding, creating an edge-to-edge floating surface.
+   - Restructured screen recording layout into a two-tier OriginOS arrangement:
+     * Top Tier: Red translucent pill badge on the left housing a custom video camera glyph (`16dp`, `#FF3B30`) and bold white elapsed timer (`00:00`), paired with the localized "Screen Recording" header on the right.
+     * Bottom Tier: Left cluster contains three frosted circular action discs (System Audio Wave, Microphone, and Annotation Stylus) at 38dp each; right cluster houses an authentic solid white circular Pause button (`42dp`, dual black vertical bars) and a white-ringed Stop disc (`42dp`, 2.2dp white border with centered red square).
+   - Flashlight and Charging expanded cards aligned with matching full-width presentation.
+2. **Bespoke Vector Drawable Library (`res/drawable`)**:
+   - `ic_origin_rec_cam.xml`: Modern video camera with rounded corners and trapezoidal lens.
+   - `ic_origin_sound_wave.xml`: 5-bar vertical equalizer sound wave with rounded caps.
+   - `ic_origin_mic.xml`: Elegant studio capsule microphone with curved cradle and base.
+   - `ic_origin_pencil.xml`: Modern annotation stylus tilted at 45 degrees.
+   - `ic_origin_pause.xml`: Dual solid black vertical pause bars.
+   - `ic_origin_play.xml`: Solid black play triangle for resuming recording.
+   - `ic_origin_stop.xml`: Solid red rounded square (`#FF3B30`).
+   - `ic_origin_torch.xml`: Bespoke modern amber flashlight with center switch.
+   - `dynamic_island_origin_stop_bg.xml`: Circular dark base with 2.2dp solid white outer ring.
+   - `dynamic_island_origin_btn_circle.xml`: Frosted glass semi-translucent circular disc for auxiliary tools.
+   - `dynamic_island_origin_record_badge.xml`: Red-tinted rounded pill badge for elapsed timer.
+3. **Fluid Transition Mechanics (`DynamicIslandChargingView.kt`)**:
+   - **Dismiss Transition**: Anchored animation pivots (`pivotX = displayWidth / 2f`, `pivotY = 0f`) directly to the punch-hole center. Card collapses upward smoothly via `PathInterpolator(0.4f, 0f, 0.2f, 1f)`. Simultaneously, the compact capsule and meta-ball enter via a gentle scale-in (`scaleX 0.75f -> 1.0f`) with elastic overshoot (`OvershootInterpolator`), completely eradicating previous abrupt layout pops.
+   - **Dual-Island Swap Transition**: Implemented a 2-phase liquid metaball physics model. When swiped, capsule and meta-ball translate horizontally towards each other (`translationX`), compressing and softening opacity over 130ms, then swap roles and spring back to origin with elastic overshoot (`OvershootInterpolator`), achieving an organic fluid fusion and separation effect.
+   - **Recording Interactivity**: Wired pause toggle to freeze/resume elapsed timer progression and bound haptic feedback to all interactive controls.
+
 
