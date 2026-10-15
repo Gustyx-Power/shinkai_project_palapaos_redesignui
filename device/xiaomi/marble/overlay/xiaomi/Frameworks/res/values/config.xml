@@ -147,6 +147,15 @@
     <!-- Type of the double tap sensor. Empty if double tap is not supported. -->
     <string name="config_dozeDoubleTapSensorType" translatable="false">org.lineageos.sensor.double_tap</string>
 
+    <!-- Whether device supports double tap to wake -->
+    <bool name="config_supportDoubleTapWake">true</bool>
+
+    <!-- Whether device supports double tap to sleep -->
+    <bool name="config_supportDoubleTapSleep">true</bool>
+
+    <!-- Double tap to sleep gesture default -->
+    <bool name="config_dt2sGestureEnabledByDefault">true</bool>
+
     <!-- Type of the tap sensor. Empty if tap is not supported. -->
     <string name="config_dozeTapSensorType" translatable="false">org.lineageos.sensor.single_tap</string>
 

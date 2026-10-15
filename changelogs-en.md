@@ -1183,4 +1183,40 @@ During testing and review sessions, several core interface discrepancies and sub
 5. **Documentation and README.md Synchronization**:
    - Synchronized README.md header and feature overview to Shinkai Project - PalapaOS Redesign UI (POCO F5 & Generic Android 17).
    - Synchronized all engineering and technical entries across changelogs.md, changelogs-id.md, and changelogs-en.md under strict zero emoji validation.
+---
 
+## Section XXXV: Implementation of DT2W (Double Tap to Wake) and DT2S (Double Tap to Sleep) Features
+
+### 1. Requirements & Overview
+- **User Request**:
+  - Add and enable DT2W (Double Tap to Wake) and DT2S (Double Tap to Sleep) features for PalapaOS (POCO F5 / `marble`).
+  - Ensure end-to-end integration across touchscreen kernel drivers, Power HAL, AOSP framework, SystemUI, and Display Settings.
+  - Ensure all changelog files strictly adhere to the zero-emoji requirement.
+
+### 2. Subsystem Analysis & Hardware Architecture
+1. **POCO F5 (`marble`) Kernel & Sysfs Support**:
+   - Sysfs nodes `/sys/class/touch/touch_dev/gesture_double_tap_enabled` and `gesture_double_tap_state` are configured in `init.marble.rc` with system permissions.
+   - Vendor double tap sensor is monitored by `NonUiNotifier.cpp` using the sensor type `org.lineageos.sensor.double_tap`.
+2. **Double Tap to Wake (DT2W)**:
+   - `PowerManagerService` dispatches `Mode::DOUBLE_TAP_TO_WAKE` to the Power HAL when `config_supportDoubleTapWake` is set to true.
+   - `TapToWakePreferenceController.java` in Settings manages `Settings.Secure.DOUBLE_TAP_TO_WAKE`.
+3. **Double Tap to Sleep (DT2S)**:
+   - `QQSGestureListener.kt` listens for double-taps on the status bar / QQS and lockscreen to trigger `powerManager.goToSleep()`.
+   - `NotificationPanelViewController.java` detects double taps and routes them to power sleep when `Settings.System.DOUBLE_TAP_SLEEP_GESTURE` is enabled.
+   - `config_supportDoubleTapSleep` and `config_dt2sGestureEnabledByDefault` configure the feature out of the box.
+
+### 3. Implementation Details & File Modifications
+1. **Device Tree & Framework Overlays (`device/xiaomi/marble`)**:
+   - `overlay/xiaomi/Frameworks/res/values/config.xml` & `overlay/marble/Frameworks/res/values/config.xml`:
+     * Added `<bool name="config_supportDoubleTapWake">true</bool>` to enable DT2W in the framework and Display Settings.
+     * Added `<bool name="config_supportDoubleTapSleep">true</bool>` to declare system-level DT2S support.
+     * Added `<bool name="config_dt2sGestureEnabledByDefault">true</bool>` to enable the DT2S gesture by default.
+2. **SettingsProvider Defaults (`frameworks/base/packages/SettingsProvider`)**:
+   - `res/values/defaults.xml`: Set `def_double_tap_to_sleep` to `true` to ensure consistent defaults.
+3. **Display Settings UI (`packages/apps/Settings`)**:
+   - `res/xml/display_settings.xml`:
+     * "Tap to wake" (`tap_to_wake`) is enabled dynamically based on `config_supportDoubleTapWake`.
+     * Set `android:defaultValue="true"` for `double_tap_sleep_gesture` ("Tap to sleep").
+4. **Redesign UI Repository Synchronization (`shinkai_project_palapaos_redesignui`)**:
+   - Synchronized all updated overlay and Settings XML configurations to the PalapaOS redesign UI repository.
+   - Updated changelog files with verified zero emojis.

@@ -1183,4 +1183,40 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
 5. **Sinkronisasi Dokumentasi dan README.md**:
    - Memperbarui README.md pada judul utama dan ringkasan implementasi menjadi Shinkai Project - PalapaOS Redesign UI (POCO F5 & Generic Android 17).
    - Menyinkronkan seluruh catatan teknis pada changelogs.md, changelogs-id.md, dan changelogs-en.md dengan verifikasi ketat 0 emoji.
+---
 
+## Bagian XXXV: Implementasi Fitur DT2W (Double Tap to Wake) dan DT2S (Double Tap to Sleep)
+
+### 1. Kebutuhan & Gambaran Umum
+- **Permintaan Pengguna**:
+  - Menambahkan dan mengaktifkan fitur DT2W (Double Tap to Wake) dan DT2S (Double Tap to Sleep) untuk PalapaOS (POCO F5 / `marble`).
+  - Memastikan kedua fitur terintegrasi secara mulus antara driver perangkat keras layar sentuh, Power HAL, framework AOSP, SystemUI, dan Pengaturan Tampilan.
+  - Memastikan seluruh berkas changelog tetap mematuhi aturan ketat tanpa emoji (zero emojis).
+
+### 2. Analisis Subsistem & Arsitektur Perangkat Keras
+1. **Dukungan Kernel & Sysfs POCO F5 (`marble`)**:
+   - Node sysfs `/sys/class/touch/touch_dev/gesture_double_tap_enabled` dan `gesture_double_tap_state` telah terkonfigurasi pada `init.marble.rc` dengan izin akses system.
+   - Sensor ketukan ganda vendor terdaftar melalui `NonUiNotifier.cpp` dan tipe sensor `org.lineageos.sensor.double_tap`.
+2. **Double Tap to Wake (DT2W)**:
+   - Integrasi `PowerManagerService` mengelola mode `Mode::DOUBLE_TAP_TO_WAKE` yang diteruskan ke Power HAL saat konfigurasi boolean `config_supportDoubleTapWake` bernilai true.
+   - Pengontrol `TapToWakePreferenceController.java` pada Settings mengontrol setting `Settings.Secure.DOUBLE_TAP_TO_WAKE`.
+3. **Double Tap to Sleep (DT2S)**:
+   - Pengontrol `QQSGestureListener.kt` menangani ketukan ganda pada status bar/QQS dan lockscreen untuk memicu pemanggilan `powerManager.goToSleep()`.
+   - `NotificationPanelViewController.java` memproses ketukan ganda melalui detektor gestur ketika pengaturan `Settings.System.DOUBLE_TAP_SLEEP_GESTURE` aktif.
+   - Konfigurasi `config_supportDoubleTapSleep` dan `config_dt2sGestureEnabledByDefault` mengaktifkan fitur ini secara langsung sejak awal boot.
+
+### 3. Detail Implementasi & Modifikasi Berkas
+1. **Pohon Perangkat & Overlay Framework (`device/xiaomi/marble`)**:
+   - `overlay/xiaomi/Frameworks/res/values/config.xml` & `overlay/marble/Frameworks/res/values/config.xml`:
+     * Menambahkan `<bool name="config_supportDoubleTapWake">true</bool>` untuk mengaktifkan DT2W pada level kerangka kerja dan antarmuka Settings.
+     * Menambahkan `<bool name="config_supportDoubleTapSleep">true</bool>` untuk mengaktifkan dukungan DT2S pada level sistem.
+     * Menambahkan `<bool name="config_dt2sGestureEnabledByDefault">true</bool>` agar gestur DT2S aktif secara default pada status bar dan lockscreen.
+2. **Nilai Default SettingsProvider (`frameworks/base/packages/SettingsProvider`)**:
+   - `res/values/defaults.xml`: Mengatur `def_double_tap_to_sleep` menjadi `true` agar selaras dengan `config_dt2sGestureEnabledByDefault`.
+3. **Antarmuka Pengaturan Tampilan (`packages/apps/Settings`)**:
+   - `res/xml/display_settings.xml`:
+     * Mengaktifkan preferensi "Tap to wake" (`tap_to_wake`) secara otomatis saat `config_supportDoubleTapWake` bernilai true.
+     * Mengatur nilai bawaan `android:defaultValue="true"` pada switch preferensi `double_tap_sleep_gesture` ("Tap to sleep").
+4. **Sinkronisasi Repositori Desain Antarmuka (`shinkai_project_palapaos_redesignui`)**:
+   - Menyinkronkan seluruh berkas konfigurasi XML overlay dan Settings ke repositori antarmuka PalapaOS.
+   - Memperbarui dokumentasi changelog tanpa menyertakan karakter emoji apa pun.

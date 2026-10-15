@@ -307,4 +307,13 @@
          @see https://www.w3.org/TR/SVG/paths.html#PathData
          -->
     <string name="config_mainBuiltInDisplayCutout" translatable="false">M 0,0 H -28 V 94 H 28 V 0 H 0 Z</string>
+
+    <!-- Whether device supports double tap to wake -->
+    <bool name="config_supportDoubleTapWake">true</bool>
+
+    <!-- Whether device supports double tap to sleep -->
+    <bool name="config_supportDoubleTapSleep">true</bool>
+
+    <!-- Double tap to sleep gesture default -->
+    <bool name="config_dt2sGestureEnabledByDefault">true</bool>
 </resources>
