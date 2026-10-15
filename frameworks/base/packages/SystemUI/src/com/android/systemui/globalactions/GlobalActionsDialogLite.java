@@ -912,6 +912,7 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
                 this::onRefresh,
                 () -> rescheduleBurnInTimeout(mGlobalActionDialogTimeout)
         );
+        mDelegate.setParent(this);
         SystemUIDialog dialog = mDelegate.createDialog();
 
         dialog.setOnDismissListener(this);
@@ -2808,6 +2809,12 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
         private FlashlightController.FlashlightListener mTorchListener;
         @Nullable
         private ContentObserver mAirplaneContentObserver;
+        @Nullable
+        private GlobalActionsDialogLite mParent;
+
+        public void setParent(@NonNull GlobalActionsDialogLite parent) {
+            mParent = parent;
+        }
 
         private final OnBackInvokedCallback mOnBackInvokedCallback = () -> {
             if (mEnhancedAdvContainer != null && mEnhancedAdvContainer.getVisibility() == View.VISIBLE) {
@@ -3168,7 +3175,9 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
                                         .withEndAction(() -> {
                                             mUiEventLogger.log(GlobalActionsEvent.GA_SHUTDOWN_PRESS);
                                             dismissWithoutAnimation();
-                                            mWindowManagerFuncs.shutdown();
+                                            if (mParent != null && mParent.mWindowManagerFuncs != null) {
+                                                mParent.mWindowManagerFuncs.shutdown();
+                                            }
                                         }).start();
                             } else if (!isDragging[0] && event.getActionMasked() == MotionEvent.ACTION_UP) {
                                 sliderPuck.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
@@ -3179,7 +3188,9 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
                                             sliderPuck.performHapticFeedback(HapticFeedbackConstants.CONFIRM);
                                             mUiEventLogger.log(GlobalActionsEvent.GA_SHUTDOWN_PRESS);
                                             dismissWithoutAnimation();
-                                            mWindowManagerFuncs.shutdown();
+                                            if (mParent != null && mParent.mWindowManagerFuncs != null) {
+                                                mParent.mWindowManagerFuncs.shutdown();
+                                            }
                                         }).start();
                             } else {
                                 sliderPuck.animate()
@@ -3205,22 +3216,27 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
             if (cardRestart != null) {
                 cardRestart.setOnClickListener(v -> {
                     mRescheduleBurnInTimeout.run();
-                    if (shouldShowRestartSubmenu(dialog.getContext())) {
+                    if (mParent != null && mParent.shouldShowRestartSubmenu(dialog.getContext())) {
                         showEnhancedAdvancedRebootMenu();
                     } else {
                         mUiEventLogger.log(GlobalActionsEvent.GA_REBOOT_PRESS);
                         dismissWithoutAnimation();
-                        mWindowManagerFuncs.reboot(false, null);
+                        if (mParent != null && mParent.mWindowManagerFuncs != null) {
+                            mParent.mWindowManagerFuncs.reboot(false, null);
+                        }
                     }
                 });
 
                 cardRestart.setOnLongClickListener(v -> {
                     mRescheduleBurnInTimeout.run();
                     mUiEventLogger.log(GlobalActionsEvent.GA_REBOOT_LONG_PRESS);
-                    if (!mUserManager.hasUserRestrictionForUser(UserManager.DISALLOW_SAFE_BOOT,
-                            mUserTracker.getUserHandle())) {
+                    if (mParent != null && mParent.mUserManager != null && mParent.mUserTracker != null
+                            && !mParent.mUserManager.hasUserRestrictionForUser(UserManager.DISALLOW_SAFE_BOOT,
+                            mParent.mUserTracker.getUserHandle())) {
                         dismissWithoutAnimation();
-                        mWindowManagerFuncs.reboot(true, null);
+                        if (mParent != null && mParent.mWindowManagerFuncs != null) {
+                            mParent.mWindowManagerFuncs.reboot(true, null);
+                        }
                         return true;
                     }
                     return false;
@@ -3242,19 +3258,22 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
                 cardEmergency.setOnClickListener(v -> {
                     mRescheduleBurnInTimeout.run();
                     dismissWithoutAnimation();
-                    mMetricsLogger.action(MetricsEvent.ACTION_EMERGENCY_DIALER_FROM_POWER_MENU);
+                    if (mParent != null && mParent.mMetricsLogger != null) {
+                        mParent.mMetricsLogger.action(MetricsEvent.ACTION_EMERGENCY_DIALER_FROM_POWER_MENU);
+                    }
                     mUiEventLogger.log(GlobalActionsEvent.GA_EMERGENCY_DIALER_PRESS);
-                    if (mTelecomManager != null) {
+                    if (mParent != null && mParent.mTelecomManager != null && mParent.mUserTracker != null) {
                         mShadeController.cancelExpansionAndCollapseShade();
-                        Intent intent = mTelecomManager.createLaunchEmergencyDialerIntent(null);
+                        Intent intent = mParent.mTelecomManager.createLaunchEmergencyDialerIntent(null);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                                 | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
                                 | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.putExtra(EmergencyDialerConstants.EXTRA_ENTRY_TYPE,
                                 EmergencyDialerConstants.ENTRY_TYPE_POWER_MENU);
-                        mContext.startActivityAsUser(intent, mUserTracker.getUserHandle());
-                    } else if (mEmergencyAffordanceManager.needsEmergencyAffordance()) {
-                        mEmergencyAffordanceManager.performEmergencyCall();
+                        mContext.startActivityAsUser(intent, mParent.mUserTracker.getUserHandle());
+                    } else if (mParent != null && mParent.mEmergencyAffordanceManager != null
+                            && mParent.mEmergencyAffordanceManager.needsEmergencyAffordance()) {
+                        mParent.mEmergencyAffordanceManager.performEmergencyCall();
                     }
                 });
             }
@@ -3298,6 +3317,10 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
                     @Override
                     public void onFlashlightAvailabilityChanged(boolean available) {
                         btnTorch.post(updateTorchUi);
+                    }
+
+                    @Override
+                    public void onFlashlightStrengthChanged(int level) {
                     }
                 };
                 flashlightController.addCallback(mTorchListener);
@@ -3374,28 +3397,36 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
             if (advSystem != null) {
                 advSystem.setOnClickListener(v -> {
                     dismissWithoutAnimation();
-                    mWindowManagerFuncs.reboot(false, null);
+                    if (mParent != null && mParent.mWindowManagerFuncs != null) {
+                        mParent.mWindowManagerFuncs.reboot(false, null);
+                    }
                 });
             }
 
             if (advRecovery != null) {
                 advRecovery.setOnClickListener(v -> {
                     dismissWithoutAnimation();
-                    mWindowManagerFuncs.reboot(false, PowerManager.REBOOT_RECOVERY);
+                    if (mParent != null && mParent.mWindowManagerFuncs != null) {
+                        mParent.mWindowManagerFuncs.reboot(false, PowerManager.REBOOT_RECOVERY);
+                    }
                 });
             }
 
             if (advBootloader != null) {
                 advBootloader.setOnClickListener(v -> {
                     dismissWithoutAnimation();
-                    mWindowManagerFuncs.reboot(false, PowerManager.REBOOT_BOOTLOADER);
+                    if (mParent != null && mParent.mWindowManagerFuncs != null) {
+                        mParent.mWindowManagerFuncs.reboot(false, PowerManager.REBOOT_BOOTLOADER);
+                    }
                 });
             }
 
             if (advSystemUI != null) {
                 advSystemUI.setOnClickListener(v -> {
                     dismissWithoutAnimation();
-                    mWindowManagerFuncs.onGlobalActionsHidden();
+                    if (mParent != null && mParent.mWindowManagerFuncs != null) {
+                        mParent.mWindowManagerFuncs.onGlobalActionsHidden();
+                    }
                     Process.killProcess(Process.myPid());
                 });
             }
