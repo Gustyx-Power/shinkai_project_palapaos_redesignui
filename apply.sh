@@ -117,6 +117,12 @@ apply_device() {
         cp -f "$SCRIPT_DIR/system/core/rootdir/init.rc" "$TARGET_DIR/system/core/rootdir/init.rc"
         echo -e "  ${GREEN}✓ system/core/rootdir/init.rc successfully updated!${NC}"
     fi
+
+    if [ -d "$SCRIPT_DIR/kernel/xiaomi/marble" ]; then
+        mkdir -p "$TARGET_DIR/kernel/xiaomi/marble"
+        cp -rf "$SCRIPT_DIR/kernel/xiaomi/marble/"* "$TARGET_DIR/kernel/xiaomi/marble/"
+        echo -e "  ${GREEN}✓ kernel/xiaomi/marble/ successfully copied!${NC}"
+    fi
 }
 
 apply_build_fixes() {

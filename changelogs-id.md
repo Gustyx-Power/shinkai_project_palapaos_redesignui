@@ -91,6 +91,19 @@ Halaman Pengaturan Baterai (`Settings -> Battery`) telah dirombak secara menyelu
 
 ---
 
+### 6. Proteksi Keamanan, Key Attestation & Status Bootloader Terkunci
+* **Hardware-Backed Key Attestation Spoofing**:
+  * Integrasi penuh sertifikat Keybox resmi Google Root CA (`Key Attestation CA1`) langsung ke dalam framework sistem (`custom_config.xml` & `KeyProviderManager`).
+  * Dukungan penuh keybox ECDSA-only RKP modern dengan pelestarian urutan rantai sertifikat numerik (`CERT_1 .. CERT_4`).
+  * Aplikasi Key Attestation (Nikolay Elenkov / Key Attestation Demo) mendeteksi perangkat dengan status **Device locked: true** dan **Verified Boot State: Verified (Green)**.
+* **Integrasi Play Integrity (GMS DroidGuard Fallback)**:
+  * Menanamkan fingerprint tersertifikasi resmi dari Google Pixel Fold (Android 17, `felix_beta`) ke dalam konfigurasi ROM (`config_verifiedDeviceSpecs`).
+  * Memastikan perangkat lolos sertifikasi Play Integrity (`MEETS_BASIC_INTEGRITY` dan `MEETS_DEVICE_INTEGRITY`).
+* **Kernel Command Line Filter (`/proc/cmdline`)**:
+  * Filter cerdas pada kernel (`cmdline.c`) yang secara otomatis mengganti flag `androidboot.verifiedbootstate=orange` menjadi `green`, `androidboot.flash.locked=0` menjadi `1`, dan `androidboot.vbmeta.device_state=unlocked` menjadi `locked` untuk pembacaan langsung di level sistem operasi.
+
+---
+
 ## Detail Teknis & Perubahan Kode
 
 | Komponen | File Terkait | Deskripsi Perubahan |
@@ -101,6 +114,7 @@ Halaman Pengaturan Baterai (`Settings -> Battery`) telah dirombak secara menyelu
 | **Info Baterai** | `OneUIBatteryInfoFragment.kt`<br>`oneui_battery_info_fragment.xml`<br>`SettingsGateway.java` | Sub-halaman info kesehatan baterai (%), siklus, suhu, voltase, dan kapasitas IEC 61960 |
 | **Pengaturan Terpadu** | `power_usage_summary.xml`<br>`PowerUsageSummary.java`<br>`PowerUsageSummaryScreen.kt` | Pengelompokan seluruh preferensi daya ke dalam kartu One UI dan pembersihan total header Pixel |
 | **Tema & Bahasa** | `colors.xml`, `values-night/colors.xml`<br>`shinkai_strings.xml`, `values-in/` | Palet warna dinamis Material You Monet (`surfaceContainer`, `primary`) dan lokalisasi lengkap ID/EN |
+| **Key Attestation & Bootloader Lock** | `custom_config.xml`<br>`KeyProviderManager.java`<br>`KeyboxDataPreference.java`<br>`cmdline.c` | Penanaman rantai Google Root Keybox ECDSA, dukungan RKP, integrasi PIF Pixel Fold, dan filter `/proc/cmdline` |
 
 ---
 *Palapa OS - Edisi Triwulan | Shinkai Project (2026)*

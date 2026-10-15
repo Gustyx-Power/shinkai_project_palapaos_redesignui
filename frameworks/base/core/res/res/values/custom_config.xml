@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2024-2025 PixelOS
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- Paths to the libraries that contain device specific key handlers -->
+    <string-array name="config_deviceKeyHandlerLibs" translatable="false">
+    </string-array>
+
+    <!-- Names of the key handler classes -->
+    <string-array name="config_deviceKeyHandlerClasses" translatable="false">
+    </string-array>
+
+    <!-- Should we listen for fingerprints when the screen is off?  Devices
+         with a rear-mounted sensor want this, but certain devices have
+         the sensor embedded in the power key and listening all the time
+         causes a poor experience. -->
+    <bool name="config_fingerprintWakeAndUnlock">true</bool>
+
+    <!-- Whether to cleanup fingerprints upon connection to the daemon and when user switches -->
+    <bool name="config_cleanupUnusedFingerprints">true</bool>
+
+    <!-- Whether device has an alert slider. -->
+    <bool name="config_hasAlertSlider">false</bool>
+
+    <!-- Whether charging control should be enabled by default -->
+    <bool name="config_chargingControlEnabled">false</bool>
+    <!-- Default charging control mode.
+         This integer should be set to:
+         1 - auto - Use the alarm to calculate the time range when to activate charging control
+         2 - custom - Use time range when the device is usually charging for hours
+         3 - limit - Just limit charging -->
+    <integer name="config_defaultChargingControlMode">1</integer>
+    <!-- Default time when charging control is activated.
+         Represented as seconds from midnight (e.g. 79200 == 10pm). -->
+    <integer name="config_defaultChargingControlStartTime">79200</integer>
+    <!-- Default time when battery will be fully charged.
+         Represented as seconds from midnight (e.g. 21600 == 6am). -->
+    <integer name="config_defaultChargingControlTargetTime">21600</integer>
+    <!-- Default charging limit. -->
+    <integer name="config_defaultChargingControlLimit">80</integer>
+    <!-- Considering the fact that the system might have an incorrect estimation of the time to
+         full. Set a time margin to make the device fully charged before the target time arrives.
+         The unit is minutes and the default value is 30 minutes. If you find that it is not enough
+         to make the device to be fully charged at the target time, increase the value
+    -->
+    <integer name="config_chargingControlTimeMargin">30</integer>
+    <!-- For a device that cannot bypass battery when charging stops (that is, the battery current
+         is 0mA when charging stops), the battery will gradually discharge. So we need to make it
+         recharge when the battery level is lower than a threshold. Set this so that the device
+         will be charged between (limit - val) and limit. -->
+    <integer name="config_chargingControlBatteryRechargeMargin">10</integer>
+    <!-- Some devices might require always setting the toggle instead of set based on current toggle
+    value. If this is the case, set this config to true to let the toggle provider always set
+    charging enabled status regardless of the current status. -->
+    <bool name="config_chargingControlToggleSetAlways">false</bool>
+
+    <!-- Default values for LiveDisplay -->
+    <bool name="config_enableLiveDisplay">true</bool>
+    <integer name="config_dayColorTemperature">6500</integer>
+    <integer name="config_nightColorTemperature">4800</integer>
+    <integer name="config_outdoorAmbientLux">12000</integer>
+    <integer name="config_outdoorAmbientLuxHysteresis">1500</integer>
+    <integer name="config_defaultLiveDisplayMode">2</integer>
+
+    <!-- These values should map to the true min and max
+        that the backend is capable of adjusting to. This
+        is more important when using the ColorBalance mode,
+        as the discrete adjustment is interpolated between
+        this range (with config_dayColorTemperature at zero) -->
+    <integer name="config_minColorTemperature">1000</integer>
+    <integer name="config_maxColorTemperature">10000</integer>
+
+    <bool name="config_defaultAutoContrast">false</bool>
+    <bool name="config_defaultAutoOutdoorMode">true</bool>
+    <bool name="config_defaultColorEnhancement">true</bool>
+    <bool name="config_defaultCABC">true</bool>
+    <bool name="config_defaultAntiFlicker">false</bool>
+
+    <!-- Display mode remapping table.
+        If the mode names returned by the backend do not match
+        the predefined and translated strings in the Settings
+        app, they can be remapped here. The format is
+        "oldname:newname", one per entry. -->
+    <string-array name="config_displayModeMappings" translatable="false" />
+
+    <!-- Should we filter any display modes which are unmapped? -->
+    <bool name="config_filterDisplayModes">false</bool>
+
+    <!-- Build properties from a GMS certified device against current platform SPL level -->
+    <string-array name="config_verifiedDeviceSpecs" translatable="false">
+        <item>MANUFACTURER:Google</item>
+        <item>MODEL:Pixel Fold</item>
+        <item>FINGERPRINT:google/felix_beta/felix:CANARY/ZP11.260918.007/16484274:user/release-keys</item>
+        <item>BRAND:google</item>
+        <item>PRODUCT:felix_beta</item>
+        <item>DEVICE:felix</item>
+        <item>VERSION.RELEASE:17</item>
+        <item>ID:ZP11.260918.007</item>
+        <item>VERSION.SECURITY_PATCH:2026-10-05</item>
+        <item>VERSION.DEVICE_INITIAL_SDK_INT:33</item>
+    </string-array>
+
+    <!-- Keybox configuration for device certification -->
+    <string-array name="config_attestationKeychain" translatable="false">
+        <item>EC.PRIV:-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEILt+UFq1mSo8NGGco5zBaAp66qK6KK3GvAIkIjudXYaHoAoGCCqGSM49
+AwEHoUQDQgAErPvR6pwPUG22NBH11yIHfcDQlJrSmU8tUEvZymoTBoAsGWmXt/pN
+aFW/GxdfklTWMa5d1Efi70S9Cd/3SkUzIA==
+-----END EC PRIVATE KEY-----</item>
+        <item>EC.CERT_1:-----BEGIN CERTIFICATE-----
+MIIB8DCCAZagAwIBAgIQd0oMc/OG3wg35HMEFeHpUDAKBggqhkjOPQQDAjApMRMw
+EQYDVQQKEwpHb29nbGUgTExDMRIwEAYDVQQDEwlEcm9pZCBDQTMwHhcNMjYxMDA3
+MDg1NDAzWhcNMjYxMDIxMDUxODE2WjA5MQwwCgYDVQQKEwNURUUxKTAnBgNVBAMT
+IDc3NGEwYzczZjM4NmRmMDgzN2U0NzMwNDE1ZTFlOTUwMFkwEwYHKoZIzj0CAQYI
+KoZIzj0DAQcDQgAErPvR6pwPUG22NBH11yIHfcDQlJrSmU8tUEvZymoTBoAsGWmX
+t/pNaFW/GxdfklTWMa5d1Efi70S9Cd/3SkUzIKOBjzCBjDAdBgNVHQ4EFgQUBsQ5
+uUY7EKgobpn8lWXY50ma2TAwHwYDVR0jBBgwFoAUwZ/hQIuf1jpLDY3E7MGMDEv/
+coEwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAgQwKQYKKwYBBAHWeQIB
+HgQbowEQA2ZMRU5PVk8FoQFsTk9UX0FQUFJPVkVEMAoGCCqGSM49BAMCA0gAMEUC
+IQCIye93HVLontCHusf0xavwNpDpMduEJp+3qlXi6oMzswIgROSWfdOZo6XbJ72l
+9ImRLuUijK5sfsp6AkNLjLJ73kQ=
+-----END CERTIFICATE-----</item>
+        <item>EC.CERT_2:-----BEGIN CERTIFICATE-----
+MIIC8DCCAnagAwIBAgIUAJCS3//nvpAf18nXZ/82Qiw53nowCgYIKoZIzj0EAwMw
+KTETMBEGA1UEChMKR29vZ2xlIExMQzESMBAGA1UEAxMJRHJvaWQgQ0EyMB4XDTI2
+MTAwODE5MDkxMFoXDTI2MTIxNzE5MDkwOVowKTETMBEGA1UEChMKR29vZ2xlIExM
+QzESMBAGA1UEAxMJRHJvaWQgQ0EzMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE
+tCYENW8kuFeOEGlvhtWhHWM46BZNxiO2KQqsPP/2aGbDciws/ds29cJDAS+IBO1c
+IMZ9glRNTyYX/5kxQ01cAqOCAXowggF2MA4GA1UdDwEB/wQEAwICBDAPBgNVHRMB
+Af8EBTADAQH/MB0GA1UdDgQWBBTBn+FAi5/WOksNjcTswYwMS/9ygTAfBgNVHSME
+GDAWgBT7lO504bVwFpWJjoYiKJ1MD+HDHTCBjQYIKwYBBQUHAQEEgYAwfjB8Bggr
+BgEFBQcwAoZwaHR0cDovL3ByaXZhdGVjYS1jb250ZW50LTY5OTQ4OTkxLTAwMDAt
+MjU5MC1iYjRkLTg4M2QyNGYzMmYwYy5zdG9yYWdlLmdvb2dsZWFwaXMuY29tL2Ix
+ZmU3MWE0MWJjMmNmNWU3NjM0L2NhLmNydDCBggYDVR0fBHsweTB3oHWgc4ZxaHR0
+cDovL3ByaXZhdGVjYS1jb250ZW50LTY5OTQ4OTkxLTAwMDAtMjU5MC1iYjRkLTg4
+M2QyNGYzMmYwYy5zdG9yYWdlLmdvb2dsZWFwaXMuY29tL2IxZmU3MWE0MWJjMmNm
+NWU3NjM0L2NybC5jcmwwCgYIKoZIzj0EAwMDaAAwZQIxAKOOWhwQXUFy1/NF3BGc
+QmL4Nj3YRFcvrdOTRaCPLQK36Dd9jrZ0z3Wn7AeeW9ZR5gIwXuDW2fMTsKIWVD1j
+LHmwu2q9HExVt+nnD24l1W988Ny5sVoCplk+2PQJYBAZQ2Ey
+-----END CERTIFICATE-----</item>
+        <item>EC.CERT_3:-----BEGIN CERTIFICATE-----
+MIICZDCCAeugAwIBAgIRAPLC/gLfzdARgeSj5rNpoowwCgYIKoZIzj0EAwMwUjEc
+MBoGA1UEAwwTS2V5IEF0dGVzdGF0aW9uIENBMTEQMA4GA1UECwwHQW5kcm9pZDET
+MBEGA1UECgwKR29vZ2xlIExMQzELMAkGA1UEBhMCVVMwHhcNMjYwMjA5MjAwMTEx
+WhcNMjkwMjA4MjAwMTExWjApMRMwEQYDVQQKEwpHb29nbGUgTExDMRIwEAYDVQQD
+EwlEcm9pZCBDQTIwdjAQBgcqhkjOPQIBBgUrgQQAIgNiAATkwn4jOZw/zpxhsBn4
+27C8Xz684+3Ajq5zsIzXwYlQPGieyFBuNxkUUFSa4YzZObqTOrgI9iFcfTBqOuOl
+yEtIuipjVowV9UCddBKO5ndqPTEk8Dd2RWn4yMtUTnyMMpGjga0wgaowHwYDVR0j
+BBgwFoAUUjK7LPtGQ5vc1oGpDmVm4DRB6kAwDwYDVR0TAQH/BAUwAwEB/zAdBgNV
+HQ4EFgQU+5TudOG1cBaViY6GIiidTA/hwx0wDgYDVR0PAQH/BAQDAgEGMEcGA1Ud
+HwRAMD4wPKA6oDiGNmh0dHBzOi8vYW5kcm9pZC5nb29nbGVhcGlzLmNvbS9hdHRl
+c3RhdGlvbi9rZXlfY2ExLmNybDAKBggqhkjOPQQDAwNnADBkAjArwb7NmSVBlasM
+dMRjY0FFEum0b+SUZTMmvBT5AGYzk8xGCi2Mj2NZdchxZfxHUJgCMDseaiAzoixN
+ISk40rfoR4vMvs7n9r4fgEgmb+9KQbpDgdq0+90mzcAL4vKr4hWSxA==
+-----END CERTIFICATE-----</item>
+        <item>EC.CERT_4:-----BEGIN CERTIFICATE-----
+MIICIjCCAaigAwIBAgIRAISp0Cl7DrWK5/8OgN52BgUwCgYIKoZIzj0EAwMwUjEc
+MBoGA1UEAwwTS2V5IEF0dGVzdGF0aW9uIENBMTEQMA4GA1UECwwHQW5kcm9pZDET
+MBEGA1UECgwKR29vZ2xlIExMQzELMAkGA1UEBhMCVVMwHhcNMjUwNzE3MjIzMjE4
+WhcNMzUwNzE1MjIzMjE4WjBSMRwwGgYDVQQDDBNLZXkgQXR0ZXN0YXRpb24gQ0Ex
+MRAwDgYDVQQLDAdBbmRyb2lkMRMwEQYDVQQKDApHb29nbGUgTExDMQswCQYDVQQG
+EwJVUzB2MBAGByqGSM49AgEGBSuBBAAiA2IABCPaI3FO3z5bBQo8cuiEas4HjqCt
+G/mLFfRT0MsIssPBEEU5Cfbt6sH5yOAxqEi5QagpU1yX4HwnGb7OtBYpDTB57uH5
+Eczm34A5FNijV3s0/f0UPl7zbJcTx6xwqMIRq6NCMEAwDwYDVR0TAQH/BAUwAwEB
+/zAOBgNVHQ8BAf8EBAMCAQYwHQYDVR0OBBYEFFIyuyz7RkOb3NaBqQ5lZuA0QepA
+MAoGCCqGSM49BAMDA2gAMGUCMETfjPO/HwqReR2CS7p0ZWoD/LHs6hDi422opifH
+EUaYLxwGlT9SLdjkVpz0UUOR5wIxAIoGyxGKRHVTpqpGRFiJtQEOOTp/+s1GcxeY
+uR2zh/80lQyu9vAFCj6E4AXc+osmRg==
+-----END CERTIFICATE-----</item>
+    </string-array>
+
+    <!-- Build fingerprint from stock ROM -->
+    <string name="config_originalDeviceBuildTag" translatable="false"></string>
+
+    <!-- Device model (Build.MODEL) to spoof for netflix, if not empty -->
+    <string name="config_movieVerifiedKey" translatable="false"></string>
+
+   <!-- API URL to fetch PIF from -->
+   <string name="config_pifUpdateUrl" translatable="false">https://raw.githubusercontent.com/PixelOS-AOSP/official_devices/{version}/API/updater/CertifiedProps/certified_build_props.json</string>
+
+    <!-- Define device configs on boot -->
+    <string-array name="global_device_configs_override" translatable="false">
+    </string-array>
+    <string-array name="device_configs_override" translatable="false">
+    </string-array>
+
+    <!-- Default values for status bar DT2S gesture -->
+    <bool name="config_dt2sGestureAvailable">false</bool>
+    <bool name="config_dt2sGestureEnabledByDefault">false</bool>
+
+    <!-- Array of:
+        - Path to fast charging status file
+        - Delimiter ";"
+        - Value if fast charging is active
+        Used to detect whether an oem fast charger is active
+        Example: <item>/sys/class/power_supply/battery/fastchg_status;1</item>
+    -->
+    <string-array name="config_oemFastChargerStatusPaths" translatable="false">
+    </string-array>
+
+   <!-- Defines the actions shown in advanced reboot submenu -->
+   <string-array name="config_restartActionsList">
+       <item>restart</item>
+       <item>restart_systemui</item>
+       <item>restart_recovery</item>
+       <item>restart_bootloader</item>
+   </string-array>
+</resources>

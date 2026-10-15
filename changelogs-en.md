@@ -91,6 +91,19 @@ The Battery settings screen (`Settings -> Battery`) has been completely overhaul
 
 ---
 
+### 6. Security, Key Attestation & Locked Bootloader Spoofing
+* **Hardware-Backed Key Attestation Spoofing**:
+  * Native integration of authentic Google Root CA (`Key Attestation CA1`) keybox into system framework configuration (`custom_config.xml` & `KeyProviderManager`).
+  * Full support for modern ECDSA-only RKP keyboxes with preserved sequential numerical certificate chain ordering (`CERT_1 .. CERT_4`).
+  * Key Attestation applications (Nikolay Elenkov / Key Attestation Demo) reliably report **Device locked: true** and **Verified Boot State: Verified (Green)**.
+* **Play Integrity GMS Integration**:
+  * Built-in official certified device fingerprint from Google Pixel Fold (Android 17, `felix_beta`) in `config_verifiedDeviceSpecs`.
+  * Guarantees passing Play Integrity API (`MEETS_BASIC_INTEGRITY` and `MEETS_DEVICE_INTEGRITY`).
+* **Kernel Command Line Filter (`/proc/cmdline`)**:
+  * Seamless kernel filter (`cmdline.c`) rewriting `androidboot.verifiedbootstate=orange` to `green`, `androidboot.flash.locked=0` to `1`, and `androidboot.vbmeta.device_state=unlocked` to `locked` for direct OS-level readers.
+
+---
+
 ## Technical Details & Modified Files
 
 | Component | Related Files | Description |
@@ -101,6 +114,7 @@ The Battery settings screen (`Settings -> Battery`) has been completely overhaul
 | **Battery Info** | `OneUIBatteryInfoFragment.kt`<br>`oneui_battery_info_fragment.xml`<br>`SettingsGateway.java` | Dedicated sub-page for battery health %, cycle count, temp, voltage, and IEC 61960 capacity |
 | **Unified Settings** | `power_usage_summary.xml`<br>`PowerUsageSummary.java`<br>`PowerUsageSummaryScreen.kt` | Restructured preference layout organizing all power features into card groups and eliminating Pixel headers |
 | **Theme & Strings** | `colors.xml`, `values-night/colors.xml`<br>`shinkai_strings.xml`, `values-in/` | Dynamic Material You Monet palettes (`surfaceContainer`, `primary`) and comprehensive EN/ID translations |
+| **Key Attestation & Bootloader Lock** | `custom_config.xml`<br>`KeyProviderManager.java`<br>`KeyboxDataPreference.java`<br>`cmdline.c` | Google Root Keybox ECDSA integration, RKP support, Pixel Fold PIF specs, and `/proc/cmdline` filter |
 
 ---
 *Palapa OS - Triwulan Edition | Shinkai Project (2026)*
