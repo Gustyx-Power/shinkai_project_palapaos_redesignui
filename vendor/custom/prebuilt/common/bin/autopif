@@ -18,10 +18,21 @@ if [ "$ACTION" = "--help" ] || [ "$ACTION" = "-h" ]; then
     echo ""
     echo "Commands:"
     echo "  fetch (default) : Fetch latest Pixel Canary/Beta fingerprint from Google"
+    echo "  clear           : Clear Google Play Store & Play Services cache and app data"
     echo "  reset           : Reset to baked-in ROM default profile"
     echo "  status          : Show current active PIF configuration"
     echo "  backup          : Apply built-in verified backup profile (Pixel Fold Canary)"
     echo ""
+    exit 0
+fi
+
+if [ "$ACTION" = "clear" ]; then
+    echo "Clearing Google Play Store and Play Services data..."
+    pm clear com.android.vending 2>/dev/null || true
+    pm clear com.google.android.gms 2>/dev/null || true
+    am force-stop com.google.android.gms 2>/dev/null
+    am force-stop com.android.vending 2>/dev/null
+    echo "Play Store and Play Services data cleared successfully!"
     exit 0
 fi
 
@@ -106,6 +117,28 @@ if HTTP_GET "https://flash.android.com" "flash.html"; then
                 echo "$JSON" > /data/system/pif.json 2>/dev/null || true
                 SUCCESS=1
             fi
+        fi
+    fi
+fi
+
+if [ "$SUCCESS" -eq 0 ]; then
+    echo "Querying live Android Beta downloads from developer.android.com..."
+    if HTTP_GET "https://developer.android.com/about/versions/17/download" "beta17.html"; then
+        BETA_ZIP=$(grep -oE '(felix|shiba|husky)_beta-[a-zA-Z0-9.]+-factory-[a-f0-9]+\.zip' beta17.html 2>/dev/null | head -n1)
+        if [ -n "$BETA_ZIP" ]; then
+            DEV=$(echo "$BETA_ZIP" | cut -d'_' -f1)
+            ID=$(echo "$BETA_ZIP" | cut -d'-' -f2 | tr '[:lower:]' '[:upper:]')
+            PRODUCT="${DEV}_beta"
+            if [ "$DEV" = "felix" ]; then MODEL="Pixel Fold"; else MODEL="Pixel 8"; fi
+            INCREMENTAL="16484274"
+            FINGERPRINT="google/$PRODUCT/$DEV:CANARY/$ID/$INCREMENTAL:user/release-keys"
+            JSON="{\"MANUFACTURER\":\"Google\",\"MODEL\":\"$MODEL\",\"FINGERPRINT\":\"$FINGERPRINT\",\"BRAND\":\"google\",\"PRODUCT\":\"$PRODUCT\",\"DEVICE\":\"$DEV\",\"VERSION_RELEASE\":\"17\",\"ID\":\"$ID\",\"SECURITY_PATCH\":\"2026-10-05\",\"DEVICE_INITIAL_SDK_INT\":33,\"TYPE\":\"user\",\"TAGS\":\"release-keys\",\"INCREMENTAL\":\"$INCREMENTAL\"}"
+
+            echo "Got fresh Pixel Beta fingerprint from developer.android.com:"
+            echo "  $FINGERPRINT"
+            settings put secure pif_data "$JSON"
+            echo "$JSON" > /data/system/pif.json 2>/dev/null || true
+            SUCCESS=1
         fi
     fi
 fi

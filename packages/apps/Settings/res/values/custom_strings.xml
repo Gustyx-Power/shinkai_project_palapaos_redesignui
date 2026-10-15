@@ -369,6 +369,21 @@
     <string name="pif_data_title">Configure PIF JSON</string>
     <string name="pif_data_summary">Configure PIF JSON used to spoof properties for GMS and the Play Store. Tap Delete to revert to dynamic defaults.</string>
 
+    <!-- Auto PIF Generator -->
+    <string name="auto_pif_title">Update PIF automatically</string>
+    <string name="auto_pif_summary">Fetch latest unbanned Pixel Canary/Beta fingerprint from Google or apply verified backup</string>
+    <string name="auto_pif_updating">Fetching latest PIF profile…</string>
+    <string name="auto_pif_success">PIF profile updated successfully: %1$s</string>
+    <string name="auto_pif_failed">Failed to update PIF profile</string>
+
+    <!-- Clear GMS & Play Store Data -->
+    <string name="clear_gms_playstore_title">Clear Play Store &amp; Play Services data</string>
+    <string name="clear_gms_playstore_summary">Clear cache and storage data for Google Play Store and GMS to refresh certification</string>
+    <string name="clear_gms_playstore_dialog_title">Clear Play Store &amp; Play Services data?</string>
+    <string name="clear_gms_playstore_dialog_message">This will reset cache and local storage for Google Play Store and Google Play Services. Your Google Account will remain linked, but Play Protect certification will be re-registered immediately.</string>
+    <string name="clear_gms_playstore_clearing">Clearing Play Store and Play Services data…</string>
+    <string name="clear_gms_playstore_success">Play Store and Play Services data cleared successfully</string>
+
     <!-- Spoofing toggle -->
     <string name="cert_overlay_title">Spoof certified properties</string>
     <string name="cert_overlay_summary">Spoof PI certified properties to GMS\nRequires a reboot to apply</string>

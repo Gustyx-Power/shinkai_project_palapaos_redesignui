@@ -222,5 +222,17 @@
     <string name="oneui_battery_info_category">Info &amp; tampilan baterai</string>
     <string name="oneui_battery_info_entry_summary">Kesehatan baterai, siklus pengisian, kapasitas</string>
     <string name="oneui_battery_time_until_full">%1$s lagi sampai penuh</string>
+    <!-- Auto PIF Generator & Clear GMS -->
+    <string name="auto_pif_title">Perbarui PIF otomatis</string>
+    <string name="auto_pif_summary">Unduh profil Pixel Canary/Beta terbaru dari Google atau gunakan profil cadangan terverifikasi</string>
+    <string name="auto_pif_updating">Mengunduh profil PIF terbaru…</string>
+    <string name="auto_pif_success">Profil PIF berhasil diperbarui: %1$s</string>
+    <string name="auto_pif_failed">Gagal memperbarui profil PIF</string>
+    <string name="clear_gms_playstore_title">Hapus data Play Store &amp; Layanan Google</string>
+    <string name="clear_gms_playstore_summary">Bersihkan cache dan penyimpanan Google Play Store &amp; GMS untuk memperbarui status sertifikasi</string>
+    <string name="clear_gms_playstore_dialog_title">Hapus data Play Store &amp; Layanan Google?</string>
+    <string name="clear_gms_playstore_dialog_message">Tindakan ini akan mereset cache dan penyimpanan lokal Google Play Store serta Play Services. Akun Google Anda tidak akan hilang, namun Play Store akan langsung mendaftarkan ulang status sertifikasi perangkat.</string>
+    <string name="clear_gms_playstore_clearing">Membersihkan data Play Store dan Layanan Google…</string>
+    <string name="clear_gms_playstore_success">Data Play Store dan Layanan Google berhasil dibersihkan</string>
 </resources>
 

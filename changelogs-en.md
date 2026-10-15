@@ -101,10 +101,12 @@ The Battery settings screen (`Settings -> Battery`) has been completely overhaul
   * Built-in official certified device fingerprint from Google Pixel Fold (Android 17, `felix_beta`) in `config_verifiedDeviceSpecs` enriched with `TYPE:user`, `TAGS:release-keys`, and `INCREMENTAL`.
   * Updated `PropImitationHooks` to spoof all `com.google.android.gms` processes (including CheckinService), ensuring Google Play Store officially reports **"Device is certified"**.
   * Prioritized key attestation blocking for DroidGuard callers (`isCallerPlayIntegrity()`) prior to keybox lookup, compelling Play Integrity to fall back to software evaluation and successfully acquire **`MEETS_DEVICE_INTEGRITY`**.
-* **Dynamic Anti-Revoked Resilience (Multi-Tier Fallbacks & Auto-PIF Utility)**:
+* **Dynamic Anti-Revoked Resilience & Spoof Option UI Integration**:
+  * **On-Device Automatic PIF Generator (`Auto PIF Generator`)**: Added an automated PIF profile generation and update preference right inside the Settings *Spoof Option* menu. Users can fetch live, unrevoked Pixel Canary/Beta builds directly from Google Flash Station or Developer Builds without requiring root access or terminal commands.
+  * **One-Tap Play Store & GMS Data/Cache Cleaner**: Added an option to wipe cache and storage for Google Play Store and Google Play Services directly from Settings UI utilizing system-privileged `clearApplicationUserData`, prompting immediate re-registration of device certification.
   * Multi-tier PIF resolution: `Settings.Secure.PIF_DATA`, local file storage (`/data/system/pif.json` or `/data/adb/pif.json`), OTA `FETCHED_PIF`, and built-in ROM fallback.
   * Multi-tier Keybox resolution: `Settings.Secure.KEYBOX_DATA`, local file storage (`/data/system/keybox.xml` or `/data/adb/tricky_store/keybox.xml`), and built-in ROM keychain.
-  * Integrated `/system/bin/autopif` command-line utility enabling on-device extraction and activation of the newest official Google Pixel Canary/Beta builds directly from Google Flash Station API without needing a ROM update.
+  * Integrated `/system/bin/autopif` command-line utility with `fetch`, `clear`, `reset`, and `status` actions.
 * **Kernel Command Line Filter (`/proc/cmdline`)**:
   * Seamless kernel filter (`cmdline.c`) rewriting `androidboot.verifiedbootstate=orange` to `green`, `androidboot.flash.locked=0` to `1`, and `androidboot.vbmeta.device_state=unlocked` to `locked` for direct OS-level readers.
 
@@ -122,6 +124,7 @@ The Battery settings screen (`Settings -> Battery`) has been completely overhaul
 | **Theme & Strings** | `colors.xml`, `values-night/colors.xml`<br>`shinkai_strings.xml`, `values-in/` | Dynamic Material You Monet palettes (`surfaceContainer`, `primary`) and comprehensive EN/ID translations |
 | **Key Attestation & Bootloader Lock** | `custom_config.xml`<br>`KeyProviderManager.java`<br>`KeyboxDataPreference.java`<br>`cmdline.c` | Google Root Keybox ECDSA integration, RKP support, Pixel Fold PIF specs, and `/proc/cmdline` filter |
 | **Play Integrity & Play Store Certification** | `PropImitationHooks.java`<br>`KeyProviderManager.java`<br>`custom_config.xml`<br>`common.mk`, `autopif` | DroidGuard blocking before keybox, comprehensive GMS Checkin spoofing, multi-tier file fallbacks, and Auto-PIF CLI |
+| **Spoof Option UI & GMS Reset** | `AutoPifHelper.java`<br>`SpoofOptionFragment.java`<br>`SpoofOptionController.java`<br>`spoof_option_fragment.xml` | Integrated live PIF generation and one-tap Play Store/GMS cache and data cleaner in Settings |
 
 ---
 *Palapa OS - Tri-Monthly Edition | Shinkai Project (2026)*

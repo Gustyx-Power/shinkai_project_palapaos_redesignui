@@ -101,10 +101,12 @@ Halaman Pengaturan Baterai (`Settings -> Battery`) telah dirombak secara menyelu
   * Menanamkan fingerprint tersertifikasi resmi dari Google Pixel Fold (Android 17, `felix_beta`) ke dalam konfigurasi ROM (`config_verifiedDeviceSpecs`) lengkap dengan `TYPE:user`, `TAGS:release-keys`, dan `INCREMENTAL`.
   * Memperbaiki `PropImitationHooks` untuk menyamarkan seluruh proses `com.google.android.gms` (termasuk CheckinService), sehingga status di Google Play Store dinyatakan resmi sebagai **"Perangkat telah tersertifikasi"**.
   * Mengutamakan pemblokiran key attestation untuk pemanggil DroidGuard (`isCallerPlayIntegrity()`) sebelum pengecekan Keybox, memastikan Play Integrity API otomatis melakukan *fallback* ke evaluasi software dan berhasil meraih **`MEETS_DEVICE_INTEGRITY`**.
-* **Ketahanan Dinamis Anti-Revoked (Dynamic Fallbacks & Auto-PIF Generator)**:
+* **Ketahanan Dinamis Anti-Revoked & Integrasi UI Spoof Option**:
+  * **Pembaruan Otomatis PIF Langsung dari Pengaturan (`Auto PIF Generator`)**: Menambahkan opsi pembaruan profil PIF otomatis langsung dari menu *Spoof Option* Pengaturan. Pengguna dapat mengunduh fingerprint Pixel Canary/Beta resmi yang aktif dari Google Flash Station atau Developer Builds tanpa akses root atau terminal.
+  * **Pembersih Data & Cache Play Store/GMS Sekali Sentuh**: Menambahkan opsi untuk membersihkan data dan cache Google Play Store serta Google Play Services langsung dari UI Pengaturan menggunakan `clearApplicationUserData` berbasis izin sistem, sehingga status sertifikasi perangkat langsung terdaftar ulang seketika.
   * Mendukung pembacaan konfigurasi PIF berlapis: `Settings.Secure.PIF_DATA`, file lokal `/data/system/pif.json` atau `/data/adb/pif.json`, OTA `FETCHED_PIF`, dan ROM baked-in.
   * Mendukung pembacaan Keybox XML berlapis: `Settings.Secure.KEYBOX_DATA`, file lokal `/data/system/keybox.xml` atau `/data/adb/tricky_store/keybox.xml`, dan overlay ROM.
-  * Menyertakan alat CLI bawaan `/system/bin/autopif` untuk meng-generate dan memperbarui fingerprint Pixel Canary/Beta langsung dari Google Flash Station API secara mandiri di perangkat tanpa perlu pembaruan ROM.
+  * Menyertakan utilitas CLI `/system/bin/autopif` lengkap dengan aksi `fetch`, `clear`, `reset`, dan `status`.
 * **Kernel Command Line Filter (`/proc/cmdline`)**:
   * Filter cerdas pada kernel (`cmdline.c`) yang secara otomatis mengganti flag `androidboot.verifiedbootstate=orange` menjadi `green`, `androidboot.flash.locked=0` menjadi `1`, dan `androidboot.vbmeta.device_state=unlocked` menjadi `locked` untuk pembacaan langsung di level sistem operasi.
 
@@ -122,6 +124,7 @@ Halaman Pengaturan Baterai (`Settings -> Battery`) telah dirombak secara menyelu
 | **Tema & Bahasa** | `colors.xml`, `values-night/colors.xml`<br>`shinkai_strings.xml`, `values-in/` | Palet warna dinamis Material You Monet (`surfaceContainer`, `primary`) dan lokalisasi lengkap ID/EN |
 | **Key Attestation & Bootloader Lock** | `custom_config.xml`<br>`KeyProviderManager.java`<br>`KeyboxDataPreference.java`<br>`cmdline.c` | Penanaman rantai Google Root Keybox ECDSA, dukungan RKP, integrasi PIF Pixel Fold, dan filter `/proc/cmdline` |
 | **Play Integrity & Play Store Certification** | `PropImitationHooks.java`<br>`KeyProviderManager.java`<br>`custom_config.xml`<br>`common.mk`, `autopif` | Blokir DroidGuard sebelum Keybox, penyamaran menyeluruh GMS Checkin, fallback file lokal, dan CLI generator Auto-PIF |
+| **Spoof Option UI & GMS Reset** | `AutoPifHelper.java`<br>`SpoofOptionFragment.java`<br>`SpoofOptionController.java`<br>`spoof_option_fragment.xml` | Integrasi generator PIF otomatis online dan fitur pembersih data/cache Google Play Store & GMS di menu Pengaturan |
 
 ---
 *Palapa OS - Edisi Triwulan | Shinkai Project (2026)*
