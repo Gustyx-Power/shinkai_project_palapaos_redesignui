@@ -92,6 +92,18 @@ apply_ui() {
     mkdir -p "$TARGET_DIR/frameworks/base/packages"
     cp -rf "$SCRIPT_DIR/frameworks/base/packages/"* "$TARGET_DIR/frameworks/base/packages/"
     echo -e "  ${GREEN}✓ frameworks/base/packages/ successfully copied!${NC}"
+
+    if [ -d "$SCRIPT_DIR/frameworks/base/core" ]; then
+        mkdir -p "$TARGET_DIR/frameworks/base/core"
+        cp -rf "$SCRIPT_DIR/frameworks/base/core/"* "$TARGET_DIR/frameworks/base/core/"
+        echo -e "  ${GREEN}✓ frameworks/base/core/ successfully copied!${NC}"
+    fi
+
+    if [ -d "$SCRIPT_DIR/vendor/custom" ]; then
+        mkdir -p "$TARGET_DIR/vendor/custom"
+        cp -rf "$SCRIPT_DIR/vendor/custom/"* "$TARGET_DIR/vendor/custom/"
+        echo -e "  ${GREEN}✓ vendor/custom/ successfully copied!${NC}"
+    fi
 }
 
 apply_device() {

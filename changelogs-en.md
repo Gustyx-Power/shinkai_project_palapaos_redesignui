@@ -993,3 +993,33 @@ During testing and review sessions, several core interface discrepancies and sub
    - **Lifecycle Teardown on onStop**:
      * Cleaned up mTorchListener from FlashlightController.
      * Unregistered mAirplaneContentObserver from ContentResolver to prevent memory leaks.
+
+
+---
+
+## Section XXX: Default System Wallpaper Integration: Kopdes Ontop
+
+### 1. Requirements & Overview
+- **User Request**:
+  - Configure the kopdes_ontop image in the root project as the out-of-the-box default wallpaper across the ROM.
+  - Ensure the wallpaper is rendered in full sharpness and aspect ratio tailored for the device display (POCO F5 marble, 1080x2400).
+
+### 2. Implementation Details
+1. **Image Processing & Format Conversion**:
+   - Ingested source image kopdes_ontop.jpg from the project root and saved kopdes_ontop.png directly in the project root.
+   - Rescaled and fitted the image to standard 1080 x 2400 resolution using Lanczos resampling (ImageOps.fit), preserving vertical composition and aspect ratio without distortion.
+2. **Framework & RRO Default Wallpaper Replacement**:
+   - Replaced core Android framework-res wallpapers:
+     * frameworks/base/core/res/res/drawable-nodpi/default_wallpaper.png
+     * frameworks/base/core/res/res/drawable-sw600dp-nodpi/default_wallpaper.png
+     * frameworks/base/core/res/res/drawable-sw720dp-nodpi/default_wallpaper.png
+   - Replaced Runtime Resource Overlay assets in FrameworkOverlayCustom:
+     * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/drawable-hdpi/default_wallpaper.png
+     * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/drawable-xhdpi/default_wallpaper.png
+     * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/drawable-xxhdpi/default_wallpaper.png
+     * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/drawable-xxxhdpi/default_wallpaper.png
+     * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/drawable-nodpi/default_wallpaper.png
+     * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/drawable-sw600dp-nodpi/default_wallpaper.png
+     * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/drawable-sw720dp-nodpi/default_wallpaper.png
+3. **Installer Script Enhancement (apply.sh)**:
+   - Updated apply_ui() in apply.sh to copy frameworks/base/core and vendor/custom overlay assets to target source trees.

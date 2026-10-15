@@ -993,3 +993,33 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - **Pembersihan Bersih pada onStop**:
      * Melepas callback mTorchListener dari FlashlightController.
      * Menghapus mAirplaneContentObserver dari ContentResolver guna mencegah kebocoran memori (memory leak).
+
+
+---
+
+## Bagian XXX: Integrasi Wallpaper Default Sistem: Kopdes Ontop
+
+### 1. Kebutuhan & Gambaran Umum
+- **Permintaan Pengguna**:
+  - Mengonfigurasi berkas citra kopdes_ontop di root project menjadi wallpaper bawaan sistem (default wallpaper) secara menyeluruh pada ROM.
+  - Memastikan wallpaper tampil dengan resolusi penuh, tajam, dan proporsional untuk rasio layar perangkat (POCO F5 marble, 1080x2400).
+
+### 2. Detail Implementasi
+1. **Pemrosesan Citra & Konversi Format**:
+   - Membaca citra sumber kopdes_ontop.jpg dari root direktori proyek dan menyimpannya sebagai format kopdes_ontop.png di root direktori proyek.
+   - Mengonversi dan menyesuaikan skala citra ke resolusi standar layar 1080 x 2400 piksel menggunakan resampling berkualitas tinggi Lanczos (ImageOps.fit) sehingga pas dengan orientasi potret perangkat tanpa distorsi visual.
+2. **Penggantian Aset Wallpaper Default di Framework-Res & Overlay**:
+   - Memperbarui aset wallpaper inti sistem Android pada direktori:
+     * frameworks/base/core/res/res/drawable-nodpi/default_wallpaper.png
+     * frameworks/base/core/res/res/drawable-sw600dp-nodpi/default_wallpaper.png
+     * frameworks/base/core/res/res/drawable-sw720dp-nodpi/default_wallpaper.png
+   - Memperbarui aset wallpaper pada Runtime Resource Overlay FrameworkOverlayCustom yang aktif saat boot:
+     * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/drawable-hdpi/default_wallpaper.png
+     * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/drawable-xhdpi/default_wallpaper.png
+     * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/drawable-xxhdpi/default_wallpaper.png
+     * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/drawable-xxxhdpi/default_wallpaper.png
+     * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/drawable-nodpi/default_wallpaper.png
+     * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/drawable-sw600dp-nodpi/default_wallpaper.png
+     * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/drawable-sw720dp-nodpi/default_wallpaper.png
+3. **Penyempurnaan Skrip Pemasang (apply.sh)**:
+   - Memperbarui fungsi apply_ui() pada apply.sh agar secara otomatis menyalin berkas kustomisasi frameworks/base/core dan vendor/custom ke pohon source tree ROM target.
