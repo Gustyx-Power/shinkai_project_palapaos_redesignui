@@ -27,12 +27,14 @@ if [ "$ACTION" = "--help" ] || [ "$ACTION" = "-h" ]; then
 fi
 
 if [ "$ACTION" = "clear" ]; then
-    echo "Clearing Google Play Store and Play Services data..."
+    echo "Clearing Google Play Store, Play Services, and GSF data..."
     pm clear com.android.vending 2>/dev/null || true
     pm clear com.google.android.gms 2>/dev/null || true
+    pm clear com.google.android.gsf 2>/dev/null || true
     am force-stop com.google.android.gms 2>/dev/null
     am force-stop com.android.vending 2>/dev/null
-    echo "Play Store and Play Services data cleared successfully!"
+    am force-stop com.google.android.gsf 2>/dev/null
+    echo "Play Store, Play Services, and GSF data cleared successfully!"
     exit 0
 fi
 
@@ -52,11 +54,13 @@ if [ "$ACTION" = "reset" ]; then
     settings delete secure pif_data 2>/dev/null || settings put secure pif_data ""
     rm -f /data/system/pif.json 2>/dev/null
     rm -f /data/adb/pif.json 2>/dev/null
-    echo "Killing GMS and Play Store..."
+    echo "Killing GMS, Play Store, and GSF..."
     am force-stop com.google.android.gms 2>/dev/null
     am force-stop com.android.vending 2>/dev/null
+    am force-stop com.google.android.gsf 2>/dev/null
     pkill -f com.google.android.gms 2>/dev/null
     pkill -f com.android.vending 2>/dev/null
+    pkill -f com.google.android.gsf 2>/dev/null
     echo "Reset complete. ROM baked-in profile is now active."
     exit 0
 fi
@@ -146,11 +150,13 @@ fi
 rm -rf "$TEMP_DIR"
 
 if [ "$SUCCESS" -eq 1 ]; then
-    echo "Restarting Google Play Services and Play Store..."
+    echo "Restarting Google Play Services, Play Store, and GSF..."
     am force-stop com.google.android.gms 2>/dev/null
     am force-stop com.android.vending 2>/dev/null
+    am force-stop com.google.android.gsf 2>/dev/null
     pkill -f com.google.android.gms 2>/dev/null
     pkill -f com.android.vending 2>/dev/null
+    pkill -f com.google.android.gsf 2>/dev/null
     echo "Play Integrity profile updated and active!"
 else
     echo "Warning: Could not reach Google Flash Tool API (offline or blocked)."
@@ -160,7 +166,9 @@ else
     echo "$JSON" > /data/system/pif.json 2>/dev/null || true
     am force-stop com.google.android.gms 2>/dev/null
     am force-stop com.android.vending 2>/dev/null
+    am force-stop com.google.android.gsf 2>/dev/null
     pkill -f com.google.android.gms 2>/dev/null
     pkill -f com.android.vending 2>/dev/null
+    pkill -f com.google.android.gsf 2>/dev/null
     echo "Active profile refreshed!"
 fi

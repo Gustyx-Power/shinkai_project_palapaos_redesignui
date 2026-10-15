@@ -107,6 +107,9 @@ The Battery settings screen (`Settings -> Battery`) has been completely overhaul
   * Multi-tier PIF resolution: `Settings.Secure.PIF_DATA`, local file storage (`/data/system/pif.json` or `/data/adb/pif.json`), OTA `FETCHED_PIF`, and built-in ROM fallback.
   * Multi-tier Keybox resolution: `Settings.Secure.KEYBOX_DATA`, local file storage (`/data/system/keybox.xml` or `/data/adb/tricky_store/keybox.xml`), and built-in ROM keychain.
   * Integrated `/system/bin/autopif` command-line utility with `fetch`, `clear`, `reset`, and `status` actions.
+* **Google Account Login & GSF Token Reset Fix**:
+  * Strictly scoped `sIsGms` to background DroidGuard (`com.google.android.gms.unstable`), preventing the Google account login UI process (`com.google.android.gms.ui` / `MinuteMaidActivity`) from prematurely terminating itself during authentication.
+  * Resolved the *"Device needs to be reset to factory settings"* Play Protect certification prompt by incorporating *Google Services Framework* (`com.google.android.gsf`) into the Play Store/GMS cache cleaning routine, forcing generation of a fresh certified GSF Checkin ID without requiring a factory reset.
 * **Kernel Command Line Filter (`/proc/cmdline`)**:
   * Seamless kernel filter (`cmdline.c`) rewriting `androidboot.verifiedbootstate=orange` to `green`, `androidboot.flash.locked=0` to `1`, and `androidboot.vbmeta.device_state=unlocked` to `locked` for direct OS-level readers.
 

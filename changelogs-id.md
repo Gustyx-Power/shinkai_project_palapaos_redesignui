@@ -107,6 +107,9 @@ Halaman Pengaturan Baterai (`Settings -> Battery`) telah dirombak secara menyelu
   * Mendukung pembacaan konfigurasi PIF berlapis: `Settings.Secure.PIF_DATA`, file lokal `/data/system/pif.json` atau `/data/adb/pif.json`, OTA `FETCHED_PIF`, dan ROM baked-in.
   * Mendukung pembacaan Keybox XML berlapis: `Settings.Secure.KEYBOX_DATA`, file lokal `/data/system/keybox.xml` atau `/data/adb/tricky_store/keybox.xml`, dan overlay ROM.
   * Menyertakan utilitas CLI `/system/bin/autopif` lengkap dengan aksi `fetch`, `clear`, `reset`, dan `status`.
+* **Perbaikan Alur Login Akun Google & Pembersihan GSF**:
+  * Mengisolasi `sIsGms` hanya untuk proses background DroidGuard (`com.google.android.gms.unstable`), mencegah proses antarmuka login akun (`com.google.android.gms.ui` / `MinuteMaidActivity`) membunuh dirinya sendiri saat alur login akun berlangsung.
+  * Menghilangkan pesan kesalahan *"Perangkat perlu direset ke setelan pabrik"* dengan menyertakan paket *Google Services Framework* (`com.google.android.gsf`) ke dalam rutinitas pembersihan data Play Store & GMS, sehingga GSF ID lama yang berstatus uncertified langsung diperbarui tanpa reset perangkat.
 * **Kernel Command Line Filter (`/proc/cmdline`)**:
   * Filter cerdas pada kernel (`cmdline.c`) yang secara otomatis mengganti flag `androidboot.verifiedbootstate=orange` menjadi `green`, `androidboot.flash.locked=0` menjadi `1`, dan `androidboot.vbmeta.device_state=unlocked` menjadi `locked` untuk pembacaan langsung di level sistem operasi.
 

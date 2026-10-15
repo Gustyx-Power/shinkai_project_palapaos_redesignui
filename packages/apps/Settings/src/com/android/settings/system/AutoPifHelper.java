@@ -248,7 +248,7 @@ public final class AutoPifHelper {
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         if (am == null) return false;
 
-        String[] packages = new String[]{"com.google.android.gms", "com.android.vending"};
+        String[] packages = new String[]{"com.google.android.gms", "com.android.vending", "com.google.android.gsf"};
         for (String pkg : packages) {
             try {
                 am.clearApplicationUserData(pkg, null);
@@ -284,7 +284,7 @@ public final class AutoPifHelper {
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         if (am == null) return;
 
-        String[] packages = new String[]{"com.google.android.gms", "com.android.vending"};
+        String[] packages = new String[]{"com.google.android.gms", "com.android.vending", "com.google.android.gsf"};
         for (String pkg : packages) {
             try {
                 am.getClass()

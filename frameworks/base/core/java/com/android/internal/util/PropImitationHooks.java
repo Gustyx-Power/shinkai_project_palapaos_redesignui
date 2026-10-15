@@ -124,7 +124,7 @@ public class PropImitationHooks {
         sNetflixModel = res.getString(R.string.config_movieVerifiedKey);
 
         sProcessName = processName;
-        sIsGms = packageName.equals(PACKAGE_GMS);
+        sIsGms = packageName.equals(PACKAGE_GMS) && processName.equals(PROCESS_GMS_UNSTABLE);
         sIsFinsky = packageName.equals(PACKAGE_FINSKY);
 
         /* Set Certified Properties for GMSCore
@@ -240,30 +240,35 @@ public class PropImitationHooks {
             return;
         }
 
-        final boolean was = isGmsAddAccountActivityOnTop();
-        final TaskStackListener taskStackListener = new TaskStackListener() {
-            @Override
-            public void onTaskStackChanged() {
-                final boolean is = isGmsAddAccountActivityOnTop();
-                if (is ^ was) {
-                    dlog("GmsAddAccountActivityOnTop is:" + is + " was:" + was +
-                            ", killing myself!"); // process will restart automatically later
-                    Process.killProcess(Process.myPid());
+        if (sIsGms) {
+            final boolean was = isGmsAddAccountActivityOnTop();
+            final TaskStackListener taskStackListener = new TaskStackListener() {
+                @Override
+                public void onTaskStackChanged() {
+                    final boolean is = isGmsAddAccountActivityOnTop();
+                    if (is ^ was) {
+                        dlog("GmsAddAccountActivityOnTop is:" + is + " was:" + was +
+                                ", killing myself!"); // process will restart automatically later
+                        Process.killProcess(Process.myPid());
+                    }
                 }
+            };
+
+            if (!was) {
+                dlog("Spoofing build for GMS");
+                setCertifiedProps();
+            } else {
+                dlog("Skip spoofing build for GMS, because GmsAddAccountActivityOnTop");
             }
-        };
 
-        if (!was) {
-            dlog("Spoofing build for GMS / Finsky");
-            setCertifiedProps();
+            try {
+                ActivityTaskManager.getService().registerTaskStackListener(taskStackListener);
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to register task stack listener!", e);
+            }
         } else {
-            dlog("Skip spoofing build for GMS / Finsky, because GmsAddAccountActivityOnTop");
-        }
-
-        try {
-            ActivityTaskManager.getService().registerTaskStackListener(taskStackListener);
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to register task stack listener!", e);
+            dlog("Spoofing build for Finsky");
+            setCertifiedProps();
         }
     }
 
