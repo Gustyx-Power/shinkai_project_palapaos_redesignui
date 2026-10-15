@@ -17,34 +17,45 @@ Pembaruan cabang baru **`palapa-triwulan`** menghadirkan pembaruan besar antarmu
 ---
 
 ### 1. Redesain Total UI Baterai (Samsung One UI 9 Style)
-Halaman Pengaturan Baterai (`Settings -> Battery`) telah dirombak secara menyeluruh mengadopsi bahasa desain Samsung One UI 9 dengan tetap mempertahankan seluruh fitur dan opsi sistem yang ada:
+Halaman Pengaturan Baterai (`Settings -> Battery`) telah dirombak secara menyeluruh mengadopsi bahasa desain Samsung One UI 9 murni dengan tetap mempertahankan seluruh fitur dan opsi sistem yang ada:
+
+* **Eliminasi Total Sisa Elemen Pixel**:
+  * Menghilangkan seluruh komponen header bawaan Google Pixel (`battery_header` ProgressBarPreference dan `battery_header_text` subtitle) serta duplikasi menu `battery_usage_summary`.
+  * Pengaturan ditata rapi ke dalam kontainer kartu membulat (*grouped rounded cards*, corner radius 26dp) berbasis palet dinamis Material You Monet (`@color/settingslib_materialColorSurfaceContainer`).
 
 * **Hero Overview Header**:
   * Angka persentase baterai berukuran besar dan tebal (`81%`) di sisi kiri.
-  * Estimasi sisa waktu pemakaian real-time (`8 h 35 m left`) di sisi kanan sejajar secara visual.
-  * *Pill Progress Bar* melengkung penuh (*full rounded capsule*, radius 100dp) berwarna hijau menyala khas One UI (`#2ED158`) dengan track abu-abu gelap elegan.
-  * Keterangan durasi pengisian penuh (*"A full charge will last about..."*) disertai ikon info `(i)` interaktif.
+  * Estimasi sisa waktu pemakaian real-time di sisi kanan sejajar secara visual.
+  * *Pill Progress Bar* melengkung penuh (*full rounded capsule*, radius 100dp) berwarna hijau menyala khas One UI (`#2ED158`) dengan track Monet container elegan.
+  * Keterangan durasi pengisian penuh atau sisa waktu hingga penuh ("... lagi sampai penuh") disertai ikon info `(i)` interaktif.
 
-* **Kartu Penggunaan Baterai Interaktif Terpadu**:
-  * Berada di dalam kartu gelap khas One UI (corner radius 26dp) yang adaptif terhadap tema AMOLED dan Material You Monet.
+* **Kartu Penggunaan Baterai Interaktif Terpadu (Data Riil)**:
+  * Berada di dalam kartu khas One UI yang adaptif terhadap tema AMOLED dan Material You Monet.
   * **Dropdown Selector Interaktif**:
-    * **Mode Daily Usage**: Menampilkan grafik 7 batang vertikal berbentuk kapsul biru One UI (`#2979FF`), garis batas rata-rata putus-putus (`--- 195 Avg.`), skala sumbu Y (`300` dan `0 (%)`), serta lingkaran penanda hari aktif saat ini (`M`).
-    * **Mode Since Last Charge**: Menampilkan subteks riwayat pengisian (*"Last charged to 100%"*, *"Stopped charging..."*), area chart kurva landai dengan gradien biru transparan, badge awal `⚡100`, pin bubble penanda persentase saat ini `81%`, garis proyeksi perkiraan habis dengan mode hemat daya, dan legenda tingkat baterai.
-  * **Ringkasan Penggunaan Aplikasi**:
-    * Label subheader *"Battery usage: X%"*.
-    * Daftar mini 3 aplikasi teratas pengguna baterai terbanyak lengkap dengan ikon squircle aplikasi, nama aplikasi, persentase penggunaan riil, dan garis pemisah tipis.
-    * Tombol footer *"View details"* untuk membuka riwayat penggunaan baterai lanjutan (`PowerUsageAdvanced`).
+    * **Mode Daily Usage**: Menampilkan grafik 7 batang vertikal berbentuk kapsul biru Monet (`@color/settingslib_materialColorPrimary`), garis batas rata-rata putus-putus (`--- Avg.`), skala sumbu Y (`300` dan `0 (%)`), serta lingkaran penanda hari aktif saat ini sesuai locale bahasa. Data batang dihitung dinamis dari penggunaan foreground harian riil.
+    * **Mode Since Last Charge**: Menampilkan subteks riwayat pengisian (*"Terakhir diisi hingga 100%"*, *"Berhenti mengisi daya..."*), area chart kurva Bezier dengan gradien biru Monet transparan, badge awal `⚡100`, pin bubble penanda persentase saat ini, garis proyeksi perkiraan habis, dan legenda tingkat baterai.
+  * **Ringkasan Penggunaan Aplikasi Riil (No Dummy Data)**:
+    * Label subheader *"Penggunaan baterai: X%"*.
+    * Menampilkan daftar aplikasi riil yang terpasang dan aktif mengonsumsi daya berdasarkan kalkulasi `BatteryStatsManager` dan `UsageStatsManager`, lengkap dengan ikon asli, nama aplikasi, persentase konsumsi riil, dan garis pemisah tipis.
+    * Tombol footer *"Lihat detail"* untuk membuka riwayat penggunaan baterai lanjutan (`PowerUsageAdvanced`).
 
 * **Halaman Informasi Baterai Khusus (Battery Information)**:
-  * Sub-halaman baru yang dapat diakses langsung dari tombol info `(i)` header atau menu pengaturan baterai.
-  * Menampilkan kartu terpadu dengan 3 baris data:
-    1. **Battery status**: Status pengisian daya (*Not charging*, *Charging*, *Full*).
-    2. **Battery level**: Persentase daya saat ini.
-    3. **Battery capacity**: Kapasitas tipikal baterai (`4500 mAh (typical)`) yang dibaca secara dinamis dari hardware dan PowerProfile perangkat.
+  * Sub-halaman terintegrasi yang dapat diakses langsung dari tombol info `(i)` header atau menu pengaturan baterai, dengan judul action bar yang tepat (`< Informasi baterai`).
+  * Menampilkan kartu terpadu lengkap dengan metrik hardware riil:
+    1. **Status baterai**: Status pengisian daya (*Mengisi daya*, *Tidak mengisi daya*, *Penuh*).
+    2. **Tingkat baterai**: Persentase daya saat ini.
+    3. **Kesehatan baterai**: Persentase kesehatan riil baterai (*Health percentage*, misal `100% (Baik)`) yang dihitung dari rasio kapasitas maksimum terhadap desain serta sysfs SOH.
+    4. **Siklus pengisian**: Jumlah siklus pengisian baterai (*Cycle count*, misal `142 kali`) dari intent hardware atau sysfs kernel.
+    5. **Kapasitas baterai**: Kapasitas tipikal baterai (`5000 mAh (tipikal)`) yang dibaca secara dinamis dari hardware dan PowerProfile perangkat.
+    6. **Suhu baterai**: Suhu baterai real-time dalam format Celcius (`31.5 °C`).
+    7. **Voltase baterai**: Tegangan baterai real-time dalam format Volt (`4.12 V`).
   * Paragraf disclaimer resmi standar pengujian laboratorium IEC 61960 di bawah kartu.
 
 * **Pelestarian 100% Fitur Daya**:
-  * Seluruh opsi bawaan tetap dipertahankan dan ditata dalam kartu rapi: *Penghemat Baterai (Battery Saver)*, *Baterai Adaptif (Smart Battery)*, *Kontrol Pengisian Daya Lineage Health*, *Kecepatan Pengisian Daya (Charging Speed)*, *Persentase Bilah Status*, dan *Info Pengisian di Layar Kunci*.
+  * Seluruh opsi bawaan tetap dipertahankan dan dikelompokkan ke dalam kategori kartu One UI yang rapi:
+    * **Manajemen Daya**: *Penghemat Baterai (Battery Saver)* dan *Baterai Adaptif (Smart Battery)*.
+    * **Pengaturan Pengisian Daya**: *Kontrol Pengisian Daya Lineage Health* dan *Kecepatan Pengisian Daya (Charging Speed)*.
+    * **Info & Tampilan Baterai**: *Persentase Baterai Bilah Status*, *Info Pengisian di Layar Kunci*, dan pintasan *Informasi Baterai*.
 
 ---
 
@@ -85,11 +96,11 @@ Halaman Pengaturan Baterai (`Settings -> Battery`) telah dirombak secara menyelu
 | Komponen | File Terkait | Deskripsi Perubahan |
 |---|---|---|
 | **Header UI Baterai** | `OneUIBatteryHeaderPreference.kt`<br>`oneui_battery_header_card.xml` | Menampilkan persentase besar, estimasi waktu tersisa, dan kapsul progress bar One UI |
-| **Grafik Interaktif** | `OneUIBatteryChartView.kt` | Custom canvas view untuk grafik batang 7-hari dan kurva area gradien |
-| **Kartu Penggunaan** | `OneUIBatteryUsageCardPreference.kt`<br>`OneUIBatteryUsageCardController.kt`<br>`oneui_battery_usage_card.xml` | Kartu utama penggabung dropdown filter, grafik, dan daftar 3 aplikasi teratas |
-| **Info Baterai** | `OneUIBatteryInfoFragment.kt`<br>`oneui_battery_info_fragment.xml`<br>`SettingsGateway.java` | Sub-halaman info kapasitas baterai IEC 61960 dan status pengisian |
-| **Pengaturan Terpadu** | `power_usage_summary.xml` | Pengelompokan seluruh preferensi daya lama ke dalam tata letak kartu terstruktur |
-| **Tema & Bahasa** | `colors.xml`, `values-night/colors.xml`<br>`shinkai_strings.xml`, `values-in/` | Palet warna tema gelap AMOLED / Monet dan lokalisasi lengkap ID/EN |
+| **Grafik Interaktif** | `OneUIBatteryChartView.kt` | Custom canvas view untuk grafik batang 7-hari dan kurva area gradien dengan adaptasi warna Monet |
+| **Kartu Penggunaan** | `OneUIBatteryUsageCardPreference.kt`<br>`OneUIBatteryUsageCardController.kt`<br>`oneui_battery_usage_card.xml` | Kartu utama penggabung dropdown filter, grafik, dan daftar aplikasi riil dari `BatteryStatsManager` |
+| **Info Baterai** | `OneUIBatteryInfoFragment.kt`<br>`oneui_battery_info_fragment.xml`<br>`SettingsGateway.java` | Sub-halaman info kesehatan baterai (%), siklus, suhu, voltase, dan kapasitas IEC 61960 |
+| **Pengaturan Terpadu** | `power_usage_summary.xml`<br>`PowerUsageSummary.java`<br>`PowerUsageSummaryScreen.kt` | Pengelompokan seluruh preferensi daya ke dalam kartu One UI dan pembersihan total header Pixel |
+| **Tema & Bahasa** | `colors.xml`, `values-night/colors.xml`<br>`shinkai_strings.xml`, `values-in/` | Palet warna dinamis Material You Monet (`surfaceContainer`, `primary`) dan lokalisasi lengkap ID/EN |
 
 ---
 *Palapa OS - Edisi Triwulan | Shinkai Project (2026)*

@@ -351,11 +351,11 @@
     <color name="about_text_secondary">@color/settingslib_materialColorOnSurfaceVariant</color>
     <color name="about_icon_circle_bg_color">@color/settingslib_materialColorSecondaryContainer</color>
 
-    <!-- One UI 9 Battery Colors (Light) -->
-    <color name="oneui_battery_card_bg">@color/settingslib_materialColorSurfaceBright</color>
+    <!-- One UI 9 Battery Colors (Light - Monet Engine) -->
+    <color name="oneui_battery_card_bg">@color/settingslib_materialColorSurfaceContainer</color>
     <color name="oneui_battery_track">@color/settingslib_materialColorSurfaceContainerHighest</color>
     <color name="oneui_battery_green">#2ED158</color>
-    <color name="oneui_battery_blue">#2979FF</color>
+    <color name="oneui_battery_blue">@color/settingslib_materialColorPrimary</color>
     <color name="oneui_battery_text_primary">@color/settingslib_materialColorOnSurface</color>
     <color name="oneui_battery_text_secondary">@color/settingslib_materialColorOnSurfaceVariant</color>
     <color name="oneui_battery_divider">@color/settingslib_materialColorOutlineVariant</color>

@@ -29,7 +29,9 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.android.settings.R
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class OneUIBatteryChartView @JvmOverloads constructor(
     context: Context,
@@ -54,16 +56,28 @@ class OneUIBatteryChartView @JvmOverloads constructor(
             invalidate()
         }
 
-    var estimatedTimeLeftStr: String = "8 h 35 m left"
+    var startBatteryLevel: Int = 100
+        set(value) {
+            field = value.coerceIn(0, 100)
+            invalidate()
+        }
+
+    var estimatedTimeLeftStr: String = ""
         set(value) {
             field = value
             invalidate()
         }
 
+    var averageUsageValue: Int = 120
+        set(value) {
+            field = value.coerceIn(10, 300)
+            invalidate()
+        }
+
     // Daily bars data (values relative to max 300%)
-    private var dailyUsageValues = floatArrayOf(180f, 150f, 230f, 150f, 140f, 180f, 60f)
-    private val dayLabels = arrayOf("T", "W", "T", "F", "S", "S", "M")
-    private var currentDayIndex = 6 // Monday as in screenshot
+    private var dailyUsageValues = floatArrayOf(80f, 65f, 140f, 75f, 70f, 110f, 45f)
+    private var dayLabels = arrayOf("S", "S", "R", "K", "J", "S", "M")
+    private var currentDayIndex = 6
 
     // Paints
     private val barPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -85,7 +99,7 @@ class OneUIBatteryChartView @JvmOverloads constructor(
     }
     private val curveStrokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
-        strokeWidth = 4f
+        strokeWidth = 4.5f
     }
     private val pinBgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
@@ -94,50 +108,50 @@ class OneUIBatteryChartView @JvmOverloads constructor(
         textAlign = Paint.Align.CENTER
         isFakeBoldText = true
     }
-
-    init {
-        updateColors()
-        calculateCurrentDayIndex()
+    private val legendPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
     }
 
-    private fun calculateCurrentDayIndex() {
+    init {
+        initDaysFromLocale()
+        updateColors()
+    }
+
+    private fun initDaysFromLocale() {
+        val locale = Locale.getDefault()
         val cal = Calendar.getInstance()
-        // Convert Calendar.DAY_OF_WEEK to 0-6 index where Monday is last or according to week
-        val dayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
-        // Set labels according to recent 7 days
-        val shortDays = arrayOf("S", "M", "T", "W", "T", "F", "S")
+        val sdf = SimpleDateFormat("EEEEE", locale) // single-letter day of week
         for (i in 0 until 7) {
             val targetCal = Calendar.getInstance().apply {
                 add(Calendar.DAY_OF_MONTH, i - 6)
             }
-            dayLabels[i] = shortDays[targetCal.get(Calendar.DAY_OF_WEEK) - 1]
+            dayLabels[i] = sdf.format(targetCal.time).uppercase(locale)
         }
         currentDayIndex = 6
     }
 
-    fun updateDailyData(usages: FloatArray) {
-        if (usages.isNotEmpty()) {
-            for (i in usages.indices) {
-                if (i < dailyUsageValues.size) {
-                    dailyUsageValues[i] = usages[i]
-                }
+    fun setDailyData(values: FloatArray, avg: Int) {
+        if (values.size >= 7) {
+            for (i in 0 until 7) {
+                dailyUsageValues[i] = values[i].coerceIn(5f, 300f)
             }
-            invalidate()
         }
+        averageUsageValue = avg
+        invalidate()
     }
 
     private fun updateColors() {
-        val blueColor = ContextCompat.getColor(context, R.color.oneui_battery_blue)
+        val monetPrimary = ContextCompat.getColor(context, R.color.oneui_battery_blue)
         val textPrimary = ContextCompat.getColor(context, R.color.oneui_battery_text_primary)
         val textSecondary = ContextCompat.getColor(context, R.color.oneui_battery_text_secondary)
         val trackColor = ContextCompat.getColor(context, R.color.oneui_battery_track)
 
-        barPaint.color = blueColor
-        bgBarTrackPaint.color = Color.argb(40, Color.red(trackColor), Color.green(trackColor), Color.blue(trackColor))
+        barPaint.color = monetPrimary
+        bgBarTrackPaint.color = Color.argb(45, Color.red(trackColor), Color.green(trackColor), Color.blue(trackColor))
         dashedLinePaint.color = Color.argb(120, Color.red(textSecondary), Color.green(textSecondary), Color.blue(textSecondary))
-        curveStrokePaint.color = Color.WHITE
-        pinBgPaint.color = Color.WHITE
-        pinTextPaint.color = Color.BLACK
+        curveStrokePaint.color = monetPrimary
+        pinBgPaint.color = monetPrimary
+        pinTextPaint.color = Color.WHITE
         textPaint.color = textSecondary
     }
 
@@ -156,38 +170,35 @@ class OneUIBatteryChartView @JvmOverloads constructor(
         val width = width.toFloat()
         val height = height.toFloat()
 
-        val paddingLeft = 40f
-        val paddingRight = 90f // room for y-axis (300, 195 Avg, 0 (%))
-        val paddingTop = 30f
-        val paddingBottom = 70f // room for day labels and legend
+        val paddingLeft = 32f
+        val paddingRight = 85f
+        val paddingTop = 28f
+        val paddingBottom = 65f
 
         val chartWidth = width - paddingLeft - paddingRight
         val chartHeight = height - paddingTop - paddingBottom
         val maxUsage = 300f
 
-        // 1. Draw Y-Axis scale and Avg Line
-        textPaint.textSize = 24f
+        textPaint.textSize = 22f
         textPaint.textAlign = Paint.Align.LEFT
         val textSecondary = ContextCompat.getColor(context, R.color.oneui_battery_text_secondary)
         textPaint.color = textSecondary
 
-        // "300"
-        canvas.drawText("300", width - paddingRight + 16f, paddingTop + 20f, textPaint)
+        // 1. Draw Y-Axis scale
+        canvas.drawText("300", width - paddingRight + 14f, paddingTop + 18f, textPaint)
+        canvas.drawText("0", width - paddingRight + 14f, paddingTop + chartHeight - 8f, textPaint)
+        canvas.drawText("(%)", width - paddingRight + 14f, paddingTop + chartHeight + 14f, textPaint)
 
-        // "0 (%)"
-        canvas.drawText("0", width - paddingRight + 16f, paddingTop + chartHeight - 10f, textPaint)
-        canvas.drawText("(%)", width - paddingRight + 16f, paddingTop + chartHeight + 15f, textPaint)
-
-        // Avg Line at 195
-        val avgY = paddingTop + chartHeight * (1f - (195f / maxUsage))
+        // 2. Draw Average Baseline
+        val avgY = paddingTop + chartHeight * (1f - (averageUsageValue.toFloat() / maxUsage))
         val dashPath = Path().apply {
             moveTo(paddingLeft, avgY)
             lineTo(width - paddingRight, avgY)
         }
         canvas.drawPath(dashPath, dashedLinePaint)
 
-        // Draw "195 Avg." badge on the right
-        val avgBadgeRect = RectF(width - paddingRight + 10f, avgY - 18f, width - 10f, avgY + 18f)
+        // Draw Avg Badge
+        val avgBadgeRect = RectF(width - paddingRight + 8f, avgY - 18f, width - 8f, avgY + 18f)
         val badgeBgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.argb(60, 140, 140, 140)
             style = Paint.Style.FILL
@@ -195,14 +206,14 @@ class OneUIBatteryChartView @JvmOverloads constructor(
         canvas.drawRoundRect(avgBadgeRect, 10f, 10f, badgeBgPaint)
         val avgBadgeTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = textSecondary
-            textSize = 20f
+            textSize = 19f
             textAlign = Paint.Align.CENTER
             isFakeBoldText = true
         }
-        canvas.drawText("195", avgBadgeRect.centerX(), avgY - 2f, avgBadgeTextPaint)
-        canvas.drawText("Avg.", avgBadgeRect.centerX(), avgY + 15f, avgBadgeTextPaint)
+        canvas.drawText("$averageUsageValue", avgBadgeRect.centerX(), avgY - 2f, avgBadgeTextPaint)
+        canvas.drawText("Avg.", avgBadgeRect.centerX(), avgY + 14f, avgBadgeTextPaint)
 
-        // 2. Draw 7 vertical pill bars
+        // 3. Draw 7 Vertical Pill Bars
         val barCount = 7
         val slotWidth = chartWidth / barCount
         val barWidth = 24f
@@ -211,15 +222,16 @@ class OneUIBatteryChartView @JvmOverloads constructor(
         for (i in 0 until barCount) {
             val cx = paddingLeft + (i * slotWidth) + (slotWidth / 2f)
 
-            // Background vertical track lane (subtle dark tint)
-            val trackRect = RectF(cx - (slotWidth / 2.2f), paddingTop, cx + (slotWidth / 2.2f), paddingTop + chartHeight)
+            // Lane highlight track
+            val trackColor = ContextCompat.getColor(context, R.color.oneui_battery_track)
             val lanePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = if (i % 2 == 0) Color.argb(15, 255, 255, 255) else Color.argb(30, 255, 255, 255)
+                val laneAlpha = if (i % 2 == 0) 15 else 35
+                color = Color.argb(laneAlpha, Color.red(trackColor), Color.green(trackColor), Color.blue(trackColor))
             }
             canvas.drawRect(trackRect, lanePaint)
 
-            // Active pill bar
-            val valUsage = dailyUsageValues.getOrElse(i) { 100f }.coerceIn(10f, maxUsage)
+            // Dynamic Bar
+            val valUsage = dailyUsageValues.getOrElse(i) { 50f }.coerceIn(8f, maxUsage)
             val barH = chartHeight * (valUsage / maxUsage)
             val top = paddingTop + chartHeight - barH
             val bottom = paddingTop + chartHeight
@@ -227,175 +239,166 @@ class OneUIBatteryChartView @JvmOverloads constructor(
             val barRect = RectF(cx - barRadius, top, cx + barRadius, bottom)
             canvas.drawRoundRect(barRect, barRadius, barRadius, barPaint)
 
-            // Day label below
-            val labelY = paddingTop + chartHeight + 35f
+            // Day label
+            val labelY = paddingTop + chartHeight + 32f
             if (i == currentDayIndex) {
-                // Circle badge around today's label
-                val circleRadius = 18f
+                // Circle highlight around today
+                val circleRadius = 17f
                 val dayCirclePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                    color = Color.WHITE
+                    color = ContextCompat.getColor(context, R.color.oneui_battery_text_primary)
                     style = Paint.Style.FILL
                 }
-                canvas.drawCircle(cx, labelY - 7f, circleRadius, dayCirclePaint)
+                canvas.drawCircle(cx, labelY - 6f, circleRadius, dayCirclePaint)
 
-                textPaint.color = Color.BLACK
+                textPaint.color = ContextCompat.getColor(context, R.color.oneui_battery_card_bg)
                 textPaint.isFakeBoldText = true
             } else {
                 textPaint.color = textSecondary
                 textPaint.isFakeBoldText = false
             }
             textPaint.textAlign = Paint.Align.CENTER
-            textPaint.textSize = 24f
+            textPaint.textSize = 22f
             canvas.drawText(dayLabels.getOrElse(i) { "D" }, cx, labelY, textPaint)
         }
 
-        // 3. Legend at bottom-left: "● This week"
-        val legendY = height - 12f
-        val legendPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = ContextCompat.getColor(context, R.color.oneui_battery_blue)
-            style = Paint.Style.FILL
-        }
-        canvas.drawCircle(paddingLeft + 8f, legendY - 6f, 6f, legendPaint)
+        // 4. Legend at bottom: "● This week"
+        val legendY = height - 10f
+        legendPaint.color = ContextCompat.getColor(context, R.color.oneui_battery_blue)
+        canvas.drawCircle(paddingLeft + 6f, legendY - 6f, 6f, legendPaint)
         textPaint.color = textSecondary
         textPaint.textAlign = Paint.Align.LEFT
-        textPaint.textSize = 22f
+        textPaint.textSize = 20f
         textPaint.isFakeBoldText = false
-        canvas.drawText(context.getString(R.string.oneui_battery_this_week), paddingLeft + 24f, legendY, textPaint)
+        canvas.drawText(context.getString(R.string.oneui_battery_this_week), paddingLeft + 20f, legendY, textPaint)
     }
 
     private fun drawSinceLastChargeChart(canvas: Canvas) {
         val width = width.toFloat()
         val height = height.toFloat()
 
-        val paddingLeft = 40f
-        val paddingRight = 80f
-        val paddingTop = 40f
-        val paddingBottom = 70f
+        val paddingLeft = 32f
+        val paddingRight = 75f
+        val paddingTop = 36f
+        val paddingBottom = 65f
 
         val chartWidth = width - paddingLeft - paddingRight
         val chartHeight = height - paddingTop - paddingBottom
-
         val textSecondary = ContextCompat.getColor(context, R.color.oneui_battery_text_secondary)
+        val monetPrimary = ContextCompat.getColor(context, R.color.oneui_battery_blue)
 
-        // 1. Y-axis: 100, 0 (%)
-        textPaint.textSize = 24f
+        // 1. Y-axis
+        textPaint.textSize = 22f
         textPaint.textAlign = Paint.Align.LEFT
         textPaint.color = textSecondary
-        canvas.drawText("100", width - paddingRight + 16f, paddingTop + 20f, textPaint)
-        canvas.drawText("0", width - paddingRight + 16f, paddingTop + chartHeight - 10f, textPaint)
-        canvas.drawText("(%)", width - paddingRight + 16f, paddingTop + chartHeight + 15f, textPaint)
+        canvas.drawText("100", width - paddingRight + 12f, paddingTop + 18f, textPaint)
+        canvas.drawText("0", width - paddingRight + 12f, paddingTop + chartHeight - 8f, textPaint)
+        canvas.drawText("(%)", width - paddingRight + 12f, paddingTop + chartHeight + 14f, textPaint)
 
-        // 100% Top Baseline Line
+        // Top 100% baseline
         val baselinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.argb(50, 150, 150, 150)
+            color = Color.argb(45, 150, 150, 150)
             style = Paint.Style.STROKE
             strokeWidth = 1.5f
         }
         canvas.drawLine(paddingLeft, paddingTop + 10f, width - paddingRight, paddingTop + 10f, baselinePaint)
 
-        // 2. Area curve from 100% to currentBatteryLevel
+        // 2. Real Curve from startBatteryLevel to currentBatteryLevel
         val currentProgress = (100 - currentBatteryLevel) / 100f
-        val currentX = paddingLeft + (chartWidth * 0.35f)
-        val currentY = paddingTop + (chartHeight * currentProgress * 0.5f) + 10f
+        val currentX = paddingLeft + (chartWidth * 0.45f)
+        val currentY = paddingTop + (chartHeight * currentProgress) + 10f
 
         val path = Path().apply {
             moveTo(paddingLeft, paddingTop + 10f)
-            quadTo(
-                paddingLeft + (currentX - paddingLeft) * 0.5f,
-                paddingTop + 15f,
-                currentX,
-                currentY
+            cubicTo(
+                paddingLeft + (currentX - paddingLeft) * 0.4f, paddingTop + 12f,
+                paddingLeft + (currentX - paddingLeft) * 0.8f, currentY - 10f,
+                currentX, currentY
             )
         }
 
-        // Fill area below path
+        // Fill area gradient
         val fillPath = Path(path).apply {
             lineTo(currentX, paddingTop + chartHeight)
             lineTo(paddingLeft, paddingTop + chartHeight)
             close()
         }
 
-        val blueColor = ContextCompat.getColor(context, R.color.oneui_battery_blue)
         areaFillPaint.shader = LinearGradient(
             0f, paddingTop, 0f, paddingTop + chartHeight,
-            Color.argb(80, Color.red(blueColor), Color.green(blueColor), Color.blue(blueColor)),
-            Color.argb(10, Color.red(blueColor), Color.green(blueColor), Color.blue(blueColor)),
+            Color.argb(85, Color.red(monetPrimary), Color.green(monetPrimary), Color.blue(monetPrimary)),
+            Color.argb(10, Color.red(monetPrimary), Color.green(monetPrimary), Color.blue(monetPrimary)),
             Shader.TileMode.CLAMP
         )
         canvas.drawPath(fillPath, areaFillPaint)
 
         // Draw solid curve line
-        curveStrokePaint.color = Color.argb(220, 255, 255, 255)
+        curveStrokePaint.color = monetPrimary
         canvas.drawPath(path, curveStrokePaint)
 
         // 3. Current Level Vertical Indicator + Pin Bubble
         val indicatorPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.argb(150, 255, 255, 255)
+            color = Color.argb(120, Color.red(monetPrimary), Color.green(monetPrimary), Color.blue(monetPrimary))
             style = Paint.Style.STROKE
             strokeWidth = 2f
         }
         canvas.drawLine(currentX, currentY, currentX, paddingTop + chartHeight, indicatorPaint)
 
-        // Pin bubble [ 81% ]
-        val pinWidth = 80f
-        val pinHeight = 40f
-        val pinRect = RectF(currentX + 10f, currentY - (pinHeight / 2f), currentX + 10f + pinWidth, currentY + (pinHeight / 2f))
-        canvas.drawRoundRect(pinRect, 20f, 20f, pinBgPaint)
+        // Pin bubble [ 65% ]
+        val pinWidth = 84f
+        val pinHeight = 38f
+        val pinRect = RectF(currentX + 8f, currentY - (pinHeight / 2f), currentX + 8f + pinWidth, currentY + (pinHeight / 2f))
+        canvas.drawRoundRect(pinRect, 19f, 19f, pinBgPaint)
 
-        pinTextPaint.textSize = 22f
+        pinTextPaint.textSize = 21f
         canvas.drawText("$currentBatteryLevel%", pinRect.centerX(), pinRect.centerY() + 7f, pinTextPaint)
 
-        // ⚡100 badge at top left
-        val startBadgeRect = RectF(paddingLeft - 10f, paddingTop - 25f, paddingLeft + 70f, paddingTop + 10f)
+        // Start badge ⚡100
+        val startBadgeRect = RectF(paddingLeft - 8f, paddingTop - 22f, paddingLeft + 68f, paddingTop + 10f)
         val startBadgePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.argb(100, 100, 100, 100)
+            color = Color.argb(80, 120, 120, 120)
             style = Paint.Style.FILL
         }
-        canvas.drawRoundRect(startBadgeRect, 15f, 15f, startBadgePaint)
+        canvas.drawRoundRect(startBadgeRect, 14f, 14f, startBadgePaint)
         val startTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.WHITE
-            textSize = 20f
+            textSize = 19f
             isFakeBoldText = true
             textAlign = Paint.Align.CENTER
         }
-        canvas.drawText("⚡100", startBadgeRect.centerX(), startBadgeRect.centerY() + 6f, startTextPaint)
+        canvas.drawText("⚡$startBatteryLevel", startBadgeRect.centerX(), startBadgeRect.centerY() + 6f, startTextPaint)
 
         // 4. Dotted Projection Line to 0%
         val projectionEndX = width - paddingRight
         val projectionEndY = paddingTop + chartHeight
         val dottedProjectionPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = blueColor
+            color = monetPrimary
             style = Paint.Style.STROKE
             strokeWidth = 3f
             pathEffect = DashPathEffect(floatArrayOf(6f, 6f), 0f)
         }
         canvas.drawLine(currentX, currentY, projectionEndX, projectionEndY, dottedProjectionPaint)
 
-        // Bottom axis label: "8 h 35 m left"
-        textPaint.color = textSecondary
-        textPaint.textAlign = Paint.Align.CENTER
-        textPaint.textSize = 24f
-        canvas.drawText(estimatedTimeLeftStr, (currentX + projectionEndX) / 2f, paddingTop + chartHeight + 35f, textPaint)
+        // Bottom label
+        if (estimatedTimeLeftStr.isNotEmpty()) {
+            textPaint.color = textSecondary
+            textPaint.textAlign = Paint.Align.CENTER
+            textPaint.textSize = 22f
+            canvas.drawText(estimatedTimeLeftStr, (currentX + projectionEndX) / 2f, paddingTop + chartHeight + 32f, textPaint)
+        }
 
         // 5. Legends at bottom
-        val legendY = height - 12f
+        val legendY = height - 10f
         var lx = paddingLeft
 
-        // White dot: Battery level
-        legendPaint.color = Color.WHITE
+        legendPaint.color = monetPrimary
         canvas.drawCircle(lx + 6f, legendY - 6f, 5f, legendPaint)
         textPaint.textAlign = Paint.Align.LEFT
-        textPaint.textSize = 20f
-        canvas.drawText(context.getString(R.string.oneui_battery_level_legend), lx + 18f, legendY, textPaint)
+        textPaint.textSize = 19f
+        canvas.drawText(context.getString(R.string.oneui_battery_level_legend), lx + 16f, legendY, textPaint)
 
-        lx += 180f
-        // Grey dot: Estimated level
+        lx += 170f
         legendPaint.color = Color.GRAY
         canvas.drawCircle(lx + 6f, legendY - 6f, 5f, legendPaint)
-        canvas.drawText(context.getString(R.string.oneui_battery_estimated_level_legend), lx + 18f, legendY, textPaint)
-    }
-
-    private val legendPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.FILL
+        canvas.drawText(context.getString(R.string.oneui_battery_estimated_level_legend), lx + 16f, legendY, textPaint)
     }
 }

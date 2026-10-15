@@ -131,12 +131,16 @@ class OneUIBatteryHeaderPreferenceController(context: Context, key: String) :
 
         if (!mDischarging) {
             timeLeftView?.text = mStatusLabel ?: mContext.getString(com.android.settingslib.R.string.battery_info_status_charging)
+            if (!mRemainingLabel.isNullOrEmpty()) {
+                fullChargeView?.text = mContext.getString(R.string.oneui_battery_time_until_full, mRemainingLabel)
+            } else {
+                fullChargeView?.text = mContext.getString(com.android.settingslib.R.string.battery_info_status_charging)
+            }
         } else {
-            timeLeftView?.text = mRemainingLabel ?: "8 h 35 m left"
+            val remaining = mRemainingLabel ?: mContext.getString(R.string.power_usage_list_summary)
+            timeLeftView?.text = remaining
+            fullChargeView?.text = mContext.getString(R.string.oneui_battery_full_charge_desc, remaining)
         }
-
-        val estimateStr = mRemainingLabel ?: "10 h 36 m"
-        fullChargeView?.text = mContext.getString(R.string.oneui_battery_full_charge_desc, estimateStr)
 
         infoIcon?.setOnClickListener {
             SubSettingLauncher(mContext)

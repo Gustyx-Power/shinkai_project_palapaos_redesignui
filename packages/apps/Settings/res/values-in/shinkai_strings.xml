@@ -208,5 +208,19 @@
     <string name="oneui_battery_capacity_title">Kapasitas baterai</string>
     <string name="oneui_battery_capacity_format">%1$d mAh (tipikal)</string>
     <string name="oneui_battery_info_disclaimer">Kapasitas tipikal telah diuji dalam kondisi laboratorium pihak ketiga. Kapasitas tipikal adalah perkiraan kapasitas rata-rata dengan mempertimbangkan deviasi kapasitas baterai di antara sampel baterai yang diuji berdasarkan standar IEC 61960. Kapasitas terukur adalah %1$d mAh. Daya tahan baterai sebenarnya dapat bervariasi bergantung pada lingkungan jaringan, pola penggunaan, dan faktor lainnya.</string>
+    <string name="oneui_battery_health_title">Kesehatan baterai</string>
+    <string name="oneui_battery_health_good">%1$d%% (Baik)</string>
+    <string name="oneui_battery_health_optimal">%1$d%% (Optimal)</string>
+    <string name="oneui_battery_cycle_count_title">Siklus pengisian</string>
+    <string name="oneui_battery_cycle_count_format">%1$d kali</string>
+    <string name="oneui_battery_temperature_title">Suhu baterai</string>
+    <string name="oneui_battery_temperature_format">%1$.1f °C</string>
+    <string name="oneui_battery_voltage_title">Voltase baterai</string>
+    <string name="oneui_battery_voltage_format">%1$.2f V</string>
+    <string name="oneui_battery_power_savings_category">Manajemen daya</string>
+    <string name="oneui_battery_charging_category">Pengaturan pengisian daya</string>
+    <string name="oneui_battery_info_category">Info &amp; tampilan baterai</string>
+    <string name="oneui_battery_info_entry_summary">Kesehatan baterai, siklus pengisian, kapasitas</string>
+    <string name="oneui_battery_time_until_full">%1$s lagi sampai penuh</string>
 </resources>
 

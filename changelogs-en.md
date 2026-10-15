@@ -17,34 +17,45 @@ The new **`palapa-triwulan`** branch introduces a comprehensive system interface
 ---
 
 ### 1. Total Battery Settings UI Redesign (Samsung One UI 9 Style)
-The Battery settings screen (`Settings -> Battery`) has been completely overhauled to adopt Samsung One UI 9 design principles while preserving 100% of the existing battery management features and system controls:
+The Battery settings screen (`Settings -> Battery`) has been completely overhauled to adopt authentic Samsung One UI 9 design principles while preserving 100% of the existing battery management features and system controls:
+
+* **Complete Elimination of Pixel Remnants**:
+  * Fully removed all stock Google Pixel header elements (`battery_header` UsageProgressBarPreference and `battery_header_text` subtitle) and suppressed duplicate `battery_usage_summary` entries.
+  * Replaced flat lists with One UI grouped rounded card containers (corner radius 26dp) adhering strictly to dynamic Material You Monet palette tokens (`@color/settingslib_materialColorSurfaceContainer`).
 
 * **Hero Overview Header**:
   * Large and prominent bold percentage indicator (`81%`) on the left.
-  * Real-time estimated discharge time (`8 h 35 m left`) on the right, baseline-aligned.
-  * Full rounded capsule pill progress bar (radius 100dp) in vibrant One UI Green (`#2ED158`) with an elegant dark charcoal track.
-  * Dynamic full-charge duration subtitle (*"A full charge will last about..."*) paired with an interactive info button `(i)`.
+  * Real-time estimated discharge time on the right, baseline-aligned.
+  * Full rounded capsule pill progress bar (radius 100dp) in vibrant One UI Green (`#2ED158`) with an elegant Monet surface container track.
+  * Dynamic full-charge duration or time remaining until full charge subtitle paired with an interactive info button `(i)`.
 
-* **Unified Interactive Battery Usage Card**:
-  * Contained within a sleek One UI dark card (corner radius 26dp) fully adaptive to AMOLED dark mode and Material You Monet dynamics.
+* **Unified Interactive Battery Usage Card (Real Data)**:
+  * Contained within a sleek One UI rounded card fully adaptive to AMOLED dark mode and Material You Monet dynamics.
   * **Interactive Dropdown Selector**:
-    * **Daily Usage Mode**: Displays a 7-day vertical pill bar chart in One UI Blue (`#2979FF`), a dashed average baseline (`--- 195 Avg.`), Y-axis scale (`300` and `0 (%)`), and a circular badge highlighting the current day (`M`).
-    * **Since Last Charge Mode**: Displays charging history subtitles (*"Last charged to 100%"*, *"Stopped charging..."*), a smooth area curve with a translucent blue gradient, start badge `⚡100`, current level pin bubble `81%`, power-saving projection trajectory, and battery level legends.
-  * **Application Consumption Breakdown**:
+    * **Daily Usage Mode**: Displays a 7-day vertical pill bar chart rendered with Monet primary tint (`@color/settingslib_materialColorPrimary`), dashed average baseline (`--- Avg.`), Y-axis scale (`300` and `0 (%)`), and a circular badge highlighting the current day based on device locale. Bar heights are dynamically calculated from real past 7 days foreground application usage.
+    * **Since Last Charge Mode**: Displays charging history subtitles (*"Last charged to 100%"*, *"Stopped charging..."*), a smooth Bezier area curve with translucent Monet blue gradient, start badge `⚡100`, current level pin bubble indicator, power-saving projection trajectory, and battery level legends.
+  * **Real Application Consumption Breakdown (No Dummy Data)**:
     * Subheader label *"Battery usage: X%"*.
-    * Mini breakdown showing top 3 battery-consuming apps with squircle app icons, application labels, accurate percentage metrics, and subtle dividers.
+    * Displays genuine installed applications actively consuming power as reported by `BatteryStatsManager` and `UsageStatsManager`, with authentic application icons, labels, precise consumption percentages, and fine hairline dividers.
     * Centered footer action button *"View details"* to launch advanced battery history (`PowerUsageAdvanced`).
 
 * **Dedicated "Battery information" Page**:
-  * Direct access via the header info icon `(i)` or the Battery Information list entry.
-  * Unified One UI card displaying:
+  * Direct access via the header info icon `(i)` or the Battery Information list entry, with the proper action bar title (`< Battery information`).
+  * Unified One UI card displaying genuine hardware metrics:
     1. **Battery status**: Charging status (*Not charging*, *Charging*, *Full*).
     2. **Battery level**: Current percentage.
-    3. **Battery capacity**: Typical capacity (`4500 mAh (typical)`) dynamically resolved from hardware and device PowerProfile.
+    3. **Battery health**: Genuine battery health percentage (e.g. `100% (Good)` or `98% (Good)`) computed from design capacity ratio and sysfs SOH.
+    4. **Cycle count**: Battery charge cycle count (e.g. `142 cycles`) retrieved from battery intent or sysfs kernel interfaces.
+    5. **Battery capacity**: Typical capacity (`5000 mAh (typical)`) dynamically resolved from hardware and device PowerProfile.
+    6. **Battery temperature**: Real-time battery temperature in Celsius (`31.5 °C`).
+    7. **Battery voltage**: Real-time battery terminal voltage in Volts (`4.12 V`).
   * Official IEC 61960 laboratory testing standard disclaimer paragraph below the card.
 
 * **100% Feature Preservation**:
-  * All previous system preferences remain intact within neatly organized card groups: *Battery Saver*, *Smart Battery / Adaptive Battery*, *Lineage Health Charging Control*, *Charging Speed*, *Status Bar Battery Percentage*, and *Lockscreen Charging Info*.
+  * All previous system preferences remain intact within neatly organized One UI card groups:
+    * **Power Management**: *Battery Saver* and *Adaptive Battery (Smart Battery)*.
+    * **Charging Settings**: *Lineage Health Charging Control* and *Charging Speed*.
+    * **Battery Info & Display**: *Status Bar Battery Percentage*, *Lockscreen Charging Info*, and *Battery Information*.
 
 ---
 
@@ -85,11 +96,11 @@ The Battery settings screen (`Settings -> Battery`) has been completely overhaul
 | Component | Related Files | Description |
 |---|---|---|
 | **Battery UI Header** | `OneUIBatteryHeaderPreference.kt`<br>`oneui_battery_header_card.xml` | Large percentage, time left estimate, and One UI pill progress bar |
-| **Interactive Chart** | `OneUIBatteryChartView.kt` | Custom canvas view rendering 7-day vertical pill bars and gradient area curves |
-| **Usage Card** | `OneUIBatteryUsageCardPreference.kt`<br>`OneUIBatteryUsageCardController.kt`<br>`oneui_battery_usage_card.xml` | Main card uniting dropdown filter, chart view, and top 3 apps list |
-| **Battery Info** | `OneUIBatteryInfoFragment.kt`<br>`oneui_battery_info_fragment.xml`<br>`SettingsGateway.java` | Dedicated sub-page for IEC 61960 battery capacity and hardware status |
-| **Unified Settings** | `power_usage_summary.xml` | Restructured preference layout organizing all power features into card groups |
-| **Theme & Strings** | `colors.xml`, `values-night/colors.xml`<br>`shinkai_strings.xml`, `values-in/` | AMOLED / Monet dynamic color palettes and comprehensive EN/ID translations |
+| **Interactive Chart** | `OneUIBatteryChartView.kt` | Custom canvas view rendering 7-day vertical pill bars and gradient area curves with Monet adaptation |
+| **Usage Card** | `OneUIBatteryUsageCardPreference.kt`<br>`OneUIBatteryUsageCardController.kt`<br>`oneui_battery_usage_card.xml` | Main card uniting dropdown filter, chart view, and real app breakdown via `BatteryStatsManager` |
+| **Battery Info** | `OneUIBatteryInfoFragment.kt`<br>`oneui_battery_info_fragment.xml`<br>`SettingsGateway.java` | Dedicated sub-page for battery health %, cycle count, temp, voltage, and IEC 61960 capacity |
+| **Unified Settings** | `power_usage_summary.xml`<br>`PowerUsageSummary.java`<br>`PowerUsageSummaryScreen.kt` | Restructured preference layout organizing all power features into card groups and eliminating Pixel headers |
+| **Theme & Strings** | `colors.xml`, `values-night/colors.xml`<br>`shinkai_strings.xml`, `values-in/` | Dynamic Material You Monet palettes (`surfaceContainer`, `primary`) and comprehensive EN/ID translations |
 
 ---
 *Palapa OS - Triwulan Edition | Shinkai Project (2026)*

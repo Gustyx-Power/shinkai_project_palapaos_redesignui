@@ -294,5 +294,19 @@
     <string name="oneui_battery_capacity_title">Battery capacity</string>
     <string name="oneui_battery_capacity_format">%1$d mAh (typical)</string>
     <string name="oneui_battery_info_disclaimer">The typical capacity has been tested under third-party laboratory conditions. The typical capacity is the estimated average capacity considering the deviation in battery capacity among the battery samples tested under the IEC 61960 standard. The rated capacity is %1$d mAh. Actual battery life may vary depending on network environment, usage patterns, and other factors.</string>
+    <string name="oneui_battery_health_title">Battery health</string>
+    <string name="oneui_battery_health_good">%1$d%% (Good)</string>
+    <string name="oneui_battery_health_optimal">%1$d%% (Optimal)</string>
+    <string name="oneui_battery_cycle_count_title">Cycle count</string>
+    <string name="oneui_battery_cycle_count_format">%1$d cycles</string>
+    <string name="oneui_battery_temperature_title">Battery temperature</string>
+    <string name="oneui_battery_temperature_format">%1$.1f °C</string>
+    <string name="oneui_battery_voltage_title">Battery voltage</string>
+    <string name="oneui_battery_voltage_format">%1$.2f V</string>
+    <string name="oneui_battery_power_savings_category">Power management</string>
+    <string name="oneui_battery_charging_category">Charging settings</string>
+    <string name="oneui_battery_info_category">Battery info &amp; display</string>
+    <string name="oneui_battery_info_entry_summary">Battery health, cycle count, capacity</string>
+    <string name="oneui_battery_time_until_full">%1$s until full</string>
 </resources>
 

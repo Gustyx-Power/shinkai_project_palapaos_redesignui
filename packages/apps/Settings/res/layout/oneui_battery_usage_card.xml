@@ -123,6 +123,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingVertical="10dp"
+                android:visibility="gone"
                 android:gravity="center_vertical">
 
                 <ImageView
@@ -144,7 +145,7 @@
                     android:layout_marginEnd="8dp"
                     android:singleLine="true"
                     android:ellipsize="end"
-                    android:text="Nagram X"
+                    android:text=""
                     android:textColor="@color/oneui_battery_text_primary"
                     android:textSize="15sp"
                     android:fontFamily="sans-serif-medium" />
@@ -155,7 +156,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:text="21.2%"
+                    android:text=""
                     android:textColor="@color/oneui_battery_text_primary"
                     android:textSize="15sp"
                     android:fontFamily="sans-serif-medium" />
@@ -174,6 +175,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingVertical="10dp"
+                android:visibility="gone"
                 android:gravity="center_vertical">
 
                 <ImageView
@@ -195,7 +197,7 @@
                     android:layout_marginEnd="8dp"
                     android:singleLine="true"
                     android:ellipsize="end"
-                    android:text="TikTok"
+                    android:text=""
                     android:textColor="@color/oneui_battery_text_primary"
                     android:textSize="15sp"
                     android:fontFamily="sans-serif-medium" />
@@ -206,7 +208,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:text="3.6%"
+                    android:text=""
                     android:textColor="@color/oneui_battery_text_primary"
                     android:textSize="15sp"
                     android:fontFamily="sans-serif-medium" />
@@ -225,6 +227,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingVertical="10dp"
+                android:visibility="gone"
                 android:gravity="center_vertical">
 
                 <ImageView
@@ -246,7 +249,7 @@
                     android:layout_marginEnd="8dp"
                     android:singleLine="true"
                     android:ellipsize="end"
-                    android:text="Samsung Keyboard"
+                    android:text=""
                     android:textColor="@color/oneui_battery_text_primary"
                     android:textSize="15sp"
                     android:fontFamily="sans-serif-medium" />
@@ -257,7 +260,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:text="1.3%"
+                    android:text=""
                     android:textColor="@color/oneui_battery_text_primary"
                     android:textSize="15sp"
                     android:fontFamily="sans-serif-medium" />
