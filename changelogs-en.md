@@ -1023,3 +1023,27 @@ During testing and review sessions, several core interface discrepancies and sub
      * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/drawable-sw720dp-nodpi/default_wallpaper.png
 3. **Installer Script Enhancement (apply.sh)**:
    - Updated apply_ui() in apply.sh to copy frameworks/base/core and vendor/custom overlay assets to target source trees.
+
+
+---
+
+## Section XXXI: Kokopdes Custom Bootanimation & Bootaudio Integration and Pure Local Build Optimization (Non-RBE)
+
+### 1. Requirements & Overview
+- **User Request**:
+  - Extract and integrate the custom bootanimation and bootaudio from kokopdes cool_modules.zip into the ROM.
+  - Disable RBE (export USE_RBE=false) in the build script temp.sh to prevent reproxy port 8081 dial timeouts and unlock all 96 server CPU cores for pure local compilation.
+
+### 2. Implementation Details
+1. **Bootanimation & Bootaudio Extraction (1080p)**:
+   - Extracted common/bootanimation.zip (1080x1920, 30 FPS, uncompressed Store Type 0 format per Android BootAnimation parser specification) and common/bootaudio.mp3 from kokopdes cool_modules.zip.
+   - Replaced target prebuilt animation archives in vendor/custom/bootanimation/:
+     * bootanimation_1080.zip
+     * bootanimation_1440.zip
+     * bootanimation_720.zip
+   - Integrated audio file vendor/custom/bootanimation/bootaudio.mp3.
+2. **Prebuilt Media Declaration & Product Packaging**:
+   - Declared bootaudio_pixelos prebuilt_media module in vendor/custom/bootanimation/Android.bp installing bootaudio.mp3 into /product/media/bootaudio.mp3.
+   - Added bootaudio_pixelos to PRODUCT_PACKAGES in vendor/custom/config/common.mk.
+3. **Build Script Optimization (temp.sh)**:
+   - Added export USE_RBE=false prior to m shinkai -j$(nproc) to bypass remote build execution dependencies and compile purely using local hardware across 96 parallel cores.

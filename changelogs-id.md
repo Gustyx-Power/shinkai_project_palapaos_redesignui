@@ -1023,3 +1023,27 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
      * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/drawable-sw720dp-nodpi/default_wallpaper.png
 3. **Penyempurnaan Skrip Pemasang (apply.sh)**:
    - Memperbarui fungsi apply_ui() pada apply.sh agar secara otomatis menyalin berkas kustomisasi frameworks/base/core dan vendor/custom ke pohon source tree ROM target.
+
+
+---
+
+## Bagian XXXI: Integrasi Bootanimation & Bootaudio Kustom Kokopdes serta Optimasi Build Lokal Murni (Non-RBE)
+
+### 1. Kebutuhan & Gambaran Umum
+- **Permintaan Pengguna**:
+  - Mengekstrak dan mengintegrasikan bootanimation dan bootaudio dari arsip kokopdes cool_modules.zip ke dalam ROM.
+  - Mematikan RBE (export USE_RBE=false) pada skrip build temp.sh untuk menghindari timeout dial koneksi reproxy pada port 8081 dan memaksimalkan seluruh 96 core CPU server secara lokal.
+
+### 2. Detail Implementasi
+1. **Ekstraksi & Integrasi Bootanimation (1080p)**:
+   - Mengekstrak paket common/bootanimation.zip (1080x1920, 30 FPS, kompresi Type 0 / Stored sesuai spesifikasi parser bootanimation Android) dan common/bootaudio.mp3 dari kokopdes cool_modules.zip.
+   - Menggantikan aset bootanimation bawaan pada modul vendor/custom/bootanimation/:
+     * bootanimation_1080.zip
+     * bootanimation_1440.zip
+     * bootanimation_720.zip
+   - Menyertakan berkas audio vendor/custom/bootanimation/bootaudio.mp3.
+2. **Konfigurasi Modul Prebuilt Media & Packaging ROM**:
+   - Menambahkan modul prebuilt bootaudio_pixelos pada vendor/custom/bootanimation/Android.bp untuk menginstal bootaudio.mp3 ke partisi produk (/product/media/bootaudio.mp3).
+   - Mendaftarkan paket bootaudio_pixelos ke dalam PRODUCT_PACKAGES pada vendor/custom/config/common.mk.
+3. **Penyempurnaan Skrip Build (temp.sh)**:
+   - Menambahkan baris export USE_RBE=false tepat sebelum perintah kompilasi m shinkai -j$(nproc) agar proses build berjalan murni secara lokal menggunakan seluruh 96 core prosesor tanpa ketergantungan pada server proxy remote.
