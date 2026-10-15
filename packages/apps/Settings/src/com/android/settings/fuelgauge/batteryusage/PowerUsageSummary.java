@@ -95,9 +95,13 @@ public class PowerUsageSummary extends PowerUsageBase
 
                 @Override
                 public void onLoadFinished(Loader<List<BatteryTip>> loader, List<BatteryTip> data) {
-                    mBatteryTipPreferenceController.updateBatteryTips(data);
-                    mBatteryHeaderTextPreferenceController.updateHeaderByBatteryTips(
-                            mBatteryTipPreferenceController.getCurrentBatteryTip(), mBatteryInfo);
+                    if (mBatteryTipPreferenceController != null) {
+                        mBatteryTipPreferenceController.updateBatteryTips(data);
+                        if (mBatteryHeaderTextPreferenceController != null) {
+                            mBatteryHeaderTextPreferenceController.updateHeaderByBatteryTips(
+                                    mBatteryTipPreferenceController.getCurrentBatteryTip(), mBatteryInfo);
+                        }
+                    }
                 }
 
                 @Override
@@ -112,9 +116,11 @@ public class PowerUsageSummary extends PowerUsageBase
         mBatteryHeaderTextPreferenceController = use(BatteryHeaderTextPreferenceController.class);
 
         mBatteryTipPreferenceController = use(BatteryTipPreferenceController.class);
-        mBatteryTipPreferenceController.setActivity(activity);
-        mBatteryTipPreferenceController.setFragment(this);
-        mBatteryTipPreferenceController.setBatteryTipListener(this::onBatteryTipHandled);
+        if (mBatteryTipPreferenceController != null) {
+            mBatteryTipPreferenceController.setActivity(activity);
+            mBatteryTipPreferenceController.setFragment(this);
+            mBatteryTipPreferenceController.setBatteryTipListener(this::onBatteryTipHandled);
+        }
     }
 
     @Override
@@ -131,9 +137,13 @@ public class PowerUsageSummary extends PowerUsageBase
             restartBatteryInfoLoader();
         } else {
             // Present help preference when battery is unavailable.
-            mHelpPreference.setVisible(true);
+            if (mHelpPreference != null) {
+                mHelpPreference.setVisible(true);
+            }
         }
-        mBatteryTipPreferenceController.restoreInstanceState(icicle);
+        if (mBatteryTipPreferenceController != null) {
+            mBatteryTipPreferenceController.restoreInstanceState(icicle);
+        }
         updateBatteryTipFlag(icicle);
     }
 
@@ -243,9 +253,13 @@ public class PowerUsageSummary extends PowerUsageBase
         BatteryInfo.getBatteryInfo(
                 getContext(),
                 info -> {
-                    mBatteryHeaderTextPreferenceController.updateHeaderPreference(info);
-                    mBatteryHeaderTextPreferenceController.updateHeaderByBatteryTips(
-                            mBatteryTipPreferenceController.getCurrentBatteryTip(), info);
+                    if (mBatteryHeaderTextPreferenceController != null) {
+                        mBatteryHeaderTextPreferenceController.updateHeaderPreference(info);
+                        if (mBatteryTipPreferenceController != null) {
+                            mBatteryHeaderTextPreferenceController.updateHeaderByBatteryTips(
+                                    mBatteryTipPreferenceController.getCurrentBatteryTip(), info);
+                        }
+                    }
                     mBatteryInfo = info;
                 },
                 true);
@@ -253,13 +267,18 @@ public class PowerUsageSummary extends PowerUsageBase
 
     @VisibleForTesting
     void updateBatteryTipFlag(Bundle icicle) {
-        mNeedUpdateBatteryTip = icicle == null || mBatteryTipPreferenceController.needUpdate();
+        mNeedUpdateBatteryTip =
+                icicle == null
+                        || (mBatteryTipPreferenceController != null
+                                && mBatteryTipPreferenceController.needUpdate());
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mBatteryTipPreferenceController.saveInstanceState(outState);
+        if (mBatteryTipPreferenceController != null) {
+            mBatteryTipPreferenceController.saveInstanceState(outState);
+        }
     }
 
     @Override

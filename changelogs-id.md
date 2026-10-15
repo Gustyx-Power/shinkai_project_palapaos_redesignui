@@ -22,6 +22,7 @@ Halaman Pengaturan Baterai (`Settings -> Battery`) telah dirombak secara menyelu
 * **Eliminasi Total Sisa Elemen Pixel**:
   * Menghilangkan seluruh komponen header bawaan Google Pixel (`battery_header` ProgressBarPreference dan `battery_header_text` subtitle) serta duplikasi menu `battery_usage_summary`.
   * Pengaturan ditata rapi ke dalam kontainer kartu membulat (*grouped rounded cards*, corner radius 26dp) berbasis palet dinamis Material You Monet (`@color/settingslib_materialColorSurfaceContainer`).
+  * Penanganan dependensi pengontrol header bawaan (`BatteryHeaderTextPreferenceController` dan `BatteryTipPreferenceController`) secara aman (*null-safe*) pada `PowerUsageSummary` serta penambahan placeholder preference tak terlihat guna menjamin fragment stabil tanpa crash NullPointerException saat inisialisasi.
 
 * **Hero Overview Header**:
   * Angka persentase baterai berukuran besar dan tebal (`81%`) di sisi kiri.

@@ -22,6 +22,7 @@ The Battery settings screen (`Settings -> Battery`) has been completely overhaul
 * **Complete Elimination of Pixel Remnants**:
   * Fully removed all stock Google Pixel header elements (`battery_header` UsageProgressBarPreference and `battery_header_text` subtitle) and suppressed duplicate `battery_usage_summary` entries.
   * Replaced flat lists with One UI grouped rounded card containers (corner radius 26dp) adhering strictly to dynamic Material You Monet palette tokens (`@color/settingslib_materialColorSurfaceContainer`).
+  * Hardened controller lifecycle and null-safety guards in `PowerUsageSummary` for `BatteryHeaderTextPreferenceController` and `BatteryTipPreferenceController`, paired with invisible preference placeholders to completely eliminate NullPointerException crashes during battery loading.
 
 * **Hero Overview Header**:
   * Large and prominent bold percentage indicator (`81%`) on the left.
