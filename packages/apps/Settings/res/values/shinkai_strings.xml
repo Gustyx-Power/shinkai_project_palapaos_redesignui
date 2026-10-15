@@ -276,5 +276,23 @@
     <!-- Enhanced Power Menu -->
     <string name="enhanced_power_menu_title">Enhanced Power Menu</string>
     <string name="enhanced_power_menu_summary">Use modern Material 3 Expressive power menu with quick controls and advanced reboot (requires SystemUI restart)</string>
+
+    <!-- One UI 9 Battery Redesign Strings -->
+    <string name="oneui_battery_daily_usage">Daily usage</string>
+    <string name="oneui_battery_since_last_charge">Since last charge</string>
+    <string name="oneui_battery_last_charged_to">Last charged to 100%</string>
+    <string name="oneui_battery_stopped_charging">Stopped charging %1$s ago</string>
+    <string name="oneui_battery_this_week">This week</string>
+    <string name="oneui_battery_avg_format">%1$d Avg.</string>
+    <string name="oneui_battery_level_legend">Battery level</string>
+    <string name="oneui_battery_estimated_level_legend">Estimated battery level</string>
+    <string name="oneui_battery_estimated_power_saving_legend">Estimated level with Power saving</string>
+    <string name="oneui_battery_usage_summary_title">Battery usage: %1$s</string>
+    <string name="oneui_battery_view_details">View details</string>
+    <string name="oneui_battery_full_charge_desc">A full charge will last about %1$s</string>
+    <string name="oneui_battery_status_title">Battery status</string>
+    <string name="oneui_battery_capacity_title">Battery capacity</string>
+    <string name="oneui_battery_capacity_format">%1$d mAh (typical)</string>
+    <string name="oneui_battery_info_disclaimer">The typical capacity has been tested under third-party laboratory conditions. The typical capacity is the estimated average capacity considering the deviation in battery capacity among the battery samples tested under the IEC 61960 standard. The rated capacity is %1$d mAh. Actual battery life may vary depending on network environment, usage patterns, and other factors.</string>
 </resources>
 

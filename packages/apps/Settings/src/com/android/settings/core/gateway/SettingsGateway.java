@@ -104,6 +104,7 @@ import com.android.settings.deviceinfo.PublicVolumeSettings;
 import com.android.settings.deviceinfo.StorageDashboardFragment;
 import com.android.settings.deviceinfo.aboutphone.MyDeviceInfoFragment;
 import com.android.settings.deviceinfo.batteryinfo.BatteryInfoFragment;
+import com.android.settings.fuelgauge.batteryusage.OneUIBatteryInfoFragment;
 import com.android.settings.deviceinfo.firmwareversion.FirmwareVersionSettings;
 import com.android.settings.deviceinfo.legal.ModuleLicensesDashboard;
 import com.android.settings.display.AutoBrightnessSettings;
@@ -419,6 +420,7 @@ public class SettingsGateway {
             MeasurementSystemItemFragment.class.getName(),
             NumberingSystemLocaleListFragment.class.getName(),
             BatteryInfoFragment.class.getName(),
+            OneUIBatteryInfoFragment.class.getName(),
             UserAspectRatioDetails.class.getName(),
             ScreenTimeoutSettings.class.getName(),
             ResetNetwork.class.getName(),

@@ -146,5 +146,14 @@
     <color name="about_text_primary">@color/settingslib_materialColorOnSurface</color>
     <color name="about_text_secondary">@color/settingslib_materialColorOnSurfaceVariant</color>
     <color name="about_icon_circle_bg_color">@color/settingslib_materialColorSecondaryContainer</color>
+
+    <!-- One UI 9 Battery Colors (Dark) -->
+    <color name="oneui_battery_card_bg">#18181B</color>
+    <color name="oneui_battery_track">#2A2A2E</color>
+    <color name="oneui_battery_green">#2ED158</color>
+    <color name="oneui_battery_blue">#3B82F6</color>
+    <color name="oneui_battery_text_primary">#FFFFFF</color>
+    <color name="oneui_battery_text_secondary">#8E8E93</color>
+    <color name="oneui_battery_divider">#2A2A2E</color>
 </resources>
 
