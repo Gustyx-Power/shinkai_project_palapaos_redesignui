@@ -1185,12 +1185,13 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - Menyinkronkan seluruh catatan teknis pada changelogs.md, changelogs-id.md, dan changelogs-en.md dengan verifikasi ketat 0 emoji.
 ---
 
-## Bagian XXXV: Implementasi Fitur DT2W (Double Tap to Wake) dan DT2S (Double Tap to Sleep)
+## Bagian XXXV: Implementasi Fitur DT2W (Double Tap to Wake) dan DT2S (Double Tap to Sleep) Termasuk Area Kosong Home Launcher
 
 ### 1. Kebutuhan & Gambaran Umum
 - **Permintaan Pengguna**:
   - Menambahkan dan mengaktifkan fitur DT2W (Double Tap to Wake) dan DT2S (Double Tap to Sleep) untuk PalapaOS (POCO F5 / `marble`).
-  - Memastikan kedua fitur terintegrasi secara mulus antara driver perangkat keras layar sentuh, Power HAL, framework AOSP, SystemUI, dan Pengaturan Tampilan.
+  - Memperluas cakupan DT2S agar dapat berfungsi di seluruh layar termasuk area kosong pada Home Launcher (Workspace Launcher3 / Quickstep).
+  - Memastikan seluruh fitur terintegrasi secara mulus antara driver perangkat keras layar sentuh, Power HAL, framework AOSP, SystemUI, Launcher3, dan Pengaturan Tampilan.
   - Memastikan seluruh berkas changelog tetap mematuhi aturan ketat tanpa emoji (zero emojis).
 
 ### 2. Analisis Subsistem & Arsitektur Perangkat Keras
@@ -1203,6 +1204,7 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
 3. **Double Tap to Sleep (DT2S)**:
    - Pengontrol `QQSGestureListener.kt` menangani ketukan ganda pada status bar/QQS dan lockscreen untuk memicu pemanggilan `powerManager.goToSleep()`.
    - `NotificationPanelViewController.java` memproses ketukan ganda melalui detektor gestur ketika pengaturan `Settings.System.DOUBLE_TAP_SLEEP_GESTURE` aktif.
+   - `WorkspaceTouchListener.java` pada Launcher3 mendeteksi ketukan ganda pada area kosong workspace saat tidak ada jendela floating aktif dan memicu `PowerManager.goToSleep()`.
    - Konfigurasi `config_supportDoubleTapSleep` dan `config_dt2sGestureEnabledByDefault` mengaktifkan fitur ini secara langsung sejak awal boot.
 
 ### 3. Detail Implementasi & Modifikasi Berkas
@@ -1217,6 +1219,10 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - `res/xml/display_settings.xml`:
      * Mengaktifkan preferensi "Tap to wake" (`tap_to_wake`) secara otomatis saat `config_supportDoubleTapWake` bernilai true.
      * Mengatur nilai bawaan `android:defaultValue="true"` pada switch preferensi `double_tap_sleep_gesture` ("Tap to sleep").
-4. **Sinkronisasi Repositori Desain Antarmuka (`shinkai_project_palapaos_redesignui`)**:
-   - Menyinkronkan seluruh berkas konfigurasi XML overlay dan Settings ke repositori antarmuka PalapaOS.
+4. **Dukungan DT2S pada Home Launcher (`packages/apps/Launcher3`)**:
+   - `WorkspaceTouchListener.java`: Menambahkan override `onDoubleTap(MotionEvent e)` yang memicu `PowerManager.goToSleep()`, terikat pada pengecekan `canHandleDoubleTap()` dan switch `double_tap_sleep_gesture`.
+   - `AndroidManifest-common.xml` & `quickstep/AndroidManifest.xml`: Mendeklarasikan izin `android.permission.DEVICE_POWER`.
+   - `frameworks/base/data/etc/com.android.launcher3.xml`: Menambahkan izin `android.permission.DEVICE_POWER` ke dalam whitelist privapp untuk Launcher3.
+5. **Sinkronisasi Repositori Desain Antarmuka (`shinkai_project_palapaos_redesignui`)**:
+   - Menyinkronkan seluruh berkas konfigurasi XML overlay, Settings, dan Launcher3 ke repositori antarmuka PalapaOS.
    - Memperbarui dokumentasi changelog tanpa menyertakan karakter emoji apa pun.
