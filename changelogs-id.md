@@ -1,4 +1,5 @@
-# Log Perubahan Pembaruan Sistem: WowoOS Shinkai Project (POCO F5 / marble)
+# Log Perubahan Pembaruan Sistem: Palapa OS
+(POCO F5 / marble)
 
 Target Perangkat: POCO F5 (marble)  
 Versi Android: Android 17 (CP2A)  
