@@ -1,4 +1,5 @@
-# System Update Changelog: WowoOS Shinkai Project (POCO F5 / marble)
+# System Update Changelog: Palapa OS
+(POCO F5 / marble)
 
 Target Device: POCO F5 (marble)  
 Android Version: Android 17 (CP2A)  
