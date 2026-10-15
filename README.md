@@ -94,7 +94,7 @@ Use the provided `apply.sh` script to apply the changes automatically:
 
 1. **Navigate to the repository directory**:
    ```bash
-   cd shinkai_project_wowoos_redesignui
+   cd shinkai_project_palapaos_redesignui
    chmod +x apply.sh
    ```
 
