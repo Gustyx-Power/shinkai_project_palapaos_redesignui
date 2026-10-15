@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright (C) 2026 Wowo OS / Shinkai Project
+  Copyright (C) 2026 Palapa OS / Shinkai Project
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -16,6 +16,5 @@
   -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="@color/settingslib_materialColorSurfaceBright" />
-    <corners android:radius="24dp" />
+    <solid android:color="@color/palapa_divider_color" />
 </shape>

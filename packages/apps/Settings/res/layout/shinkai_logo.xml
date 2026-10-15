@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright (C) 2026 Wowo OS / Shinkai Project
+  Copyright (C) 2026 Palapa OS / Shinkai Project
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -27,10 +27,10 @@
     android:clickable="false">
 
     <!-- ======================================================== -->
-    <!-- CHUNK 1: Modern Wowo OS Hero Card Banner                 -->
+    <!-- CHUNK 1: Modern Palapa OS Hero Card Banner                 -->
     <!-- ======================================================== -->
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/wowo_hero_card"
+        android:id="@+id/palapa_hero_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="24dp"
@@ -42,12 +42,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/wowo_banner_card_background"
+            android:background="@drawable/palapa_banner_card_background"
             android:padding="20dp">
 
-            <!-- Top Header: 3-Second Carousel (Wowo OS & Shinkai Project) -->
+            <!-- Top Header: 3-Second Carousel (Palapa OS & Shinkai Project) -->
             <ViewFlipper
-                android:id="@+id/wowo_header_flipper"
+                android:id="@+id/palapa_header_flipper"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:flipInterval="3000"
@@ -55,7 +55,7 @@
                 android:inAnimation="@anim/shinkai_slide_in_bottom"
                 android:outAnimation="@anim/shinkai_slide_out_top">
 
-                <!-- Slide 1: Wowo OS + Kopdes Logo -->
+                <!-- Slide 1: Palapa OS + Kopdes Logo -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
                     <FrameLayout
                         android:layout_width="56dp"
                         android:layout_height="56dp"
-                        android:background="@drawable/wowo_logo_box_bg"
+                        android:background="@drawable/palapa_logo_box_bg"
                         android:padding="5dp">
 
                         <ImageView
@@ -88,7 +88,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/wowo_os_title"
+                            android:text="@string/palapa_os_title"
                             android:textSize="26sp"
                             android:fontFamily="@font/product_sans_bold"
                             android:textColor="?android:attr/textColorPrimary"
@@ -106,7 +106,7 @@
                     <FrameLayout
                         android:layout_width="56dp"
                         android:layout_height="56dp"
-                        android:background="@drawable/wowo_logo_box_bg"
+                        android:background="@drawable/palapa_logo_box_bg"
                         android:padding="8dp">
 
                         <ImageView
@@ -145,7 +145,7 @@
                 android:layout_height="1dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="14dp"
-                android:background="@drawable/wowo_divider" />
+                android:background="@drawable/palapa_divider" />
 
             <!-- Bottom Quick Stats Row (3 Modern Mini-Cards) -->
             <LinearLayout
@@ -156,12 +156,12 @@
 
                 <!-- Card 1: Android Version & Easter Egg Logo -->
                 <LinearLayout
-                    android:id="@+id/wowo_stat_android_card"
+                    android:id="@+id/palapa_stat_android_card"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginEnd="4dp"
-                    android:background="@drawable/wowo_stat_box_bg"
+                    android:background="@drawable/palapa_stat_box_bg"
                     android:foreground="?android:attr/selectableItemBackground"
                     android:orientation="vertical"
                     android:gravity="center"
@@ -173,7 +173,7 @@
                     android:focusable="true">
 
                     <ImageView
-                        android:id="@+id/wowo_stat_android_logo"
+                        android:id="@+id/palapa_stat_android_logo"
                         android:layout_width="34dp"
                         android:layout_height="34dp"
                         android:src="@drawable/ic_android_17_platlogo"
@@ -184,14 +184,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="@string/wowo_stat_os_label"
+                        android:text="@string/palapa_stat_os_label"
                         android:textSize="10sp"
                         android:textColor="?android:attr/textColorSecondary"
                         android:fontFamily="@font/product_sans_bold"
                         android:includeFontPadding="false" />
 
                     <TextView
-                        android:id="@+id/wowo_stat_android_version"
+                        android:id="@+id/palapa_stat_android_version"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
@@ -204,12 +204,12 @@
 
                 <!-- Card 3: Device -->
                 <LinearLayout
-                    android:id="@+id/wowo_stat_device_card"
+                    android:id="@+id/palapa_stat_device_card"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="4dp"
-                    android:background="@drawable/wowo_stat_box_bg"
+                    android:background="@drawable/palapa_stat_box_bg"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:paddingTop="12dp"
@@ -230,14 +230,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="@string/wowo_stat_device_label"
+                        android:text="@string/palapa_stat_device_label"
                         android:textSize="10sp"
                         android:textColor="?android:attr/textColorSecondary"
                         android:fontFamily="@font/product_sans_bold"
                         android:includeFontPadding="false" />
 
                     <TextView
-                        android:id="@+id/wowo_stat_device_name"
+                        android:id="@+id/palapa_stat_device_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
@@ -254,11 +254,11 @@
 
             <!-- Modern Shinkai Project Credit Bar (Based By Shinkai Project) -->
             <LinearLayout
-                android:id="@+id/wowo_shinkai_credit_bar"
+                android:id="@+id/palapa_shinkai_credit_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
-                android:background="@drawable/wowo_shinkai_credit_bg"
+                android:background="@drawable/palapa_shinkai_credit_bg"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:paddingStart="12dp"
@@ -273,7 +273,7 @@
                 <FrameLayout
                     android:layout_width="26dp"
                     android:layout_height="26dp"
-                    android:background="@drawable/wowo_shinkai_icon_circle_bg"
+                    android:background="@drawable/palapa_shinkai_icon_circle_bg"
                     android:padding="4dp">
 
                     <ImageView
@@ -292,7 +292,7 @@
                     android:layout_weight="1"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="6dp"
-                    android:text="@string/wowo_based_shinkai_project"
+                    android:text="@string/palapa_based_shinkai_project"
                     android:textSize="12sp"
                     android:fontFamily="@font/product_sans_bold"
                     android:textColor="?android:attr/textColorPrimary"
@@ -302,12 +302,12 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/wowo_hashtag_badge_bg"
+                    android:background="@drawable/palapa_hashtag_badge_bg"
                     android:paddingStart="9dp"
                     android:paddingEnd="9dp"
                     android:paddingTop="4dp"
                     android:paddingBottom="4dp"
-                    android:text="@string/wowo_shinkai_hashtag"
+                    android:text="@string/palapa_shinkai_hashtag"
                     android:textSize="11sp"
                     android:fontFamily="@font/product_sans_bold"
                     android:textColor="@color/settingslib_materialColorOnPrimaryContainer"
@@ -323,7 +323,7 @@
     <!-- CHUNK 2: Sistem & Keamanan (Core OS & Security Chunk)    -->
     <!-- ======================================================== -->
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/wowo_chunk_system"
+        android:id="@+id/palapa_chunk_system"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
@@ -353,13 +353,13 @@
                 <FrameLayout
                     android:layout_width="16dp"
                     android:layout_height="11dp"
-                    android:background="@drawable/wowo_mini_indonesia_flag" />
+                    android:background="@drawable/palapa_mini_indonesia_flag" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="@string/wowo_chunk_system_title"
+                    android:text="@string/palapa_chunk_system_title"
                     android:textSize="12sp"
                     android:fontFamily="@font/product_sans_bold"
                     android:textAllCaps="true"
@@ -370,7 +370,7 @@
 
             <!-- 1. Versi Android -->
             <LinearLayout
-                android:id="@+id/wowo_row_android_version"
+                android:id="@+id/palapa_row_android_version"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -386,7 +386,7 @@
                 <FrameLayout
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:background="@drawable/wowo_icon_box_bg">
+                    android:background="@drawable/palapa_icon_box_bg">
 
                     <ImageView
                         android:layout_width="26dp"
@@ -413,7 +413,7 @@
                         android:includeFontPadding="false" />
 
                     <TextView
-                        android:id="@+id/wowo_val_android_version"
+                        android:id="@+id/palapa_val_android_version"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
@@ -430,11 +430,11 @@
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
                 android:layout_marginEnd="18dp"
-                android:background="@drawable/wowo_divider" />
+                android:background="@drawable/palapa_divider" />
 
             <!-- 2. Versi Shinkai -->
             <LinearLayout
-                android:id="@+id/wowo_row_shinkai_version"
+                android:id="@+id/palapa_row_shinkai_version"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -450,7 +450,7 @@
                 <FrameLayout
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:background="@drawable/wowo_icon_box_bg">
+                    android:background="@drawable/palapa_icon_box_bg">
 
                     <ImageView
                         android:layout_width="20dp"
@@ -478,7 +478,7 @@
                         android:includeFontPadding="false" />
 
                     <TextView
-                        android:id="@+id/wowo_val_shinkai_version"
+                        android:id="@+id/palapa_val_shinkai_version"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
@@ -495,11 +495,11 @@
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
                 android:layout_marginEnd="18dp"
-                android:background="@drawable/wowo_divider" />
+                android:background="@drawable/palapa_divider" />
 
-            <!-- 3. Versi Wowo OS -->
+            <!-- 3. Versi Palapa OS -->
             <LinearLayout
-                android:id="@+id/wowo_row_wowo_version"
+                android:id="@+id/palapa_row_palapa_version"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -515,7 +515,7 @@
                 <FrameLayout
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:background="@drawable/wowo_icon_box_bg">
+                    android:background="@drawable/palapa_icon_box_bg">
 
                     <ImageView
                         android:layout_width="22dp"
@@ -536,14 +536,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/wowo_os_version"
+                        android:text="@string/palapa_os_version"
                         android:textSize="12.5sp"
                         android:fontFamily="sans-serif-medium"
                         android:textColor="?android:attr/textColorSecondary"
                         android:includeFontPadding="false" />
 
                     <TextView
-                        android:id="@+id/wowo_val_wowo_version"
+                        android:id="@+id/palapa_val_palapa_version"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
@@ -560,11 +560,11 @@
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
                 android:layout_marginEnd="18dp"
-                android:background="@drawable/wowo_divider" />
+                android:background="@drawable/palapa_divider" />
 
             <!-- 3. Update Keamanan Android -->
             <LinearLayout
-                android:id="@+id/wowo_row_security_patch"
+                android:id="@+id/palapa_row_security_patch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -580,7 +580,7 @@
                 <FrameLayout
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:background="@drawable/wowo_icon_box_bg">
+                    android:background="@drawable/palapa_icon_box_bg">
 
                     <ImageView
                         android:layout_width="22dp"
@@ -608,7 +608,7 @@
                         android:includeFontPadding="false" />
 
                     <TextView
-                        android:id="@+id/wowo_val_security_patch"
+                        android:id="@+id/palapa_val_security_patch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
@@ -626,11 +626,11 @@
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
                 android:layout_marginEnd="18dp"
-                android:background="@drawable/wowo_divider" />
+                android:background="@drawable/palapa_divider" />
 
             <!-- 4. Maintainer Source Row (Static: SkyyVerse & kylieeXD) -->
             <LinearLayout
-                android:id="@+id/wowo_row_maintainer_source"
+                android:id="@+id/palapa_row_maintainer_source"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -646,13 +646,13 @@
                 <FrameLayout
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:background="@drawable/wowo_icon_box_bg">
+                    android:background="@drawable/palapa_icon_box_bg">
 
                     <ImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_wowo_maintainer_source"
+                        android:src="@drawable/ic_palapa_maintainer_source"
                         android:tint="@color/shinkai_logo_accent"
                         app:tint="@color/shinkai_logo_accent"
                         android:contentDescription="@null" />
@@ -675,7 +675,7 @@
                         android:includeFontPadding="false" />
 
                     <TextView
-                        android:id="@+id/wowo_val_maintainer_source"
+                        android:id="@+id/palapa_val_maintainer_source"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
@@ -693,11 +693,11 @@
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
                 android:layout_marginEnd="18dp"
-                android:background="@drawable/wowo_divider" />
+                android:background="@drawable/palapa_divider" />
 
             <!-- 5. Maintainer Device Row (From Prop: Pavelc4) -->
             <LinearLayout
-                android:id="@+id/wowo_row_maintainer"
+                android:id="@+id/palapa_row_maintainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -713,13 +713,13 @@
                 <FrameLayout
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:background="@drawable/wowo_icon_box_bg">
+                    android:background="@drawable/palapa_icon_box_bg">
 
                     <ImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_wowo_maintainer_device"
+                        android:src="@drawable/ic_palapa_maintainer_device"
                         android:tint="@color/shinkai_logo_accent"
                         app:tint="@color/shinkai_logo_accent"
                         android:contentDescription="@null" />
@@ -742,7 +742,7 @@
                         android:includeFontPadding="false" />
 
                     <TextView
-                        android:id="@+id/wowo_val_maintainer"
+                        android:id="@+id/palapa_val_maintainer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
@@ -763,7 +763,7 @@
     <!-- CHUNK 4: Kernel & Perangkat Keras (Kernel & Radio Chunk) -->
     <!-- ======================================================== -->
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/wowo_chunk_hardware"
+        android:id="@+id/palapa_chunk_hardware"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
@@ -787,7 +787,7 @@
                 android:layout_marginEnd="18dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="4dp"
-                android:text="@string/wowo_chunk_hardware_title"
+                android:text="@string/palapa_chunk_hardware_title"
                 android:textSize="12sp"
                 android:fontFamily="@font/product_sans_bold"
                 android:textAllCaps="true"
@@ -797,7 +797,7 @@
 
             <!-- Versi Kernel -->
             <LinearLayout
-                android:id="@+id/wowo_row_kernel"
+                android:id="@+id/palapa_row_kernel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -813,7 +813,7 @@
                 <FrameLayout
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:background="@drawable/wowo_icon_box_bg">
+                    android:background="@drawable/palapa_icon_box_bg">
 
                     <ImageView
                         android:layout_width="22dp"
@@ -841,7 +841,7 @@
                         android:includeFontPadding="false" />
 
                     <TextView
-                        android:id="@+id/wowo_val_kernel"
+                        android:id="@+id/palapa_val_kernel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
@@ -858,11 +858,11 @@
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
                 android:layout_marginEnd="18dp"
-                android:background="@drawable/wowo_divider" />
+                android:background="@drawable/palapa_divider" />
 
             <!-- Versi Pita Basis (Baseband) -->
             <LinearLayout
-                android:id="@+id/wowo_row_baseband"
+                android:id="@+id/palapa_row_baseband"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -878,7 +878,7 @@
                 <FrameLayout
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:background="@drawable/wowo_icon_box_bg">
+                    android:background="@drawable/palapa_icon_box_bg">
 
                     <ImageView
                         android:layout_width="22dp"
@@ -906,7 +906,7 @@
                         android:includeFontPadding="false" />
 
                     <TextView
-                        android:id="@+id/wowo_val_baseband"
+                        android:id="@+id/palapa_val_baseband"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
@@ -926,7 +926,7 @@
     <!-- CHUNK 5: Info Build Card                                 -->
     <!-- ======================================================== -->
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/wowo_chunk_build"
+        android:id="@+id/palapa_chunk_build"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
@@ -936,7 +936,7 @@
         app:cardBackgroundColor="@color/about_card_bg">
 
         <LinearLayout
-            android:id="@+id/wowo_row_build_number"
+            android:id="@+id/palapa_row_build_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -952,7 +952,7 @@
             <FrameLayout
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:background="@drawable/wowo_icon_box_bg">
+                android:background="@drawable/palapa_icon_box_bg">
 
                 <ImageView
                     android:layout_width="22dp"
@@ -980,7 +980,7 @@
                     android:includeFontPadding="false" />
 
                 <TextView
-                    android:id="@+id/wowo_val_build_number"
+                    android:id="@+id/palapa_val_build_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"

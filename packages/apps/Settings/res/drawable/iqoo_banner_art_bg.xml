@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright (C) 2026 Wowo OS / Shinkai Project
-  Wowo OS 19jt - Merah Putih Edition
+  Copyright (C) 2026 Palapa OS / Shinkai Project
+  Palapa OS - Merah Putih Edition
   -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Layer 1: Frame / Border Merah Putih (Gradient: Merah di atas, Putih di bawah) -->

@@ -21,7 +21,7 @@
     android:title="@string/firmware_version"
     settings:keywords="@string/keywords_android_version">
 
-    <!-- Shinkai Prjkt logo / Wowo OS Hero & Specs Dashboard -->
+    <!-- Shinkai Prjkt logo / Palapa OS Hero & Specs Dashboard -->
     <com.android.settingslib.widget.LayoutPreference
         android:key="shinkai_logo"
         android:layout="@layout/shinkai_logo"

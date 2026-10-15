@@ -1129,4 +1129,58 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
 5. **Render & Integrasi Logo Satelit Palapa**:
    - Mengonversi kode vektor SVG Satelit Palapa ke format aset raster resolusi tinggi (512 x 512 piksel, RGBA transparan) menggunakan ImageMagick.
    - Menggantikan packages/apps/Settings/res/drawable-nodpi/kopdes.png dan menambahkan palapa_logo.png dengan logo baru Satelit Palapa.
+---
+
+## Bagian XXXIV: Pembersihan Total Pengenal Internal Warisan (wowo_ Menjadi palapa_), Refaktor Sumber Daya XML/Kotlin, dan Sinkronisasi Dokumentasi README
+
+### 1. Kebutuhan & Gambaran Umum
+- **Permintaan Pengguna**:
+  - Mengubah seluruh pengenal internal (resource ID, nama string, nama warna, nama berkas drawable) dari prefix warisan wowo_ menjadi palapa_ pada seluruh kode sumber Settings dan SystemUI.
+  - Memperbarui dokumentasi changelogs-id, changelogs-en, dan README.md agar merefleksikan identitas resmi PalapaOS (Edisi Majapahit).
+  - Memastikan seluruh berkas changelog tetap mempertahankan aturan ketat tanpa emoji (zero emojis).
+
+### 2. Detail Implementasi
+1. **Refaktor Berkas Drawable Antarmuka (res/drawable)**:
+   - Mengubah nama 14 berkas aset visual dari prefix wowo_ menjadi palapa_:
+     * wowo_badge_edition_bg.xml -> palapa_badge_edition_bg.xml
+     * wowo_badge_sub_bg.xml -> palapa_badge_sub_bg.xml
+     * wowo_banner_card_background.xml -> palapa_banner_card_background.xml
+     * wowo_card_flag_border.xml -> palapa_card_flag_border.xml
+     * wowo_divider.xml -> palapa_divider.xml
+     * wowo_hashtag_badge_bg.xml -> palapa_hashtag_badge_bg.xml
+     * wowo_icon_box_bg.xml -> palapa_icon_box_bg.xml
+     * wowo_logo_box_bg.xml -> palapa_logo_box_bg.xml
+     * wowo_mini_indonesia_flag.xml -> palapa_mini_indonesia_flag.xml
+     * wowo_shinkai_credit_bg.xml -> palapa_shinkai_credit_bg.xml
+     * wowo_shinkai_icon_circle_bg.xml -> palapa_shinkai_icon_circle_bg.xml
+     * wowo_stat_box_bg.xml -> palapa_stat_box_bg.xml
+     * ic_wowo_maintainer_device.xml -> ic_palapa_maintainer_device.xml
+     * ic_wowo_maintainer_source.xml -> ic_palapa_maintainer_source.xml
+   - Memperbarui referensi internal di dalam berkas drawable tersebut ke skema palapa_ (misal: @color/palapa_banner_bg).
+2. **Refaktor ID Tata Letak dan XML Layout (res/layout/shinkai_logo.xml & settings_homepage_container.xml)**:
+   - Mengubah seluruh ID komponen tampilan dari wowo_* menjadi palapa_*:
+     * palapa_hero_card, palapa_header_flipper, palapa_banner_os_title, palapa_banner_edition_badge, palapa_banner_official_badge
+     * palapa_stats_row, palapa_stat_android_card, palapa_stat_android_version, palapa_stat_device_card, palapa_stat_device_name, palapa_shinkai_credit_bar
+     * palapa_chunk_system, palapa_row_android_version, palapa_val_android_version, palapa_row_shinkai_version, palapa_val_shinkai_version
+     * palapa_row_palapa_version, palapa_val_palapa_version, palapa_row_security_patch, palapa_val_security_patch
+     * palapa_row_maintainer_source, palapa_val_maintainer_source, palapa_row_maintainer, palapa_val_maintainer
+     * palapa_chunk_hardware, palapa_row_kernel, palapa_val_kernel, palapa_row_baseband, palapa_val_baseband
+     * palapa_chunk_build, palapa_row_build_number, palapa_val_build_number
+   - Memperbarui string glance beranda menjadi @string/home_glance_palapa_edition.
+3. **Penyelarasan Sumber Daya String dan Warna (res/values & res/values-in & res/values-night)**:
+   - Memperbarui seluruh nama kunci string pada shinkai_strings.xml:
+     * palapa_os_title, palapa_os_version, palapa_edition_badge_text, palapa_version_edition, palapa_official_badge
+     * palapa_stat_os_label, palapa_stat_edition_label, palapa_stat_device_label, palapa_system_specs_title, palapa_copied_toast
+     * palapa_based_shinkai_project, palapa_shinkai_hashtag, home_glance_palapa_edition, palapa_chunk_system_title, palapa_chunk_hardware_title
+   - Memperbarui seluruh token warna pada colors.xml dan values-night/colors.xml:
+     * palapa_banner_bg, palapa_card_stroke, palapa_logo_container_bg, palapa_logo_container_stroke
+     * palapa_edition_badge_bg, palapa_edition_badge_stroke, palapa_chip_bg, palapa_stat_box_bg, palapa_divider_color
+4. **Pembaruan Kode Sumber Kotlin & Java Controllers**:
+   - ShinkaiLogoPreference.kt: Menghubungkan seluruh binding tampilan ke R.id.palapa_* dan R.string.palapa_*.
+   - ShinkaiVersionPreference.kt: Mengarahkan pengambilan properti sistem ke KEY_PALAPA_EDITION (ro.palapa.edition) dengan fallback mundur yang aman ke KEY_LEGACY_EDITION (ro.wowo.edition).
+   - AboutPhoneDashboardPreferenceController.kt: Memperbarui penanganan nama Palapa OS dan versi Majapahit.
+   - Memperbarui komentar lisensi pada 58 berkas pengontrol antarmuka menjadi Copyright (C) 2026 Palapa OS / Shinkai Project.
+5. **Sinkronisasi Dokumentasi dan README.md**:
+   - Memperbarui README.md pada judul utama dan ringkasan implementasi menjadi Shinkai Project - PalapaOS Redesign UI (POCO F5 & Generic Android 17).
+   - Menyinkronkan seluruh catatan teknis pada changelogs.md, changelogs-id.md, dan changelogs-en.md dengan verifikasi ketat 0 emoji.
 

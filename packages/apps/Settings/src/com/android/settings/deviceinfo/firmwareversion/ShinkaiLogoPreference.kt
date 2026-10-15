@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2026 Wowo OS / Shinkai Project
+ * Copyright (C) 2026 Palapa OS / Shinkai Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,8 +69,8 @@ class ShinkaiLogoPreference : PreferenceMetadata, PreferenceBinding {
 
         // Top Hero Card Stats
         val androidVer = Build.VERSION.RELEASE_OR_PREVIEW_DISPLAY
-        layoutPreference.findViewById<TextView>(R.id.wowo_stat_android_version)?.text = androidVer
-        layoutPreference.findViewById<View>(R.id.wowo_stat_android_card)?.setOnClickListener { v ->
+        layoutPreference.findViewById<TextView>(R.id.palapa_stat_android_version)?.text = androidVer
+        layoutPreference.findViewById<View>(R.id.palapa_stat_android_card)?.setOnClickListener { v ->
             val ctx = v.context
             if (Utils.isMonkeyRunning()) return@setOnClickListener
             try {
@@ -92,14 +92,14 @@ class ShinkaiLogoPreference : PreferenceMetadata, PreferenceBinding {
         } else {
             "Marble"
         }
-        layoutPreference.findViewById<TextView>(R.id.wowo_stat_device_name)?.text = deviceName
-        layoutPreference.findViewById<View>(R.id.wowo_shinkai_credit_bar)?.setOnClickListener { v ->
+        layoutPreference.findViewById<TextView>(R.id.palapa_stat_device_name)?.text = deviceName
+        layoutPreference.findViewById<View>(R.id.palapa_shinkai_credit_bar)?.setOnClickListener { v ->
             Toast.makeText(v.context, "Shinkai Project • #ShinkaiProjectOnTop!", Toast.LENGTH_SHORT).show()
         }
 
         // 1. Versi Android Row
-        layoutPreference.findViewById<TextView>(R.id.wowo_val_android_version)?.text = androidVer
-        layoutPreference.findViewById<View>(R.id.wowo_row_android_version)?.setOnClickListener { v ->
+        layoutPreference.findViewById<TextView>(R.id.palapa_val_android_version)?.text = androidVer
+        layoutPreference.findViewById<View>(R.id.palapa_row_android_version)?.setOnClickListener { v ->
             val ctx = v.context
             if (Utils.isMonkeyRunning()) return@setOnClickListener
             for (i in 1 until hits.size) hits[i - 1] = hits[i]
@@ -115,7 +115,7 @@ class ShinkaiLogoPreference : PreferenceMetadata, PreferenceBinding {
                 }
             }
         }
-        layoutPreference.findViewById<View>(R.id.wowo_row_android_version)?.setOnLongClickListener { v ->
+        layoutPreference.findViewById<View>(R.id.palapa_row_android_version)?.setOnLongClickListener { v ->
             copyToClipboard(v.context, context.getString(R.string.firmware_version), androidVer)
             true
         }
@@ -127,22 +127,22 @@ class ShinkaiLogoPreference : PreferenceMetadata, PreferenceBinding {
         } else {
             "heptakaideka-marble-20260921-2138"
         }
-        layoutPreference.findViewById<TextView>(R.id.wowo_val_shinkai_version)?.text = shinkaiVerDisplay
-        layoutPreference.findViewById<View>(R.id.wowo_row_shinkai_version)?.setOnClickListener { v ->
+        layoutPreference.findViewById<TextView>(R.id.palapa_val_shinkai_version)?.text = shinkaiVerDisplay
+        layoutPreference.findViewById<View>(R.id.palapa_row_shinkai_version)?.setOnClickListener { v ->
             copyToClipboard(v.context, context.getString(R.string.shinkai_version), shinkaiVerDisplay)
         }
 
         // 3. Versi Palapa OS Row (Majapahit)
         val palapaVerDisplay = SystemProperties.get("ro.palapa.os.version", SystemProperties.get("ro.wowo.os.version", "Majapahit"))
-        layoutPreference.findViewById<TextView>(R.id.wowo_val_wowo_version)?.text = palapaVerDisplay
-        layoutPreference.findViewById<View>(R.id.wowo_row_wowo_version)?.setOnClickListener { v ->
-            copyToClipboard(v.context, context.getString(R.string.wowo_os_version), palapaVerDisplay)
+        layoutPreference.findViewById<TextView>(R.id.palapa_val_palapa_version)?.text = palapaVerDisplay
+        layoutPreference.findViewById<View>(R.id.palapa_row_palapa_version)?.setOnClickListener { v ->
+            copyToClipboard(v.context, context.getString(R.string.palapa_os_version), palapaVerDisplay)
         }
 
         // 3. Update Keamanan Android Row
         val patch = DeviceInfoUtils.getSecurityPatch(context.getLocale()) ?: Build.VERSION.SECURITY_PATCH
-        layoutPreference.findViewById<TextView>(R.id.wowo_val_security_patch)?.text = patch
-        layoutPreference.findViewById<View>(R.id.wowo_row_security_patch)?.setOnClickListener { v ->
+        layoutPreference.findViewById<TextView>(R.id.palapa_val_security_patch)?.text = patch
+        layoutPreference.findViewById<View>(R.id.palapa_row_security_patch)?.setOnClickListener { v ->
             try {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://source.android.com/docs/security/bulletin/"))
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -151,13 +151,13 @@ class ShinkaiLogoPreference : PreferenceMetadata, PreferenceBinding {
                 copyToClipboard(v.context, context.getString(R.string.security_patch), patch)
             }
         }
-        layoutPreference.findViewById<View>(R.id.wowo_row_security_patch)?.setOnLongClickListener { v ->
+        layoutPreference.findViewById<View>(R.id.palapa_row_security_patch)?.setOnLongClickListener { v ->
             copyToClipboard(v.context, context.getString(R.string.security_patch), patch)
             true
         }
 
         // 4. Maintainer Source Row (Static: SkyyVerse & kylieeXD)
-        layoutPreference.findViewById<View>(R.id.wowo_row_maintainer_source)?.setOnClickListener { v ->
+        layoutPreference.findViewById<View>(R.id.palapa_row_maintainer_source)?.setOnClickListener { v ->
             copyToClipboard(v.context, context.getString(R.string.shinkai_maintainer_source), "SkyyVerse & kylieeXD")
         }
 
@@ -168,35 +168,35 @@ class ShinkaiLogoPreference : PreferenceMetadata, PreferenceBinding {
         } else {
             rawMaintainer.replace("_", " ")
         }
-        layoutPreference.findViewById<TextView>(R.id.wowo_val_maintainer)?.text = maintainer
-        layoutPreference.findViewById<View>(R.id.wowo_row_maintainer)?.setOnClickListener { v ->
+        layoutPreference.findViewById<TextView>(R.id.palapa_val_maintainer)?.text = maintainer
+        layoutPreference.findViewById<View>(R.id.palapa_row_maintainer)?.setOnClickListener { v ->
             copyToClipboard(v.context, context.getString(R.string.shinkai_maintainer), maintainer)
         }
 
         // 5. Versi Pita Basis (Baseband) Row
         val basebandRaw = SystemProperties.get("gsm.version.baseband", context.getString(R.string.device_info_default))
         val baseband = basebandRaw.split(",").firstOrNull { it.isNotEmpty() } ?: basebandRaw
-        layoutPreference.findViewById<TextView>(R.id.wowo_val_baseband)?.text = baseband
-        layoutPreference.findViewById<View>(R.id.wowo_row_baseband)?.setOnClickListener { v ->
+        layoutPreference.findViewById<TextView>(R.id.palapa_val_baseband)?.text = baseband
+        layoutPreference.findViewById<View>(R.id.palapa_row_baseband)?.setOnClickListener { v ->
             copyToClipboard(v.context, context.getString(R.string.baseband_version), baseband)
         }
 
         // 6. Versi Kernel Row
         val kernel = DeviceInfoUtils.getFormattedKernelVersion(context) ?: "Unknown"
-        layoutPreference.findViewById<TextView>(R.id.wowo_val_kernel)?.text = kernel
-        layoutPreference.findViewById<View>(R.id.wowo_row_kernel)?.setOnClickListener { v ->
+        layoutPreference.findViewById<TextView>(R.id.palapa_val_kernel)?.text = kernel
+        layoutPreference.findViewById<View>(R.id.palapa_row_kernel)?.setOnClickListener { v ->
             copyToClipboard(v.context, context.getString(R.string.kernel_version), kernel)
         }
 
         // 7. Nomor Build Row - 7 ketukan untuk membuka Opsi Pengembang (Developer Options)
         val isRtl = context.resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
         val buildNumber = BidiFormatter.getInstance(isRtl).unicodeWrap(Build.DISPLAY)
-        layoutPreference.findViewById<TextView>(R.id.wowo_val_build_number)?.text = buildNumber
+        layoutPreference.findViewById<TextView>(R.id.palapa_val_build_number)?.text = buildNumber
 
         var devHitCountdown = if (DevelopmentSettingsEnabler.isDevelopmentSettingsEnabled(context)) -1 else 7
         var devToast: Toast? = null
 
-        layoutPreference.findViewById<View>(R.id.wowo_row_build_number)?.setOnClickListener { v ->
+        layoutPreference.findViewById<View>(R.id.palapa_row_build_number)?.setOnClickListener { v ->
             val ctx = v.context
             if (DevelopmentSettingsEnabler.isDevelopmentSettingsEnabled(ctx)) {
                 devToast?.cancel()
@@ -224,7 +224,7 @@ class ShinkaiLogoPreference : PreferenceMetadata, PreferenceBinding {
                 }
             }
         }
-        layoutPreference.findViewById<View>(R.id.wowo_row_build_number)?.setOnLongClickListener { v ->
+        layoutPreference.findViewById<View>(R.id.palapa_row_build_number)?.setOnLongClickListener { v ->
             copyToClipboard(v.context, context.getString(R.string.build_number), buildNumber.toString())
             true
         }
@@ -234,7 +234,7 @@ class ShinkaiLogoPreference : PreferenceMetadata, PreferenceBinding {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
         val clip = ClipData.newPlainText(label, text)
         clipboard?.setPrimaryClip(clip)
-        val msg = context.getString(R.string.wowo_copied_toast, label)
+        val msg = context.getString(R.string.palapa_copied_toast, label)
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
 }

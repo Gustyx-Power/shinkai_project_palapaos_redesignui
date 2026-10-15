@@ -1129,4 +1129,58 @@ During testing and review sessions, several core interface discrepancies and sub
 5. **Palapa Satellite Logo Rendering & Integration**:
    - Rendered the Palapa Satellite SVG into high-resolution transparent raster assets (512 x 512 pixels, 16-bit RGBA) using ImageMagick.
    - Replaced packages/apps/Settings/res/drawable-nodpi/kopdes.png and added palapa_logo.png with the new Palapa Satellite emblem.
+---
+
+## Section XXXIV: Complete Purge of Legacy Internal Identifiers (wowo_ to palapa_), XML/Kotlin Resource Refactoring, and README Documentation Synchronization
+
+### 1. Requirements & Overview
+- **User Request**:
+  - Rename all internal identifiers (resource IDs, string names, color tokens, drawable filenames) from legacy prefix wowo_ to palapa_ across Settings and SystemUI codebases.
+  - Update changelogs-id, changelogs-en, and README.md documentation to reflect the official PalapaOS (Majapahit Edition) identity.
+  - Ensure all changelog files strictly adhere to the zero emojis policy.
+
+### 2. Implementation Details
+1. **Interface Drawable Asset Refactoring (res/drawable)**:
+   - Renamed 14 visual asset files from prefix wowo_ to palapa_:
+     * wowo_badge_edition_bg.xml -> palapa_badge_edition_bg.xml
+     * wowo_badge_sub_bg.xml -> palapa_badge_sub_bg.xml
+     * wowo_banner_card_background.xml -> palapa_banner_card_background.xml
+     * wowo_card_flag_border.xml -> palapa_card_flag_border.xml
+     * wowo_divider.xml -> palapa_divider.xml
+     * wowo_hashtag_badge_bg.xml -> palapa_hashtag_badge_bg.xml
+     * wowo_icon_box_bg.xml -> palapa_icon_box_bg.xml
+     * wowo_logo_box_bg.xml -> palapa_logo_box_bg.xml
+     * wowo_mini_indonesia_flag.xml -> palapa_mini_indonesia_flag.xml
+     * wowo_shinkai_credit_bg.xml -> palapa_shinkai_credit_bg.xml
+     * wowo_shinkai_icon_circle_bg.xml -> palapa_shinkai_icon_circle_bg.xml
+     * wowo_stat_box_bg.xml -> palapa_stat_box_bg.xml
+     * ic_wowo_maintainer_device.xml -> ic_palapa_maintainer_device.xml
+     * ic_wowo_maintainer_source.xml -> ic_palapa_maintainer_source.xml
+   - Updated internal color references inside these drawable files to the palapa_ scheme (e.g. @color/palapa_banner_bg).
+2. **Layout IDs and XML View Hierarchy Refactoring (res/layout/shinkai_logo.xml & settings_homepage_container.xml)**:
+   - Renamed all view component IDs from wowo_* to palapa_*:
+     * palapa_hero_card, palapa_header_flipper, palapa_banner_os_title, palapa_banner_edition_badge, palapa_banner_official_badge
+     * palapa_stats_row, palapa_stat_android_card, palapa_stat_android_version, palapa_stat_device_card, palapa_stat_device_name, palapa_shinkai_credit_bar
+     * palapa_chunk_system, palapa_row_android_version, palapa_val_android_version, palapa_row_shinkai_version, palapa_val_shinkai_version
+     * palapa_row_palapa_version, palapa_val_palapa_version, palapa_row_security_patch, palapa_val_security_patch
+     * palapa_row_maintainer_source, palapa_val_maintainer_source, palapa_row_maintainer, palapa_val_maintainer
+     * palapa_chunk_hardware, palapa_row_kernel, palapa_val_kernel, palapa_row_baseband, palapa_val_baseband
+     * palapa_chunk_build, palapa_row_build_number, palapa_val_build_number
+   - Updated homepage glance string reference to @string/home_glance_palapa_edition.
+3. **String Resources and Color Token Harmonization (res/values & res/values-in & res/values-night)**:
+   - Updated all string resource keys in shinkai_strings.xml:
+     * palapa_os_title, palapa_os_version, palapa_edition_badge_text, palapa_version_edition, palapa_official_badge
+     * palapa_stat_os_label, palapa_stat_edition_label, palapa_stat_device_label, palapa_system_specs_title, palapa_copied_toast
+     * palapa_based_shinkai_project, palapa_shinkai_hashtag, home_glance_palapa_edition, palapa_chunk_system_title, palapa_chunk_hardware_title
+   - Updated all color tokens in colors.xml and values-night/colors.xml:
+     * palapa_banner_bg, palapa_card_stroke, palapa_logo_container_bg, palapa_logo_container_stroke
+     * palapa_edition_badge_bg, palapa_edition_badge_stroke, palapa_chip_bg, palapa_stat_box_bg, palapa_divider_color
+4. **Kotlin & Java Source Controllers Refactoring**:
+   - ShinkaiLogoPreference.kt: Bound all view lookups to R.id.palapa_* and string resources to R.string.palapa_*.
+   - ShinkaiVersionPreference.kt: Pointed primary system property reading to KEY_PALAPA_EDITION (ro.palapa.edition) with a safe backwards-compatible fallback to KEY_LEGACY_EDITION (ro.wowo.edition).
+   - AboutPhoneDashboardPreferenceController.kt: Updated runtime display logic to present Palapa OS and Majapahit Edition.
+   - Refactored copyright header notices across 58 UI controller files to Copyright (C) 2026 Palapa OS / Shinkai Project.
+5. **Documentation and README.md Synchronization**:
+   - Synchronized README.md header and feature overview to Shinkai Project - PalapaOS Redesign UI (POCO F5 & Generic Android 17).
+   - Synchronized all engineering and technical entries across changelogs.md, changelogs-id.md, and changelogs-en.md under strict zero emoji validation.
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2026 Wowo OS / Shinkai Project
+ * Copyright (C) 2026 Palapa OS / Shinkai Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -388,7 +388,7 @@ class AboutPhoneDashboardPreferenceController(context: Context, key: String) :
                 val padH = (16 * density).toInt()
                 val padV = (12 * density).toInt()
                 setPadding(padH, padV, padH, padV)
-                background = dialogContext.getDrawable(R.drawable.wowo_stat_box_bg)
+                background = dialogContext.getDrawable(R.drawable.palapa_stat_box_bg)
                 setTextColor(Utils.getColorAttr(dialogContext, android.R.attr.textColorPrimary))
                 setHintTextColor(Utils.getColorAttr(dialogContext, android.R.attr.textColorSecondary))
             }

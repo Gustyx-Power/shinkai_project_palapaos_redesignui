@@ -1,6 +1,6 @@
-# Shinkai Project - WowoOS Redesign UI (POCO F5 & Generic Android 17)
+# Shinkai Project - PalapaOS Redesign UI (POCO F5 & Generic Android 17)
 
-This repository contains the complete user interface source code, XML layouts, drawable assets, kernel scripts, and system configurations for the One UI 9-inspired redesign and interactive Dynamic Island implemented for Shinkai Project / WowoOS on Android 17 (POCO F5 / marble and generic AOSP devices).
+This repository contains the complete user interface source code, XML layouts, drawable assets, kernel scripts, and system configurations for the One UI 9-inspired redesign and interactive Dynamic Island implemented for Shinkai Project / PalapaOS (Majapahit Edition) on Android 17 (POCO F5 / marble and generic AOSP devices).
 
 ---
 

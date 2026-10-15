@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2026 Wowo OS / Shinkai Project
+ * Copyright (C) 2026 Palapa OS / Shinkai Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ class ShinkaiVersionPreference :
 
     val KEY_SHINKAI_VERSION = "ro.shinkai.version"
     val KEY_PALAPA_EDITION = "ro.palapa.edition"
-    val KEY_WOWO_EDITION = "ro.wowo.edition"
+    val KEY_LEGACY_EDITION = "ro.wowo.edition"
 
     private var currentVersion: String? = null
 
@@ -63,7 +63,7 @@ class ShinkaiVersionPreference :
     override fun isAvailable(context: Context) = context.getVersion().isNotEmpty()
 
     override fun getSummary(context: Context): CharSequence {
-        val edition = SystemProperties.get(KEY_PALAPA_EDITION, SystemProperties.get(KEY_WOWO_EDITION, "Majapahit Edition"))
+        val edition = SystemProperties.get(KEY_PALAPA_EDITION, SystemProperties.get(KEY_LEGACY_EDITION, "Majapahit Edition"))
         val rawVersion = context.getVersion()
         return if (rawVersion.isNotEmpty() && rawVersion != context.getString(R.string.unknown)) {
             if (rawVersion.contains("Majapahit", ignoreCase = true)) {

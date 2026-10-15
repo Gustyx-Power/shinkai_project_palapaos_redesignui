@@ -332,16 +332,16 @@
    <!-- Shinkai Light Logo (Monet Engine) -->
    <color name="shinkai_logo_accent">@color/settingslib_materialColorPrimary</color>
 
-   <!-- Wowo OS Colors (Light - Monet Engine) -->
-   <color name="wowo_banner_bg">@color/settingslib_materialColorSurfaceBright</color>
-   <color name="wowo_card_stroke">@android:color/transparent</color>
-   <color name="wowo_logo_container_bg">@color/settingslib_materialColorSurfaceContainerLowest</color>
-   <color name="wowo_logo_container_stroke">@android:color/transparent</color>
-   <color name="wowo_edition_badge_bg">@color/settingslib_materialColorPrimaryContainer</color>
-   <color name="wowo_edition_badge_stroke">@color/settingslib_materialColorPrimary</color>
-   <color name="wowo_chip_bg">@color/settingslib_materialColorSecondaryContainer</color>
-   <color name="wowo_stat_box_bg">@color/settingslib_materialColorSurfaceContainer</color>
-   <color name="wowo_divider_color">@color/settingslib_materialColorOutlineVariant</color>
+   <!-- Palapa OS Colors (Light - Monet Engine) -->
+   <color name="palapa_banner_bg">@color/settingslib_materialColorSurfaceBright</color>
+   <color name="palapa_card_stroke">@android:color/transparent</color>
+   <color name="palapa_logo_container_bg">@color/settingslib_materialColorSurfaceContainerLowest</color>
+   <color name="palapa_logo_container_stroke">@android:color/transparent</color>
+   <color name="palapa_edition_badge_bg">@color/settingslib_materialColorPrimaryContainer</color>
+   <color name="palapa_edition_badge_stroke">@color/settingslib_materialColorPrimary</color>
+   <color name="palapa_chip_bg">@color/settingslib_materialColorSecondaryContainer</color>
+   <color name="palapa_stat_box_bg">@color/settingslib_materialColorSurfaceContainer</color>
+   <color name="palapa_divider_color">@color/settingslib_materialColorOutlineVariant</color>
 
     <!-- About Phone Redesign Colors (Light - Monet Engine) -->
     <color name="about_card_bg">@color/settingslib_materialColorSurfaceBright</color>
