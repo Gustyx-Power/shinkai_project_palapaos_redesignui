@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2026 Wowo OS / Shinkai Project
+  Material 3 Expressive Emergency Card
+-->
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="#3380D2DC">
+    android:color="@android:color/system_accent3_700">
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#1E3F45" />
+            <solid android:color="@android:color/system_accent3_800" />
+            <stroke
+                android:width="1dp"
+                android:color="@android:color/system_accent3_700" />
             <corners android:radius="26dp" />
         </shape>
     </item>

@@ -13,7 +13,7 @@
     <string name="dynamic_island_record_stop">Stop</string>
 
     <!-- Enhanced Power Menu Strings -->
-    <string name="power_menu_tag_pill">Material 3 Expressive • Pixel 9 Pro XL</string>
+    <string name="power_menu_tag_pill">Material 3 Expressive • POCO F5</string>
     <string name="power_menu_header_title">System Power Menu</string>
     <string name="power_menu_slide_to_power_off">Slide to Power Off</string>
     <string name="power_menu_find_my_device">Still trackable by Find My Device</string>

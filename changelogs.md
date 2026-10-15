@@ -1047,3 +1047,43 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - Mendaftarkan paket bootaudio_pixelos ke dalam PRODUCT_PACKAGES pada vendor/custom/config/common.mk.
 3. **Penyempurnaan Skrip Build (temp.sh)**:
    - Menambahkan baris export USE_RBE=false tepat sebelum perintah kompilasi m shinkai -j$(nproc) agar proses build berjalan murni secara lokal menggunakan seluruh 96 core prosesor tanpa ketergantungan pada server proxy remote.
+
+---
+
+## Bagian XXXII: Pembaruan Identitas Perangkat Power Menu (POCO F5) dan Penerapan Tema Dinamis Material You (Monet Color)
+
+### 1. Kebutuhan & Gambaran Umum
+- **Permintaan Pengguna**:
+  - Mengoreksi label kapsul atas pada Power Menu: mengganti string "Material 3 Expressive • Pixel 9 Pro XL" menjadi "Material 3 Expressive • POCO F5" sesuai perangkat target utama (POCO F5 / marble).
+  - Mengubah skema warna Power Menu yang sebelumnya menggunakan warna hijau solid statis (#042D1C, #9EE4B4, #2B3830, dll.) menjadi tema warna dinamis Monet (Material You) berbasis sistem Android, sehingga tampilan Power Menu secara otomatis menyatu dan beradaptasi dengan palet wallpaper pengguna.
+
+### 2. Detail Implementasi
+1. **Pembaruan String Identitas Perangkat**:
+   - Memperbarui resource string power_menu_tag_pill pada:
+     * frameworks/base/packages/SystemUI/res/values/shinkai_strings.xml
+     * frameworks/base/packages/SystemUI/res/values-in/shinkai_strings.xml
+   - Nilai baru: "Material 3 Expressive • POCO F5".
+2. **Refaktor Drawable Power Menu ke Token Warna Dinamis Monet**:
+   - Menghapus seluruh kode warna hex hijau statis dan menerapkan token palet sistem Material You (@android:color/system_*):
+     * power_menu_tag_pill_bg.xml: Menggunakan solid @android:color/system_accent1_900 dan stroke @android:color/system_accent1_700.
+     * power_menu_card_restart_bg.xml: Menggunakan warna hero accent @android:color/system_accent1_200 dengan efek riak @android:color/system_accent1_100.
+     * power_menu_card_lockdown_bg.xml: Menggunakan container permukaan netral @android:color/system_neutral1_800 dan border @android:color/system_neutral2_800.
+     * power_menu_card_emergency_bg.xml: Menggunakan aksen tersier @android:color/system_accent3_800 dan border @android:color/system_accent3_700.
+     * power_menu_card_quick_controls_bg.xml: Menggunakan latar belakang kontainer utama @android:color/system_neutral1_900 dengan garis tepi @android:color/system_neutral2_800.
+     * power_menu_control_off_bg.xml: Menggunakan permukaan nonaktif @android:color/system_neutral1_800 dengan stroke @android:color/system_neutral2_800.
+     * power_menu_control_torch_on_bg.xml: Menggunakan aksen aktif @android:color/system_accent1_800 dan stroke @android:color/system_accent1_600.
+     * power_menu_control_airplane_on_bg.xml: Menggunakan aksen sekunder aktif @android:color/system_accent2_800 dan stroke @android:color/system_accent2_600.
+     * power_menu_advanced_item_bg.xml: Menggunakan kontainer @android:color/system_neutral1_800 dengan border @android:color/system_neutral2_800.
+3. **Penyempurnaan Ikon Vektor dan Layout Antarmuka**:
+   - Mengubah warna dasar pada berkas vektor (ic_power_menu_restart, ic_power_menu_emergency, ic_power_menu_torch, ic_power_menu_airplane, ic_power_menu_quick_controls) menjadi putih murni (#FFFFFFFF) sehingga mendukung pewarnaan dinamis (android:tint).
+   - Memperbarui global_actions_enhanced_menu.xml dan global_actions_advanced_reboot_dialog.xml:
+     * Label kapsul atas: Teks menggunakan @android:color/system_accent1_200.
+     * Kartu Restart: Ikon dan teks menggunakan kontras tinggi @android:color/system_accent1_900 di atas permukaan accent1_200.
+     * Kartu Lockdown: Teks dan ikon menggunakan @android:color/system_neutral1_50.
+     * Kartu Emergency: Teks dan ikon menggunakan @android:color/system_accent3_200.
+     * Header & Tag VIP: Menggunakan @android:color/system_neutral1_100 dan @android:color/system_accent1_200.
+4. **Logika Pewarnaan Status Dinamis di GlobalActionsDialogLite.java**:
+   - Mengganti kode warna statis saat sakelar diaktifkan/dinonaktifkan dengan context.getColor() dinamis:
+     * Status & ikon Senter (Torch): Menggunakan android.R.color.system_accent1_200 saat aktif dan system_neutral2_300 / system_neutral1_100 saat nonaktif.
+     * Status & ikon Mode Pesawat (Airplane): Menggunakan android.R.color.system_accent2_200 saat aktif dan system_neutral2_300 / system_neutral1_100 saat nonaktif.
+

@@ -3282,8 +3282,15 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
         private void setupEnhancedControls(@NonNull SystemUIDialog dialog) {
             View btnTorch = dialog.findViewById(com.android.systemui.res.R.id.btn_torch);
             TextView txtTorchStatus = dialog.findViewById(com.android.systemui.res.R.id.txt_torch_status);
+            ImageView imgTorchIcon = dialog.findViewById(com.android.systemui.res.R.id.img_torch_icon);
             View btnAirplane = dialog.findViewById(com.android.systemui.res.R.id.btn_airplane);
             TextView txtAirplaneStatus = dialog.findViewById(com.android.systemui.res.R.id.txt_airplane_status);
+            ImageView imgAirplaneIcon = dialog.findViewById(com.android.systemui.res.R.id.img_airplane_icon);
+
+            final int activeTorchColor = mContext.getColor(android.R.color.system_accent1_200);
+            final int activeAirplaneColor = mContext.getColor(android.R.color.system_accent2_200);
+            final int inactiveStatusColor = mContext.getColor(android.R.color.system_neutral2_300);
+            final int inactiveIconColor = mContext.getColor(android.R.color.system_neutral1_100);
 
             // Setup Flashlight (Senter) - 100% Real hardware toggle
             FlashlightController flashlightController = Dependency.get(FlashlightController.class);
@@ -3297,7 +3304,10 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
                         txtTorchStatus.setText(isEnabled
                                 ? com.android.systemui.res.R.string.power_menu_torch_on
                                 : com.android.systemui.res.R.string.power_menu_torch_off);
-                        txtTorchStatus.setTextColor(isEnabled ? 0xFFFFD60A : 0xFFA6B0AA);
+                        txtTorchStatus.setTextColor(isEnabled ? activeTorchColor : inactiveStatusColor);
+                    }
+                    if (imgTorchIcon != null) {
+                        imgTorchIcon.setImageTintList(ColorStateList.valueOf(isEnabled ? activeTorchColor : inactiveIconColor));
                     }
                 };
 
@@ -3349,7 +3359,10 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
                         txtAirplaneStatus.setText(isAirplaneOn
                                 ? com.android.systemui.res.R.string.power_menu_airplane_on
                                 : com.android.systemui.res.R.string.power_menu_airplane_off);
-                        txtAirplaneStatus.setTextColor(isAirplaneOn ? 0xFF80D2DC : 0xFFA6B0AA);
+                        txtAirplaneStatus.setTextColor(isAirplaneOn ? activeAirplaneColor : inactiveStatusColor);
+                    }
+                    if (imgAirplaneIcon != null) {
+                        imgAirplaneIcon.setImageTintList(ColorStateList.valueOf(isAirplaneOn ? activeAirplaneColor : inactiveIconColor));
                     }
                 };
 

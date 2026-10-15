@@ -1047,3 +1047,43 @@ During testing and review sessions, several core interface discrepancies and sub
    - Added bootaudio_pixelos to PRODUCT_PACKAGES in vendor/custom/config/common.mk.
 3. **Build Script Optimization (temp.sh)**:
    - Added export USE_RBE=false prior to m shinkai -j$(nproc) to bypass remote build execution dependencies and compile purely using local hardware across 96 parallel cores.
+
+---
+
+## Section XXXII: Power Menu Device Tag Rebranding (POCO F5) and Dynamic Material You Monet Color Adaptation
+
+### 1. Requirements & Overview
+- **User Request**:
+  - Correct the top capsule pill tag in the Power Menu: replace "Material 3 Expressive • Pixel 9 Pro XL" with "Material 3 Expressive • POCO F5" to accurately reflect the target device (POCO F5 / marble).
+  - Transition the Power Menu color scheme from static solid green shades (#042D1C, #9EE4B4, #2B3830, etc.) to Android Material You dynamic Monet color tokens, enabling the menu to organically harmonize with the user's active wallpaper palette.
+
+### 2. Implementation Details
+1. **Device Identity String Update**:
+   - Updated power_menu_tag_pill string resource across:
+     * frameworks/base/packages/SystemUI/res/values/shinkai_strings.xml
+     * frameworks/base/packages/SystemUI/res/values-in/shinkai_strings.xml
+   - New value: "Material 3 Expressive • POCO F5".
+2. **Power Menu Drawables Refactored to Dynamic Monet Tokens**:
+   - Replaced all hardcoded green hex colors with official Android Material You system palette resources (@android:color/system_*):
+     * power_menu_tag_pill_bg.xml: Uses solid @android:color/system_accent1_900 with stroke @android:color/system_accent1_700.
+     * power_menu_card_restart_bg.xml: Uses hero accent fill @android:color/system_accent1_200 with ripple @android:color/system_accent1_100.
+     * power_menu_card_lockdown_bg.xml: Uses neutral surface container @android:color/system_neutral1_800 with border @android:color/system_neutral2_800.
+     * power_menu_card_emergency_bg.xml: Uses tertiary accent @android:color/system_accent3_800 with border @android:color/system_accent3_700.
+     * power_menu_card_quick_controls_bg.xml: Uses container background @android:color/system_neutral1_900 with subtle outline @android:color/system_neutral2_800.
+     * power_menu_control_off_bg.xml: Uses inactive tile background @android:color/system_neutral1_800 with outline @android:color/system_neutral2_800.
+     * power_menu_control_torch_on_bg.xml: Uses active primary accent @android:color/system_accent1_800 with border @android:color/system_accent1_600.
+     * power_menu_control_airplane_on_bg.xml: Uses active secondary accent @android:color/system_accent2_800 with border @android:color/system_accent2_600.
+     * power_menu_advanced_item_bg.xml: Uses surface container @android:color/system_neutral1_800 with border @android:color/system_neutral2_800.
+3. **Vector Drawable & Layout Refinements**:
+   - Standardized vector drawable base fillColors (ic_power_menu_restart, ic_power_menu_emergency, ic_power_menu_torch, ic_power_menu_airplane, ic_power_menu_quick_controls) to pure white (#FFFFFFFF) to allow seamless dynamic tinting.
+   - Updated global_actions_enhanced_menu.xml and global_actions_advanced_reboot_dialog.xml:
+     * Top pill tag: Text styled with @android:color/system_accent1_200.
+     * Restart Card: High-contrast on-accent text and icon tint @android:color/system_accent1_900 over system_accent1_200.
+     * Lockdown Card: Text and icon styled with @android:color/system_neutral1_50.
+     * Emergency Card: Text and icon styled with @android:color/system_accent3_200.
+     * Header & VIP Tag: Styled with @android:color/system_neutral1_100 and @android:color/system_accent1_200.
+4. **Dynamic Status Color Runtime Logic in GlobalActionsDialogLite.java**:
+   - Replaced hardcoded status hex values with dynamic context.getColor() Monet references:
+     * Torch (Flashlight): Active tint android.R.color.system_accent1_200; inactive tint system_neutral2_300 / system_neutral1_100.
+     * Airplane Mode: Active tint android.R.color.system_accent2_200; inactive tint system_neutral2_300 / system_neutral1_100.
+
