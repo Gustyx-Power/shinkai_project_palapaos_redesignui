@@ -1223,6 +1223,8 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - `WorkspaceTouchListener.java`: Menambahkan override `onDoubleTap(MotionEvent e)` yang memicu `PowerManager.goToSleep()`, terikat pada pengecekan `canHandleDoubleTap()` dan switch `double_tap_sleep_gesture`.
    - `AndroidManifest-common.xml` & `quickstep/AndroidManifest.xml`: Mendeklarasikan izin `android.permission.DEVICE_POWER`.
    - `frameworks/base/data/etc/com.android.launcher3.xml`: Menambahkan izin `android.permission.DEVICE_POWER` ke dalam whitelist privapp untuk Launcher3.
+   - `frameworks/base/core/res/AndroidManifest.xml`: Mengonfigurasi `protectionLevel` izin `DEVICE_POWER` menjadi `signature|privileged|role` agar aplikasi istimewa seperti Launcher3 dapat mematikan layar tanpa exception.
+   - `packages/apps/Launcher3/Android.bp`: Menambahkan sertifikat platform (`certificate: "platform"`) pada target QuickStep untuk keselarasan izin tingkat sistem.
 5. **Sinkronisasi Repositori Desain Antarmuka (`shinkai_project_palapaos_redesignui`)**:
    - Menyinkronkan seluruh berkas konfigurasi XML overlay, Settings, dan Launcher3 ke repositori antarmuka PalapaOS.
    - Memperbarui dokumentasi changelog tanpa menyertakan karakter emoji apa pun.

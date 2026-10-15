@@ -1223,6 +1223,8 @@ During testing and review sessions, several core interface discrepancies and sub
    - `WorkspaceTouchListener.java`: Added `onDoubleTap(MotionEvent e)` override to trigger `PowerManager.goToSleep()` when `canHandleDoubleTap()` and `double_tap_sleep_gesture` are true.
    - `AndroidManifest-common.xml` & `quickstep/AndroidManifest.xml`: Declared `android.permission.DEVICE_POWER`.
    - `frameworks/base/data/etc/com.android.launcher3.xml`: Added `android.permission.DEVICE_POWER` to Launcher3 privapp whitelist.
+   - `frameworks/base/core/res/AndroidManifest.xml`: Configured `DEVICE_POWER` permission `protectionLevel` to `signature|privileged|role` so privileged components like Launcher3 can put the device to sleep without permission exceptions.
+   - `packages/apps/Launcher3/Android.bp`: Assigned platform certificate (`certificate: "platform"`) to QuickStep targets for platform-level permission alignment.
 5. **Redesign UI Repository Synchronization (`shinkai_project_palapaos_redesignui`)**:
    - Synchronized all updated overlay, Settings, and Launcher3 XML configurations to the PalapaOS redesign UI repository.
    - Updated changelog files with verified zero emojis.
