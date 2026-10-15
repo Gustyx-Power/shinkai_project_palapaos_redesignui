@@ -223,6 +223,7 @@ class OneUIBatteryChartView @JvmOverloads constructor(
             val cx = paddingLeft + (i * slotWidth) + (slotWidth / 2f)
 
             // Lane highlight track
+            val trackRect = RectF(cx - (slotWidth / 2.2f), paddingTop, cx + (slotWidth / 2.2f), paddingTop + chartHeight)
             val trackColor = ContextCompat.getColor(context, R.color.oneui_battery_track)
             val lanePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 val laneAlpha = if (i % 2 == 0) 15 else 35

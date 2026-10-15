@@ -190,18 +190,24 @@ class OneUIBatteryInfoFragment : InstrumentedFragment() {
         val intentCycle = batteryIntent?.getIntExtra(BatteryManager.EXTRA_CYCLE_COUNT, -1) ?: -1
         if (intentCycle >= 0) return intentCycle
 
-        // Method B: BatteryManager Property
-        try {
-            val propCycle = bm?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CYCLE_COUNT) ?: -1
-            if (propCycle >= 0) return propCycle
-        } catch (_: Throwable) {}
-
-        // Method C: Sysfs cycle_count
+        // Method B: Sysfs cycle_count
         val sysfsCycle = readSysfs("/sys/class/power_supply/battery/cycle_count")
             ?: readSysfs("/sys/class/power_supply/bms/cycle_count")
+            ?: readSysfs("/sys/class/power_supply/battery/battery_cycle")
+            ?: readSysfs("/sys/class/power_supply/bms/battery_cycle")
+            ?: readSysfs("/sys/class/qcom-battery/cycle_count")
+            ?: readSysfs("/sys/class/power_supply/battery/device/cycle_count")
         sysfsCycle?.toIntOrNull()?.let {
             if (it >= 0) return it
         }
+
+        // Method C: Dynamic property reflection (if present in OEM/ROM framework)
+        try {
+            val field = BatteryManager::class.java.getField("BATTERY_PROPERTY_CYCLE_COUNT")
+            val propId = field.getInt(null)
+            val propCycle = bm?.getIntProperty(propId) ?: -1
+            if (propCycle >= 0) return propCycle
+        } catch (_: Throwable) {}
 
         return -1
     }

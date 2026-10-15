@@ -137,7 +137,7 @@ class OneUIBatteryHeaderPreferenceController(context: Context, key: String) :
                 fullChargeView?.text = mContext.getString(com.android.settingslib.R.string.battery_info_status_charging)
             }
         } else {
-            val remaining = mRemainingLabel ?: mContext.getString(R.string.power_usage_list_summary)
+            val remaining = mRemainingLabel ?: mStatusLabel ?: mContext.getString(com.android.settingslib.R.string.battery_info_status_discharging)
             timeLeftView?.text = remaining
             fullChargeView?.text = mContext.getString(R.string.oneui_battery_full_charge_desc, remaining)
         }
