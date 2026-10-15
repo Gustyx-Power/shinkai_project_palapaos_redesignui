@@ -111,6 +111,9 @@
         <item>ID:ZP11.260918.007</item>
         <item>VERSION.SECURITY_PATCH:2026-10-05</item>
         <item>VERSION.DEVICE_INITIAL_SDK_INT:33</item>
+        <item>TYPE:user</item>
+        <item>TAGS:release-keys</item>
+        <item>VERSION.INCREMENTAL:16484274</item>
     </string-array>
 
     <!-- Keybox configuration for device certification -->

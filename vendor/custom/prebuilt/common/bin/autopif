@@ -1,0 +1,133 @@
+#!/system/bin/sh
+#
+# PalapaOS Auto-PIF Generator & Keybox Manager
+# Copyright (C) 2026 Shinkai Project / PalapaOS
+#
+# Fetches latest unbanned Pixel Canary/Beta fingerprints from Google Flash Tool API
+# or applies verified fallback profiles.
+#
+
+echo "========================================="
+echo "   PalapaOS Play Integrity PIF Manager   "
+echo "========================================="
+
+ACTION="${1:-fetch}"
+
+if [ "$ACTION" = "--help" ] || [ "$ACTION" = "-h" ]; then
+    echo "Usage: autopif [command]"
+    echo ""
+    echo "Commands:"
+    echo "  fetch (default) : Fetch latest Pixel Canary/Beta fingerprint from Google"
+    echo "  reset           : Reset to baked-in ROM default profile"
+    echo "  status          : Show current active PIF configuration"
+    echo "  backup          : Apply built-in verified backup profile (Pixel Fold Canary)"
+    echo ""
+    exit 0
+fi
+
+if [ "$ACTION" = "status" ]; then
+    echo "Current settings.secure pif_data:"
+    settings get secure pif_data
+    echo ""
+    if [ -f /data/system/pif.json ]; then
+        echo "Contents of /data/system/pif.json:"
+        cat /data/system/pif.json
+    fi
+    exit 0
+fi
+
+if [ "$ACTION" = "reset" ]; then
+    echo "Clearing custom PIF data..."
+    settings delete secure pif_data 2>/dev/null || settings put secure pif_data ""
+    rm -f /data/system/pif.json 2>/dev/null
+    rm -f /data/adb/pif.json 2>/dev/null
+    echo "Killing GMS and Play Store..."
+    am force-stop com.google.android.gms 2>/dev/null
+    am force-stop com.android.vending 2>/dev/null
+    pkill -f com.google.android.gms 2>/dev/null
+    pkill -f com.android.vending 2>/dev/null
+    echo "Reset complete. ROM baked-in profile is now active."
+    exit 0
+fi
+
+if [ "$ACTION" = "backup" ]; then
+    echo "Applying verified backup profile (Pixel Fold Canary)..."
+    JSON='{"MANUFACTURER":"Google","MODEL":"Pixel Fold","FINGERPRINT":"google/felix_beta/felix:CANARY/ZP11.260918.007/16484274:user/release-keys","BRAND":"google","PRODUCT":"felix_beta","DEVICE":"felix","VERSION_RELEASE":"17","ID":"ZP11.260918.007","SECURITY_PATCH":"2026-10-05","DEVICE_INITIAL_SDK_INT":33,"TYPE":"user","TAGS":"release-keys","INCREMENTAL":"16484274"}'
+    settings put secure pif_data "$JSON"
+    echo "$JSON" > /data/system/pif.json 2>/dev/null || true
+    echo "Restarting Google Play Services and Play Store..."
+    am force-stop com.google.android.gms 2>/dev/null
+    am force-stop com.android.vending 2>/dev/null
+    pkill -f com.google.android.gms 2>/dev/null
+    pkill -f com.android.vending 2>/dev/null
+    echo "Backup profile activated successfully!"
+    exit 0
+fi
+
+# Fetch from Google Flash Station API
+echo "Fetching latest Pixel Canary build from Google Flash Tool..."
+TEMP_DIR="/data/local/tmp/autopif_$$"
+mkdir -p "$TEMP_DIR"
+cd "$TEMP_DIR"
+
+HTTP_GET() {
+    URL="$1"
+    OUT="$2"
+    if command -v curl >/dev/null 2>&1; then
+        curl -s -m 15 -H "Referer: https://flash.android.com" "$URL" > "$OUT"
+    elif command -v wget >/dev/null 2>&1; then
+        wget -q -T 15 --header "Referer: https://flash.android.com" -O "$OUT" "$URL"
+    else
+        return 1
+    fi
+}
+
+SUCCESS=0
+if HTTP_GET "https://flash.android.com" "flash.html"; then
+    FLASH_KEY=$(grep -o '<body data-client-config=.*' flash.html 2>/dev/null | cut -d\; -f2 | cut -d\& -f1)
+    if [ -n "$FLASH_KEY" ]; then
+        PRODUCT="felix_beta"
+        DEVICE="felix"
+        MODEL="Pixel Fold"
+        if HTTP_GET "https://content-flashstation-pa.googleapis.com/v1/builds?product=$PRODUCT&key=$FLASH_KEY" "builds.json"; then
+            ID=$(grep -o '"releaseCandidateName": *"[^"]*"' builds.json 2>/dev/null | head -n1 | cut -d'"' -f4)
+            INCREMENTAL=$(grep -o '"buildId": *"[^"]*"' builds.json 2>/dev/null | head -n1 | cut -d'"' -f4)
+            if [ -n "$ID" ] && [ -n "$INCREMENTAL" ]; then
+                FINGERPRINT="google/$PRODUCT/$DEVICE:CANARY/$ID/$INCREMENTAL:user/release-keys"
+                CANARY_ID=$(echo "$ID" | sed -e 's;.*canary-\(.*\)".*;\1;' -e 's;^\(.\{4\}\);\1-;')
+                [ -z "$CANARY_ID" ] && CANARY_ID=$(date +%Y-%m)
+                SECURITY_PATCH="${CANARY_ID}-05"
+
+                JSON="{\"MANUFACTURER\":\"Google\",\"MODEL\":\"$MODEL\",\"FINGERPRINT\":\"$FINGERPRINT\",\"BRAND\":\"google\",\"PRODUCT\":\"$PRODUCT\",\"DEVICE\":\"$DEVICE\",\"VERSION_RELEASE\":\"17\",\"ID\":\"$ID\",\"SECURITY_PATCH\":\"$SECURITY_PATCH\",\"DEVICE_INITIAL_SDK_INT\":33,\"TYPE\":\"user\",\"TAGS\":\"release-keys\",\"INCREMENTAL\":\"$INCREMENTAL\"}"
+
+                echo "Got fresh Pixel Canary fingerprint:"
+                echo "  $FINGERPRINT"
+                settings put secure pif_data "$JSON"
+                echo "$JSON" > /data/system/pif.json 2>/dev/null || true
+                SUCCESS=1
+            fi
+        fi
+    fi
+fi
+
+rm -rf "$TEMP_DIR"
+
+if [ "$SUCCESS" -eq 1 ]; then
+    echo "Restarting Google Play Services and Play Store..."
+    am force-stop com.google.android.gms 2>/dev/null
+    am force-stop com.android.vending 2>/dev/null
+    pkill -f com.google.android.gms 2>/dev/null
+    pkill -f com.android.vending 2>/dev/null
+    echo "Play Integrity profile updated and active!"
+else
+    echo "Warning: Could not reach Google Flash Tool API (offline or blocked)."
+    echo "Falling back to verified Pixel Fold Canary profile..."
+    JSON='{"MANUFACTURER":"Google","MODEL":"Pixel Fold","FINGERPRINT":"google/felix_beta/felix:CANARY/ZP11.260918.007/16484274:user/release-keys","BRAND":"google","PRODUCT":"felix_beta","DEVICE":"felix","VERSION_RELEASE":"17","ID":"ZP11.260918.007","SECURITY_PATCH":"2026-10-05","DEVICE_INITIAL_SDK_INT":33,"TYPE":"user","TAGS":"release-keys","INCREMENTAL":"16484274"}'
+    settings put secure pif_data "$JSON"
+    echo "$JSON" > /data/system/pif.json 2>/dev/null || true
+    am force-stop com.google.android.gms 2>/dev/null
+    am force-stop com.android.vending 2>/dev/null
+    pkill -f com.google.android.gms 2>/dev/null
+    pkill -f com.android.vending 2>/dev/null
+    echo "Active profile refreshed!"
+fi

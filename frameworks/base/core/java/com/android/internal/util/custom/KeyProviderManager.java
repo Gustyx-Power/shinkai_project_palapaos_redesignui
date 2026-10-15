@@ -13,6 +13,7 @@ import android.util.Xml;
 import com.android.internal.R;
 import org.xmlpull.v1.XmlPullParser;
 
+import java.io.File;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,14 +48,13 @@ public final class KeyProviderManager {
                 return;
             }
 
-            if (!loadFromXmlSetting(context)) {
+            if (!loadFromXmlSetting(context) && !loadFromXmlFile()) {
                 loadFromConfigArray(context);
             }
         }
 
-        private boolean loadFromXmlSetting(Context ctx) {
+        private boolean parseKeyboxXml(String xml) {
             try {
-                String xml = Settings.Secure.getString(ctx.getContentResolver(), Settings.Secure.KEYBOX_DATA);
                 if (xml == null || xml.trim().isEmpty()) return false;
 
                 XmlPullParser p = Xml.newPullParser();
@@ -127,16 +127,53 @@ public final class KeyProviderManager {
                 }
 
                 if (!hasKeybox()) {
-                    Log.w(TAG, "Failed to load keybox from XML setting");
+                    Log.w(TAG, "Failed to load keybox from parsed XML");
                     return false;
                 }
 
-                Log.i(TAG, "Loaded keybox from XML setting");
                 return true;
             } catch (Exception e) {
-                Log.e(TAG, "XML keybox load failed", e);
+                Log.e(TAG, "Keybox XML parsing failed", e);
                 return false;
             }
+        }
+
+        private boolean loadFromXmlSetting(Context ctx) {
+            try {
+                String xml = Settings.Secure.getString(ctx.getContentResolver(), Settings.Secure.KEYBOX_DATA);
+                if (xml == null || xml.trim().isEmpty()) return false;
+
+                if (parseKeyboxXml(xml)) {
+                    Log.i(TAG, "Loaded keybox from XML setting");
+                    return true;
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "XML keybox load from settings failed", e);
+            }
+            return false;
+        }
+
+        private boolean loadFromXmlFile() {
+            final String[] paths = new String[] {
+                "/data/system/keybox.xml",
+                "/data/adb/tricky_store/keybox.xml",
+                "/data/adb/teesim/keybox.xml"
+            };
+            for (String path : paths) {
+                File file = new File(path);
+                if (file.exists() && file.canRead()) {
+                    try {
+                        String xml = new String(java.nio.file.Files.readAllBytes(file.toPath()), java.nio.charset.StandardCharsets.UTF_8);
+                        if (parseKeyboxXml(xml)) {
+                            Log.i(TAG, "Loaded keybox from file: " + path);
+                            return true;
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "XML keybox load from file failed: " + path, e);
+                    }
+                }
+            }
+            return false;
         }
 
         private void loadFromConfigArray(Context ctx) {

@@ -124,7 +124,7 @@ public class PropImitationHooks {
         sNetflixModel = res.getString(R.string.config_movieVerifiedKey);
 
         sProcessName = processName;
-        sIsGms = packageName.equals(PACKAGE_GMS) && processName.equals(PROCESS_GMS_UNSTABLE);
+        sIsGms = packageName.equals(PACKAGE_GMS);
         sIsFinsky = packageName.equals(PACKAGE_FINSKY);
 
         /* Set Certified Properties for GMSCore
@@ -158,7 +158,7 @@ public class PropImitationHooks {
             if (key.startsWith("VERSION.")) {
                 clazz = Build.VERSION.class;
                 key = key.substring(8);
-            } else if (key.equals("SECURITY_PATCH") || key.equals("DEVICE_INITIAL_SDK_INT") || key.equals("RELEASE") || key.equals("SDK_INT")) {
+            } else if (key.equals("SECURITY_PATCH") || key.equals("DEVICE_INITIAL_SDK_INT") || key.equals("RELEASE") || key.equals("SDK_INT") || key.equals("INCREMENTAL")) {
                 clazz = Build.VERSION.class;
             } else if (key.equals("VERSION_RELEASE")) {
                 clazz = Build.VERSION.class;
@@ -166,10 +166,12 @@ public class PropImitationHooks {
             }
             Field field = clazz.getDeclaredField(key);
             field.setAccessible(true);
-            // Cast the value to int if it's an integer field, otherwise string.
+            // Cast the value to int if it's an integer field, long if long field, otherwise string.
             long offset = OFFSET_FIELD.getInt(field);
             if (field.getType().equals(Integer.TYPE)) {
                 UNSAFE.putInt(field.getDeclaringClass(), offset, Integer.parseInt(value));
+            } else if (field.getType().equals(Long.TYPE)) {
+                UNSAFE.putLong(field.getDeclaringClass(), offset, Long.parseLong(value));
             } else {
                 UNSAFE.putObject(field.getDeclaringClass(), offset, value);
             }
@@ -194,6 +196,23 @@ public class PropImitationHooks {
         String savedProps = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.PIF_DATA);
         if (savedProps == null || TextUtils.isEmpty(savedProps)) {
             savedProps = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.FETCHED_PIF);
+        }
+
+        if (savedProps == null || TextUtils.isEmpty(savedProps)) {
+            final File[] pifFiles = new File[] {
+                new File("/data/system/pif.json"),
+                new File("/data/adb/pif.json"),
+                new File("/data/system/gms_certified_props.json")
+            };
+            for (File pifFile : pifFiles) {
+                if (pifFile.exists() && pifFile.canRead()) {
+                    savedProps = readFromFile(pifFile);
+                    if (savedProps != null && !savedProps.trim().isEmpty()) {
+                        dlog("Loaded PIF props from file: " + pifFile.getAbsolutePath());
+                        break;
+                    }
+                }
+            }
         }
 
         if (savedProps == null || TextUtils.isEmpty(savedProps)) {
@@ -319,16 +338,16 @@ public class PropImitationHooks {
             return;
         }
 
-        // If a keybox is found, don't block key attestation
-        if (KeyProviderManager.isKeyboxAvailable()) {
-            dlog("Key attestation blocking is disabled because a keybox is defined to spoof");
-            return;
-        }
-
-        // Check stack for Play Integrity
+        // Check stack for Play Integrity - block DroidGuard so it falls back to software attestation
         if (isCallerPlayIntegrity()) {
             dlog("Blocked key attestation for play integrity");
             throw new UnsupportedOperationException();
+        }
+
+        // If a keybox is found, don't block key attestation for other apps (e.g. Key Attestation app)
+        if (KeyProviderManager.isKeyboxAvailable()) {
+            dlog("Key attestation blocking is disabled because a keybox is defined to spoof");
+            return;
         }
     }
 

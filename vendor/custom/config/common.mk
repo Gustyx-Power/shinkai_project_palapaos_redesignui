@@ -76,9 +76,10 @@ PRODUCT_PRODUCT_PROPERTIES += \
 PRODUCT_COPY_FILES += \
     vendor/custom/config/permissions/privapp-permissions-lineagehw.xml:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/permissions/privapp-permissions-lineagehw.xml
 
-# Google Photos Pixel Exclusive XML
+# Google Photos Pixel Exclusive XML and Play Integrity autopif tool
 PRODUCT_COPY_FILES += \
-    vendor/custom/prebuilt/common/etc/sysconfig/pixel_2016_exclusive.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/sysconfig/pixel_2016_exclusive.xml
+    vendor/custom/prebuilt/common/etc/sysconfig/pixel_2016_exclusive.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/sysconfig/pixel_2016_exclusive.xml \
+    vendor/custom/prebuilt/common/bin/autopif:$(TARGET_COPY_OUT_SYSTEM)/bin/autopif
 
 # Overlay
 PRODUCT_PACKAGE_OVERLAYS += \
