@@ -37,6 +37,7 @@ class ShinkaiVersionPreference :
     PreferenceBinding {
 
     val KEY_SHINKAI_VERSION = "ro.shinkai.version"
+    val KEY_PALAPA_EDITION = "ro.palapa.edition"
     val KEY_WOWO_EDITION = "ro.wowo.edition"
 
     private var currentVersion: String? = null
@@ -51,7 +52,7 @@ class ShinkaiVersionPreference :
         get() = R.string.shinkai_version
 
     override val availabilityDescription =
-        "The device must have the Wowo OS version system property set."
+        "The device must have the Palapa OS version system property set."
 
     override fun getAvailabilityStability() = PreconditionStability.STABLE_UNTIL_APK_UPDATE
 
@@ -62,10 +63,10 @@ class ShinkaiVersionPreference :
     override fun isAvailable(context: Context) = context.getVersion().isNotEmpty()
 
     override fun getSummary(context: Context): CharSequence {
-        val edition = SystemProperties.get(KEY_WOWO_EDITION, "Kopdes Edition")
+        val edition = SystemProperties.get(KEY_PALAPA_EDITION, SystemProperties.get(KEY_WOWO_EDITION, "Majapahit Edition"))
         val rawVersion = context.getVersion()
         return if (rawVersion.isNotEmpty() && rawVersion != context.getString(R.string.unknown)) {
-            if (rawVersion.contains("Kopdes", ignoreCase = true)) {
+            if (rawVersion.contains("Majapahit", ignoreCase = true)) {
                 rawVersion
             } else {
                 "$edition • $rawVersion"

@@ -1087,3 +1087,46 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
      * Status & ikon Senter (Torch): Menggunakan android.R.color.system_accent1_200 saat aktif dan system_neutral2_300 / system_neutral1_100 saat nonaktif.
      * Status & ikon Mode Pesawat (Airplane): Menggunakan android.R.color.system_accent2_200 saat aktif dan system_neutral2_300 / system_neutral1_100 saat nonaktif.
 
+---
+
+## Bagian XXXIII: Rebranding Komprehensif Menjadi PalapaOS, Pembaruan Wallpaper Default, Bootanimation Baru, dan Integrasi Logo Satelit Palapa
+
+### 1. Kebutuhan & Gambaran Umum
+- **Permintaan Pengguna**:
+  - Rebranding nama sistem operasi dari WowoOS / Wowo OS menjadi PalapaOS / Palapa OS secara menyeluruh pada source code ROM dan antarmuka pengguna.
+  - Mengubah default wallpaper sistem dari kopdes_ontop menjadi palapa_os.jpg.
+  - Mengganti bootanimation produk ke paket gemini.zip yang berada di root direktori project.
+  - Menghapus kartu informasi edisi Kopdes (beserta logo kopdes) pada antarmuka info versi Android (shinkai_logo.xml).
+  - Mengubah baris versi Wowo OS menjadi Palapa OS version dengan nilai versi dari Embegeh-1T menjadi Majapahit.
+  - Memperbarui logo sistem Kopdes di seluruh antarmuka menjadi logo vektor Satelit Palapa (silinder emas Palapa, sayap panel surya cyan, orbit elips P emas, parabola pemancar sinyal).
+
+### 2. Detail Implementasi
+1. **Rebranding Identitas Sistem Operasi**:
+   - Memperbarui nilai properti produk pada vendor/custom/config/version.mk:
+     * Menambahkan ro.palapa.edition=Majapahit Edition, ro.palapa.os.name=Palapa OS, ro.palapa.os.version=Majapahit.
+     * Memperbarui ro.wowo.edition=Majapahit Edition, ro.wowo.os.name=Palapa OS, ro.wowo.os.version=Majapahit untuk kompatibilitas mundur.
+   - Memperbarui nama berkas paket target OTA pada vendor/lineage/build/tasks/bacon.mk menjadi PalapaOS-Majapahit-$(TARGET_DEVICE)-17.zip.
+   - Memperbarui label power_menu_vip_tag pada SystemUI strings (values & values-in) menjadi "Palapa OS".
+   - Memperbarui skrip penginstal apply.sh menjadi Shinkai Project / PalapaOS Redesign UI.
+2. **Penggantian Wallpaper Default (palapa_os.jpg)**:
+   - Mengonversi palapa_os.jpg ke format PNG resolusi 1080 x 2400 piksel menggunakan resampling Lanczos berkualitas tinggi (ImageOps.fit).
+   - Memperbarui aset default_wallpaper.png di seluruh target:
+     * frameworks/base/core/res/res/drawable-nodpi/default_wallpaper.png
+     * frameworks/base/core/res/res/drawable-sw600dp-nodpi/default_wallpaper.png
+     * frameworks/base/core/res/res/drawable-sw720dp-nodpi/default_wallpaper.png
+     * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/ (semua resolusi hdpi, xhdpi, xxhdpi, xxxhdpi, nodpi, sw600dp, sw720dp).
+3. **Pemasangan Bootanimation Gemini (gemini.zip)**:
+   - Mengekstrak berkas bootanimation.zip (1080x498, 30 FPS, uncompressed Store Type 0) dari gemini.zip.
+   - Menggantikan aset bootanimation pada vendor/custom/bootanimation/:
+     * bootanimation_1080.zip
+     * bootanimation_1440.zip
+     * bootanimation_720.zip
+4. **Pembaruan Layar Info Versi Android & Dashboard Tentang Ponsel**:
+   - Menghapus kartu mini wowo_stat_edition_card (kartu edisi Kopdes) pada packages/apps/Settings/res/layout/shinkai_logo.xml, menyisakan 2 kartu utama (Versi Android dan Perangkat) dengan rasio seimbang.
+   - Mengubah judul banner Tentang Ponsel pada about_phone_dashboard.xml dari "Wowo OS 19jt" menjadi "Palapa OS" dan subjudul menjadi "Majapahit Edition • Shinkai Project".
+   - Mengubah teks baris versi pada shinkai_logo.xml dari "Embegeh-1T" menjadi "Majapahit".
+   - Memperbarui controller AboutPhoneDashboardPreferenceController.kt, ShinkaiLogoPreference.kt, dan ShinkaiVersionPreference.kt agar secara dinamis memuat nama Palapa OS dan versi Majapahit.
+5. **Render & Integrasi Logo Satelit Palapa**:
+   - Mengonversi kode vektor SVG Satelit Palapa ke format aset raster resolusi tinggi (512 x 512 piksel, RGBA transparan) menggunakan ImageMagick.
+   - Menggantikan packages/apps/Settings/res/drawable-nodpi/kopdes.png dan menambahkan palapa_logo.png dengan logo baru Satelit Palapa.
+

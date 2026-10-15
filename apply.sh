@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Shinkai Project / WowoOS Redesign UI - Installer & Patcher
+# Shinkai Project / PalapaOS Redesign UI - Installer & Patcher
 # Copyright (C) 2026 Gustyx-Power / Shinkai Project
 #
 
@@ -18,7 +18,7 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo -e "${CYAN}${BOLD}====================================================${NC}"
-echo -e "${CYAN}${BOLD}   Shinkai Project - WowoOS Redesign UI Patcher     ${NC}"
+echo -e "${CYAN}${BOLD}   Shinkai Project - PalapaOS Redesign UI Patcher     ${NC}"
 echo -e "${CYAN}${BOLD}====================================================${NC}"
 
 usage() {

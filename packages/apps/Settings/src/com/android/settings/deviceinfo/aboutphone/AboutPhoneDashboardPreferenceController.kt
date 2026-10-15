@@ -198,11 +198,11 @@ class AboutPhoneDashboardPreferenceController(context: Context, key: String) :
             layoutPreference.findViewById<TextView>(R.id.about_footer_android_text)?.text = androidVer
 
             // Banner Title
-            val wowoEdition = SystemProperties.get("ro.wowo.edition", "Kopdes Edition")
-            val wowoTitle = SystemProperties.get("ro.wowo.os.name", "Wowo OS 19jt")
-            layoutPreference.findViewById<TextView>(R.id.about_iqoo_banner_os_title)?.text = wowoTitle
+            val palapaEdition = SystemProperties.get("ro.palapa.edition", SystemProperties.get("ro.wowo.edition", "Majapahit Edition"))
+            val palapaTitle = SystemProperties.get("ro.palapa.os.name", SystemProperties.get("ro.wowo.os.name", "Palapa OS"))
+            layoutPreference.findViewById<TextView>(R.id.about_iqoo_banner_os_title)?.text = palapaTitle
             layoutPreference.findViewById<TextView>(R.id.about_iqoo_banner_os_subtitle)?.text =
-                "$wowoEdition • Shinkai Project"
+                "$palapaEdition • Shinkai Project"
 
             // CLICK LISTENERS
 

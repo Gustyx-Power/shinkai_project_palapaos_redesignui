@@ -1087,3 +1087,46 @@ During testing and review sessions, several core interface discrepancies and sub
      * Torch (Flashlight): Active tint android.R.color.system_accent1_200; inactive tint system_neutral2_300 / system_neutral1_100.
      * Airplane Mode: Active tint android.R.color.system_accent2_200; inactive tint system_neutral2_300 / system_neutral1_100.
 
+---
+
+## Section XXXIII: Comprehensive Rebranding to PalapaOS, Default Wallpaper Update, New Bootanimation, and Palapa Satellite Logo Integration
+
+### 1. Requirements & Overview
+- **User Request**:
+  - Comprehensive rebranding from WowoOS / Wowo OS to PalapaOS / Palapa OS across the ROM codebase and user-facing interfaces.
+  - Update system default wallpaper from kopdes_ontop to palapa_os.jpg.
+  - Replace product bootanimation with the gemini.zip archive located in the root project directory.
+  - Remove the Kopdes edition card (and kopdes logo) from the Android version info interface (shinkai_logo.xml).
+  - Update the Wowo OS version row to Palapa OS version with version code changing from Embegeh-1T to Majapahit.
+  - Replace all Kopdes logos across the interface with the provided Palapa Satellite SVG (gold Palapa cylinder body, cyan solar panel arrays, gold letter-P satellite orbit, signal emitter antenna).
+
+### 2. Implementation Details
+1. **Operating System Identity Rebranding**:
+   - Updated product build properties in vendor/custom/config/version.mk:
+     * Added ro.palapa.edition=Majapahit Edition, ro.palapa.os.name=Palapa OS, ro.palapa.os.version=Majapahit.
+     * Updated ro.wowo.edition=Majapahit Edition, ro.wowo.os.name=Palapa OS, ro.wowo.os.version=Majapahit for full backward compatibility.
+   - Updated OTA target package filename in vendor/lineage/build/tasks/bacon.mk to PalapaOS-Majapahit-$(TARGET_DEVICE)-17.zip.
+   - Updated power_menu_vip_tag in SystemUI strings (values & values-in) to "Palapa OS".
+   - Updated installer banner and script metadata in apply.sh to Shinkai Project / PalapaOS Redesign UI.
+2. **Default Wallpaper Replacement (palapa_os.jpg)**:
+   - Converted palapa_os.jpg to clean 1080 x 2400 pixel PNG format utilizing high-precision Lanczos resampling (ImageOps.fit).
+   - Deployed updated default_wallpaper.png across all system destinations:
+     * frameworks/base/core/res/res/drawable-nodpi/default_wallpaper.png
+     * frameworks/base/core/res/res/drawable-sw600dp-nodpi/default_wallpaper.png
+     * frameworks/base/core/res/res/drawable-sw720dp-nodpi/default_wallpaper.png
+     * vendor/custom/overlay/rro_packages/FrameworkOverlayCustom/res/ (hdpi, xhdpi, xxhdpi, xxxhdpi, nodpi, sw600dp, sw720dp).
+3. **Gemini Bootanimation Deployment (gemini.zip)**:
+   - Extracted uncompressed bootanimation.zip (1080x498, 30 FPS, Store Type 0 specification) from gemini.zip.
+   - Replaced animation prebuilts in vendor/custom/bootanimation/:
+     * bootanimation_1080.zip
+     * bootanimation_1440.zip
+     * bootanimation_720.zip
+4. **Android Version Info & About Phone Dashboard Updates**:
+   - Deleted wowo_stat_edition_card (Kopdes edition card) in packages/apps/Settings/res/layout/shinkai_logo.xml, leaving a clean balanced two-card layout (Android Version and Device).
+   - Updated About Phone banner in about_phone_dashboard.xml from "Wowo OS 19jt" to "Palapa OS" and subtitle to "Majapahit Edition • Shinkai Project".
+   - Updated version row in shinkai_logo.xml from "Embegeh-1T" to "Majapahit".
+   - Updated preference controllers AboutPhoneDashboardPreferenceController.kt, ShinkaiLogoPreference.kt, and ShinkaiVersionPreference.kt to dynamically reference Palapa OS and Majapahit Edition.
+5. **Palapa Satellite Logo Rendering & Integration**:
+   - Rendered the Palapa Satellite SVG into high-resolution transparent raster assets (512 x 512 pixels, 16-bit RGBA) using ImageMagick.
+   - Replaced packages/apps/Settings/res/drawable-nodpi/kopdes.png and added palapa_logo.png with the new Palapa Satellite emblem.
+

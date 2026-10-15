@@ -29,7 +29,7 @@
     <string name="about_copied_to_clipboard">%1$s disalin ke papan klip</string>
     <string name="shinkai_version">Versi Shinkai</string>
     <string name="shinkai_version_purpose">Menampilkan versi build Shinkai yang terpasang</string>
-    <string name="wowo_os_version">Versi Wowo OS</string>
+    <string name="wowo_os_version">Versi Palapa OS</string>
     <string name="shinkai_maintainer">Maintainer Device</string>
     <string name="shinkai_maintainer_source">Maintainer Source</string>
     <string name="disable_flash_sms_title">Nonaktifkan Flash SMS</string>
@@ -57,7 +57,7 @@
     <string name="home_glance_greeting">Hai, User! 👋</string>
     <string name="home_glance_shinkai_top">Shinkai Project On Top 🚀</string>
     <string name="home_glance_karya_bangsa">Karya Anak Bangsa Indonesia 🇮🇩</string>
-    <string name="home_glance_wowo_edition">Wowo OS • Kopdes Edition ⚡</string>
+    <string name="home_glance_wowo_edition">Palapa OS • Edisi Majapahit ⚡</string>
     <string name="home_glance_smooth_perf">Performa Halus &amp; Murni 🔥</string>
 
     <!-- Homepage Quick Dashboard: Device & Stats -->

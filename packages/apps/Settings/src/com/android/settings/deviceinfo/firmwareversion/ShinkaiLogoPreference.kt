@@ -132,11 +132,11 @@ class ShinkaiLogoPreference : PreferenceMetadata, PreferenceBinding {
             copyToClipboard(v.context, context.getString(R.string.shinkai_version), shinkaiVerDisplay)
         }
 
-        // 3. Versi Wowo OS Row (Embegeh-1T)
-        val wowoVerDisplay = SystemProperties.get("ro.wowo.os.version", "Embegeh-1T")
-        layoutPreference.findViewById<TextView>(R.id.wowo_val_wowo_version)?.text = wowoVerDisplay
+        // 3. Versi Palapa OS Row (Majapahit)
+        val palapaVerDisplay = SystemProperties.get("ro.palapa.os.version", SystemProperties.get("ro.wowo.os.version", "Majapahit"))
+        layoutPreference.findViewById<TextView>(R.id.wowo_val_wowo_version)?.text = palapaVerDisplay
         layoutPreference.findViewById<View>(R.id.wowo_row_wowo_version)?.setOnClickListener { v ->
-            copyToClipboard(v.context, context.getString(R.string.wowo_os_version), wowoVerDisplay)
+            copyToClipboard(v.context, context.getString(R.string.wowo_os_version), palapaVerDisplay)
         }
 
         // 3. Update Keamanan Android Row

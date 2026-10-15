@@ -1,6 +1,6 @@
 #!/vendor/bin/sh
 #
-# Copyright (C) 2026 Shinkai Project / Wowo OS
+# Copyright (C) 2026 Shinkai Project / Palapa OS
 # RAM Expansion / zRAM Controller (FurLC ZRAM Method)
 #
 
