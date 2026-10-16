@@ -118,6 +118,9 @@ Halaman Pengaturan Baterai (`Settings -> Battery`) telah dirombak secara menyelu
 * **Jaminan Play Store Tersertifikasi & Framework Signature Spoofing (DEVICE_INTEGRITY)**:
   * Mengisolasi penggunaan Keybox publik agar tidak pernah diberikan kepada proses background DroidGuard (`com.google.android.gms.unstable`). Hal ini mencegah Google mendeteksi serial keybox yang telah di-revoke dan memaksa DroidGuard melakukan *fallback* mulus ke evaluasi software.
   * Mengintegrasikan penyamaran signature paket kerangka kerja (`"android"`) khusus pada proses `com.google.android.gms.unstable` dengan sertifikat rilis resmi Google Pixel (`GOOGLE_RELEASE_SIGNATURE`), menjamin Google Play Integrity meloloskan **`MEETS_DEVICE_INTEGRITY`** dan status Google Play Store dinyatakan resmi sebagai **"Perangkat telah tersertifikasi"**.
+* **Penetapan Paten Release-Keys pada Seluruh Partisi Build**:
+  * Menetapkan `BUILD_KEYS := release-keys` dan `BUILD_VERSION_TAGS := release-keys` secara menyeluruh pada `vendor/custom/config/common.mk`, `shinkai_marble.mk`, dan `build/make/core/config.mk`.
+  * Memastikan seluruh file `build.prop` pada partisi `system`, `vendor`, `product`, `system_ext`, dan `odm` secara native meng-generate `ro.*.build.tags=release-keys` dan `BuildTag=release-keys` saat proses build berlangsung, tanpa bergantung hanya pada runtime spoofing.
 
 ---
 

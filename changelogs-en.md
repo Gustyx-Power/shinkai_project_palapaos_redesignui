@@ -118,6 +118,9 @@ The Battery settings screen (`Settings -> Battery`) has been completely overhaul
 * **Guaranteed Play Store Certification & Framework Signature Spoofing (DEVICE_INTEGRITY)**:
   * Prevented public keybox leakage to background DroidGuard (`com.google.android.gms.unstable`), avoiding Google CRL revocation flags and forcing DroidGuard into a clean software attestation fallback.
   * Injected official Google Pixel framework release key (`GOOGLE_RELEASE_SIGNATURE`) into `"android"` package queries specifically inside `com.google.android.gms.unstable` via dynamic `PackageInfo.CREATOR` hooking, guaranteeing Google Play Integrity passes **`MEETS_DEVICE_INTEGRITY`** and Google Play Store certifies the device as **"Device is certified"**.
+* **Global Native Release-Keys Enforcement Across All Build Partitions**:
+  * Configured `BUILD_KEYS := release-keys` and `BUILD_VERSION_TAGS := release-keys` globally across `vendor/custom/config/common.mk`, `shinkai_marble.mk`, and `build/make/core/config.mk`.
+  * Ensured all partition `build.prop` outputs across `system`, `vendor`, `product`, `system_ext`, and `odm` natively emit `ro.*.build.tags=release-keys` and `BuildTag=release-keys` during compilation without relying purely on runtime spoofing.
 
 ---
 

@@ -110,3 +110,26 @@ include vendor/custom/config/ota.mk
 
 # Version
 include vendor/custom/config/version.mk
+
+# Enforce release-keys on all partitions during build
+BUILD_KEYS := release-keys
+BUILD_VERSION_TAGS := release-keys
+
+PRODUCT_BUILD_PROP_OVERRIDES += \
+    BuildTag=release-keys
+
+PRODUCT_SYSTEM_PROPERTIES += \
+    ro.build.tags=release-keys \
+    ro.system.build.tags=release-keys
+
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.vendor.build.tags=release-keys
+
+PRODUCT_PRODUCT_PROPERTIES += \
+    ro.product.build.tags=release-keys
+
+PRODUCT_SYSTEM_EXT_PROPERTIES += \
+    ro.system_ext.build.tags=release-keys
+
+PRODUCT_ODM_PROPERTIES += \
+    ro.odm.build.tags=release-keys
