@@ -17,6 +17,7 @@ import android.system.keystore2.KeyEntryResponse;
 import android.system.keystore2.KeyMetadata;
 import android.util.Log;
 
+import com.android.internal.util.PropImitationHooks;
 import com.android.internal.util.custom.KeyboxChainGenerator.KeyGenParameters;
 
 import java.security.cert.Certificate;
@@ -39,6 +40,10 @@ public class KeyboxImitationHooks {
             return null;
         }
 
+        if (PropImitationHooks.isGms()) {
+            return null;
+        }
+
         if (!mSuccess) {
             return null;
         }
@@ -54,6 +59,10 @@ public class KeyboxImitationHooks {
 
     public static KeyMetadata generateKey(IKeystoreSecurityLevel level, KeyDescriptor descriptor, Collection<KeyParameter> args) {
         if (!KeyProviderManager.isKeyboxAvailable()) {
+            return null;
+        }
+
+        if (PropImitationHooks.isGms()) {
             return null;
         }
 

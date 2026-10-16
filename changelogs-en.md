@@ -113,6 +113,12 @@ The Battery settings screen (`Settings -> Battery`) has been completely overhaul
 * **Kernel Command Line Filter (`/proc/cmdline`)**:
   * Seamless kernel filter (`cmdline.c`) rewriting `androidboot.verifiedbootstate=orange` to `green`, `androidboot.flash.locked=0` to `1`, and `androidboot.vbmeta.device_state=unlocked` to `locked` for direct OS-level readers.
 
+* **Hardware Key Attestation Enhancement & "Attest Key" Fix**:
+  * Removed the restrictive `if (attestationKey == null)` guard in `KeyStoreSecurityLevel.java`, ensuring asymmetric key attestation requests in Key Attestation app ("Attest key" mode) are consistently intercepted by `KeyboxImitationHooks`. This resolves the anomaly where the bootloader was previously reported as *Bootloader is Unlocked* in that mode.
+* **Guaranteed Play Store Certification & Framework Signature Spoofing (DEVICE_INTEGRITY)**:
+  * Prevented public keybox leakage to background DroidGuard (`com.google.android.gms.unstable`), avoiding Google CRL revocation flags and forcing DroidGuard into a clean software attestation fallback.
+  * Injected official Google Pixel framework release key (`GOOGLE_RELEASE_SIGNATURE`) into `"android"` package queries specifically inside `com.google.android.gms.unstable` via dynamic `PackageInfo.CREATOR` hooking, guaranteeing Google Play Integrity passes **`MEETS_DEVICE_INTEGRITY`** and Google Play Store certifies the device as **"Device is certified"**.
+
 ---
 
 ## Technical Details & Modified Files
@@ -125,9 +131,9 @@ The Battery settings screen (`Settings -> Battery`) has been completely overhaul
 | **Battery Info** | `OneUIBatteryInfoFragment.kt`<br>`oneui_battery_info_fragment.xml`<br>`SettingsGateway.java` | Dedicated sub-page for battery health %, cycle count, temp, voltage, and IEC 61960 capacity |
 | **Unified Settings** | `power_usage_summary.xml`<br>`PowerUsageSummary.java`<br>`PowerUsageSummaryScreen.kt` | Restructured preference layout organizing all power features into card groups and eliminating Pixel headers |
 | **Theme & Strings** | `colors.xml`, `values-night/colors.xml`<br>`shinkai_strings.xml`, `values-in/` | Dynamic Material You Monet palettes (`surfaceContainer`, `primary`) and comprehensive EN/ID translations |
-| **Key Attestation & Bootloader Lock** | `custom_config.xml`<br>`KeyProviderManager.java`<br>`KeyboxDataPreference.java`<br>`cmdline.c` | Google Root Keybox ECDSA integration, RKP support, Pixel Fold PIF specs, and `/proc/cmdline` filter |
-| **Play Integrity & Play Store Certification** | `PropImitationHooks.java`<br>`KeyProviderManager.java`<br>`custom_config.xml`<br>`common.mk`, `autopif` | DroidGuard blocking before keybox, comprehensive GMS Checkin spoofing, multi-tier file fallbacks, and Auto-PIF CLI |
-| **Spoof Option UI & GMS Reset** | `AutoPifHelper.java`<br>`SpoofOptionFragment.java`<br>`SpoofOptionController.java`<br>`spoof_option_fragment.xml` | Integrated live PIF generation and one-tap Play Store/GMS cache and data cleaner in Settings |
+| **Key Attestation & Bootloader Lock** | `custom_config.xml`<br>`KeyProviderManager.java`<br>`KeyboxDataPreference.java`<br>`KeyStoreSecurityLevel.java`<br>`cmdline.c` | Google Root Keybox ECDSA integration, RKP support, Pixel Fold PIF specs, "Attest key" bypass fix, and `/proc/cmdline` filter |
+| **Play Integrity & Play Store Certification** | `PropImitationHooks.java`<br>`KeyboxImitationHooks.java`<br>`KeyProviderManager.java`<br>`custom_config.xml`<br>`common.mk`, `autopif` | DroidGuard blocking before keybox, framework `"android"` Pixel release signature spoofing, GMS Checkin spoofing, multi-tier file fallbacks, and Auto-PIF CLI |
+| **Spoof Option UI & GMS Reset** | `AutoPifHelper.java`<br>`SpoofOptionFragment.java`<br>`SpoofOptionController.java`<br>`spoof_option_fragment.xml` | Integrated live PIF generation and one-tap Play Store/GMS/GSF cache and data cleaner in Settings |
 
 ---
 *Palapa OS - Tri-Monthly Edition | Shinkai Project (2026)*

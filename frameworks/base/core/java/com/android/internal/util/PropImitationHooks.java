@@ -24,9 +24,14 @@ import android.app.TaskStackListener;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.Build;
 import android.os.Binder;
 import android.os.Environment;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.os.Process;
 import android.os.SystemProperties;
 import android.provider.Settings;
@@ -44,6 +49,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -136,6 +142,9 @@ public class PropImitationHooks {
                 setPlayIntegrityProps(context);
             } else {
                 dlog("Not setting Play Integrity props in isolated process");
+            }
+            if (sIsGms) {
+                spoofSignature();
             }
         } else if (!sStockFp.isEmpty() && packageName.equals(PACKAGE_ARCORE)) {
             dlog("Setting stock fingerprint for: " + packageName);
@@ -331,6 +340,16 @@ public class PropImitationHooks {
         return gmsUid == callingUid;
     }
 
+    public static boolean isGms() {
+        if (sIsGms) return true;
+        try {
+            String processName = Application.getProcessName();
+            return PROCESS_GMS_UNSTABLE.equals(processName);
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
     private static boolean isCallerPlayIntegrity() {
         return Arrays.stream(Thread.currentThread().getStackTrace())
                 .map(StackTraceElement::getClassName)
@@ -343,16 +362,104 @@ public class PropImitationHooks {
             return;
         }
 
-        // Check stack for Play Integrity - block DroidGuard so it falls back to software attestation
-        if (isCallerPlayIntegrity()) {
-            dlog("Blocked key attestation for play integrity");
-            throw new UnsupportedOperationException();
+        // Inside GMS unstable (DroidGuard worker), always block key attestation so it
+        // cleanly falls back to software-backed attestation (MEETS_DEVICE_INTEGRITY).
+        if (sIsGms || isCallerPlayIntegrity()) {
+            dlog("Blocked key attestation for play integrity (sIsGms=" + sIsGms + ")");
+            throw new UnsupportedOperationException("Play integrity fallback to software attestation");
         }
 
         // If a keybox is found, don't block key attestation for other apps (e.g. Key Attestation app)
         if (KeyProviderManager.isKeyboxAvailable()) {
             dlog("Key attestation blocking is disabled because a keybox is defined to spoof");
             return;
+        }
+    }
+
+    private static final String GOOGLE_RELEASE_SIGNATURE =
+            "MIIFyTCCA7GgAwIBAgIVALyxxl+zDS9SL68SzOr48309eAZyMA0GCSqGSIb3DQEBCwUAMHQxCzAJ" +
+            "BgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQw" +
+            "EgYDVQQKEwtHb29nbGUgSW5jLjEQMA4GA1UECxMHQW5kcm9pZDEQMA4GA1UEAxMHQW5kcm9pZDAg" +
+            "Fw0yMjExMDExODExMzVaGA8yMDUyMTEwMTE4MTEzNVowdDELMAkGA1UEBhMCVVMxEzARBgNVBAgT" +
+            "CkNhbGlmb3JuaWExFjAUBgNVBAcTDU1vdW50YWluIFZpZXcxFDASBgNVBAoTC0dvb2dsZSBJbmMu" +
+            "MRAwDgYDVQQLEwdBbmRyb2lkMRAwDgYDVQQDEwdBbmRyb2lkMIICIjANBgkqhkiG9w0BAQEFAAOC" +
+            "Ag8AMIICCgKCAgEAsqtalIy/nctKlrhd1UVoDffFGnDf9GLi0QQhsVoJkfF16vDDydZJOycG7/kQ" +
+            "ziRZhFdcoMrIYZzzw0ppBjsSe1AiWMuKXwTBaEtxN99S1xsJiW4/QMI6N6kMunydWRMsbJ6aAxi1" +
+            "lVq0bxSwr8Sg/8u9HGVivfdG8OpUM+qjuV5gey5xttNLK3BZDrAlco8RkJZryAD40flmJZrWXJmc" +
+            "r2HhJJUnqG4Z3MSziEgW1u1JnnY3f/BFdgYsA54SgdUGdQP3aqzSjIpGK01/vjrXvifHazSANjvl" +
+            "0AUE5i6AarMw2biEKB2ySUDp8idC5w12GpqDrhZ/QkW8yBSa87KbkMYXuRA2Gq1fYbQx3YJraw0U" +
+            "gZ4M3fFKpt6raxxM5j0sWHlULD7dAZMERvNESVrKG3tQ7B39WAD8QLGYc45DFEGOhKv5Fv8510h5" +
+            "sXK502IvGpI4FDwz2rbtAgJ0j+16db5wCSW5ThvNPhCheyciajc8dU1B5tJzZN/ksBpzne4Xf9gO" +
+            "LZ9ZU0+3Z5gHVvTS/YpxBFwiFpmL7dvGxew0cXGSsG5UTBlgr7i0SX0WhY4Djjo8IfPwrvvA0QaC" +
+            "FamdYXKqBsSHgEyXS9zgGIFPt2jWdhaS+sAa//5SXcWro0OdiKPuwEzLgj759ke1sHRnvO735dYn" +
+            "5whVbzlGyLBh3L0CAwEAAaNQME4wDAYDVR0TBAUwAwEB/zAdBgNVHQ4EFgQUU1eXQ7NoYKjvOQlh" +
+            "5V8jHQMoxA8wHwYDVR0jBBgwFoAUU1eXQ7NoYKjvOQlh5V8jHQMoxA8wDQYJKoZIhvcNAQELBQAD" +
+            "ggIBAHFIazRLs3itnZKllPnboSd6sHbzeJURKehx8GJPvIC+xWlwWyFO5+GHmgc3yh/SVd3Xja/k" +
+            "8Ud59WEYTjyJJWTw0Jygx37rHW7VGn2HDuy/x0D+els+S8HeLD1toPFMepjIXJn7nHLhtmzTPlDW" +
+            "DrhiaYsls/k5Izf89xYnI4euuOY2+1gsweJqFGfbznqyqy8xLyzoZ6bvBJtgeY+G3i/9Be14HseS" +
+            "Na4FvI1Oze/l2gUu1IXzN6DGWR/lxEyt+TncJfBGKbjafYrfSh3zsE4N3TU7BeOL5INirOMjre/j" +
+            "VgB1YQG5qLVaPoz6mdn75AbBBm5a5ahApLiKqzy/hP+1rWgw8Ikb7vbUqov/bnY3IlIU6XcPJTCD" +
+            "b9aRZQkStvYpQd82XTyxD/T0GgRLnUj5Uv6iZlikFx1KNj0YNS2T3gyvL++J9B0Y6gAkiG0EtNpl" +
+            "z7Pomsv5pVdmHVdKMjqWw5/6zYzVmu5cXFtR384Ti1qwML1xkD6TC3VIv88rKIEjrkY2c+v1frh9" +
+            "fRJ2OmzXmML9NgHTjEiJR2Ib2iNrMKxkuTIs9oxKZgrJtJKvdU9qJJKM5PnZuNuHhGs6A/9gt9Oc" +
+            "cetYeQvVSqeEmQluWfcunQn9C9Vwi2BJIiVJh4IdWZf5/e2PlSSQ9CJjz2bKI17pzdxOmjQfE0JS" +
+            "F7Xt";
+
+    private static void spoofSignature() {
+        try {
+            final Signature spoofedSignature = new Signature(android.util.Base64.decode(
+                    GOOGLE_RELEASE_SIGNATURE, android.util.Base64.DEFAULT));
+            final Parcelable.Creator<PackageInfo> originalCreator = PackageInfo.CREATOR;
+            final Parcelable.Creator<PackageInfo> customCreator = new Parcelable.Creator<PackageInfo>() {
+                @Override
+                public PackageInfo createFromParcel(Parcel source) {
+                    PackageInfo packageInfo = originalCreator.createFromParcel(source);
+                    if (packageInfo != null && "android".equals(packageInfo.packageName)) {
+                        if (packageInfo.signatures != null && packageInfo.signatures.length > 0) {
+                            packageInfo.signatures[0] = spoofedSignature;
+                        }
+                        if (packageInfo.signingInfo != null) {
+                            Signature[] signers = packageInfo.signingInfo.getApkContentsSigners();
+                            if (signers != null && signers.length > 0) {
+                                signers[0] = spoofedSignature;
+                            }
+                            Signature[] history = packageInfo.signingInfo.getSigningCertificateHistory();
+                            if (history != null && history.length > 0) {
+                                history[0] = spoofedSignature;
+                            }
+                        }
+                    }
+                    return packageInfo;
+                }
+
+                @Override
+                public PackageInfo[] newArray(int size) {
+                    return originalCreator.newArray(size);
+                }
+            };
+
+            Field creatorField = PackageInfo.class.getDeclaredField("CREATOR");
+            creatorField.setAccessible(true);
+            if (UNSAFE != null && OFFSET_FIELD != null) {
+                long offset = OFFSET_FIELD.getInt(creatorField);
+                UNSAFE.putObject(creatorField.getDeclaringClass(), offset, customCreator);
+            } else {
+                creatorField.set(null, customCreator);
+            }
+            dlog("Successfully spoofed PackageInfo.CREATOR for GMS unstable");
+
+            try {
+                Field cacheField = PackageManager.class.getDeclaredField("sPackageInfoCache");
+                cacheField.setAccessible(true);
+                Object cache = cacheField.get(null);
+                if (cache != null) {
+                    Method clearMethod = cache.getClass().getMethod("clear");
+                    clearMethod.invoke(cache);
+                }
+            } catch (Throwable ignored) {
+            }
+        } catch (Throwable t) {
+            Log.e(TAG, "Failed to spoof PackageInfo signature for GMS", t);
         }
     }
 

@@ -113,6 +113,12 @@ Halaman Pengaturan Baterai (`Settings -> Battery`) telah dirombak secara menyelu
 * **Kernel Command Line Filter (`/proc/cmdline`)**:
   * Filter cerdas pada kernel (`cmdline.c`) yang secara otomatis mengganti flag `androidboot.verifiedbootstate=orange` menjadi `green`, `androidboot.flash.locked=0` menjadi `1`, dan `androidboot.vbmeta.device_state=unlocked` menjadi `locked` untuk pembacaan langsung di level sistem operasi.
 
+* **Penyempurnaan Key Attestation Hardware & Perbaikan Mode "Attest Key"**:
+  * Menghapus pembatasan `if (attestationKey == null)` pada `KeyStoreSecurityLevel.java`, sehingga saat pengujian "Attest key" dijalankan pada aplikasi Key Attestation, permintaan tetap ditangani oleh rantai `KeyboxImitationHooks`. Hal ini memperbaiki bug di mana status bootloader sebelumnya terbaca *Bootloader is Unlocked* pada mode tersebut.
+* **Jaminan Play Store Tersertifikasi & Framework Signature Spoofing (DEVICE_INTEGRITY)**:
+  * Mengisolasi penggunaan Keybox publik agar tidak pernah diberikan kepada proses background DroidGuard (`com.google.android.gms.unstable`). Hal ini mencegah Google mendeteksi serial keybox yang telah di-revoke dan memaksa DroidGuard melakukan *fallback* mulus ke evaluasi software.
+  * Mengintegrasikan penyamaran signature paket kerangka kerja (`"android"`) khusus pada proses `com.google.android.gms.unstable` dengan sertifikat rilis resmi Google Pixel (`GOOGLE_RELEASE_SIGNATURE`), menjamin Google Play Integrity meloloskan **`MEETS_DEVICE_INTEGRITY`** dan status Google Play Store dinyatakan resmi sebagai **"Perangkat telah tersertifikasi"**.
+
 ---
 
 ## Detail Teknis & Perubahan Kode
@@ -125,9 +131,9 @@ Halaman Pengaturan Baterai (`Settings -> Battery`) telah dirombak secara menyelu
 | **Info Baterai** | `OneUIBatteryInfoFragment.kt`<br>`oneui_battery_info_fragment.xml`<br>`SettingsGateway.java` | Sub-halaman info kesehatan baterai (%), siklus, suhu, voltase, dan kapasitas IEC 61960 |
 | **Pengaturan Terpadu** | `power_usage_summary.xml`<br>`PowerUsageSummary.java`<br>`PowerUsageSummaryScreen.kt` | Pengelompokan seluruh preferensi daya ke dalam kartu One UI dan pembersihan total header Pixel |
 | **Tema & Bahasa** | `colors.xml`, `values-night/colors.xml`<br>`shinkai_strings.xml`, `values-in/` | Palet warna dinamis Material You Monet (`surfaceContainer`, `primary`) dan lokalisasi lengkap ID/EN |
-| **Key Attestation & Bootloader Lock** | `custom_config.xml`<br>`KeyProviderManager.java`<br>`KeyboxDataPreference.java`<br>`cmdline.c` | Penanaman rantai Google Root Keybox ECDSA, dukungan RKP, integrasi PIF Pixel Fold, dan filter `/proc/cmdline` |
-| **Play Integrity & Play Store Certification** | `PropImitationHooks.java`<br>`KeyProviderManager.java`<br>`custom_config.xml`<br>`common.mk`, `autopif` | Blokir DroidGuard sebelum Keybox, penyamaran menyeluruh GMS Checkin, fallback file lokal, dan CLI generator Auto-PIF |
-| **Spoof Option UI & GMS Reset** | `AutoPifHelper.java`<br>`SpoofOptionFragment.java`<br>`SpoofOptionController.java`<br>`spoof_option_fragment.xml` | Integrasi generator PIF otomatis online dan fitur pembersih data/cache Google Play Store & GMS di menu Pengaturan |
+| **Key Attestation & Bootloader Lock** | `custom_config.xml`<br>`KeyProviderManager.java`<br>`KeyboxDataPreference.java`<br>`KeyStoreSecurityLevel.java`<br>`cmdline.c` | Penanaman rantai Google Root Keybox ECDSA, dukungan RKP, integrasi PIF Pixel Fold, pencegahan bypass "Attest key", dan filter `/proc/cmdline` |
+| **Play Integrity & Play Store Certification** | `PropImitationHooks.java`<br>`KeyboxImitationHooks.java`<br>`KeyProviderManager.java`<br>`custom_config.xml`<br>`common.mk`, `autopif` | Blokir DroidGuard sebelum Keybox, penyamaran signature framework `"android"` rilis Pixel, penyamaran GMS Checkin, fallback file lokal, dan CLI generator Auto-PIF |
+| **Spoof Option UI & GMS Reset** | `AutoPifHelper.java`<br>`SpoofOptionFragment.java`<br>`SpoofOptionController.java`<br>`spoof_option_fragment.xml` | Integrasi generator PIF otomatis online dan fitur pembersih data/cache Google Play Store, GMS, dan GSF di menu Pengaturan |
 
 ---
 *Palapa OS - Edisi Triwulan | Shinkai Project (2026)*

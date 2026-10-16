@@ -99,6 +99,12 @@ apply_ui() {
         echo -e "  ${GREEN}✓ frameworks/base/core/ successfully copied!${NC}"
     fi
 
+    if [ -d "$SCRIPT_DIR/frameworks/base/keystore" ]; then
+        mkdir -p "$TARGET_DIR/frameworks/base/keystore"
+        cp -rf "$SCRIPT_DIR/frameworks/base/keystore/"* "$TARGET_DIR/frameworks/base/keystore/"
+        echo -e "  ${GREEN}✓ frameworks/base/keystore/ successfully copied!${NC}"
+    fi
+
     if [ -d "$SCRIPT_DIR/vendor/custom" ]; then
         mkdir -p "$TARGET_DIR/vendor/custom"
         cp -rf "$SCRIPT_DIR/vendor/custom/"* "$TARGET_DIR/vendor/custom/"
