@@ -154,6 +154,17 @@ Comprehensively transformed **Settings -> System -> Spoof Option** into a centra
   * One-tap Play Store, GMS, and GSF data & cache cleaner with automatic package restarts.
   * Direct intent launcher to Key Attestation test applications.
 
+### 5. Play Integrity Strong & Device Certification Parity (TrickyStore OSS Parity)
+* **GMS Hardware Keybox Attestation Unblocked**:
+  * Removed restrictive `isGms()` checks in `KeyboxImitationHooks.java`, allowing `com.google.android.gms` (DroidGuard worker) to receive genuine hardware Keybox certificate chains (`deviceLocked = true`, `verifiedBootState = 0`).
+  * Re-ordered attestation handling in `PropImitationHooks.java`: Keystore attestation blocking (`UnsupportedOperationException`) is now bypassed whenever a Keybox is available, ensuring GMS successfully completes hardware attestation instead of failing to basic integrity.
+* **System Properties Consistency for GMS**:
+  * Integrated `PropImitationHooks.getSystemProperty` in `SystemProperties.java` (`get`, `getInt`, `getBoolean`) to return spoofed build properties, security patch levels, and locked boot state for GMS and Google Play Store processes, preventing native-to-Java property divergence.
+* **Refined Spoof Option Header Card**:
+  * Polished Material 3 card container with 26dp rounded squircle corners, subtle Monet outline stroke, and emerald security shield header.
+  * Responsive 3-metric status row displaying real-time Play Integrity (`STRONG` / `DEVICE`), Hardware TEE (`HARDWARE`), and Bootloader state (`LOCKED`).
+  * Enhanced Target Profile box with active profile indicator and formatted monospace fingerprint display.
+
 ---
 
 ## Technical Details & Modified Files
@@ -167,8 +178,8 @@ Comprehensively transformed **Settings -> System -> Spoof Option** into a centra
 | **Unified Settings** | `power_usage_summary.xml`<br>`PowerUsageSummary.java`<br>`PowerUsageSummaryScreen.kt` | Restructured preference layout organizing all power features into card groups and eliminating Pixel headers |
 | **Theme & Strings** | `colors.xml`, `values-night/colors.xml`<br>`shinkai_strings.xml`, `values-in/` | Dynamic Material You Monet palettes (`surfaceContainer`, `primary`) and comprehensive EN/ID translations |
 | **Key Attestation & Bootloader Lock** | `custom_config.xml`<br>`KeyProviderManager.java`<br>`KeyboxDataPreference.java`<br>`KeyStoreSecurityLevel.java`<br>`cmdline.c` | Google Root Keybox ECDSA integration, RKP support, Pixel Fold PIF specs, "Attest key" bypass fix, and `/proc/cmdline` filter |
-| **Play Integrity & Play Store Certification** | `PropImitationHooks.java`<br>`KeyboxImitationHooks.java`<br>`KeyProviderManager.java`<br>`custom_config.xml`<br>`common.mk`, `autopif` | DroidGuard blocking before keybox, framework `"android"` Pixel release signature spoofing, GMS Checkin spoofing, multi-tier file fallbacks, and Auto-PIF CLI |
-| **Spoof Option & Suite** | `AutoPifHelper.java`<br>`SpoofOptionFragment.java`<br>`SpoofOptionController.java`<br>`spoof_option_fragment.xml`<br>`spoof_option_header_card.xml`<br>`Settings.java`<br>`KeyboxChainGenerator.java`<br>`SecureSettingsValidators.java` | Centralized Play Integrity, TrickyStore & TEESimulator control center with Material card, PIF presets catalog, and verified boot hash spoofing |
+| **Play Integrity & Play Store Certification** | `PropImitationHooks.java`<br>`KeyboxImitationHooks.java`<br>`KeyProviderManager.java`<br>`SystemProperties.java`<br>`custom_config.xml`<br>`common.mk`, `autopif` | GMS hardware Keybox unblocking, property virtualization in `SystemProperties`, DroidGuard attestation bypass with Keybox, framework Pixel release signature spoofing, and Auto-PIF CLI |
+| **Spoof Option & Suite** | `AutoPifHelper.java`<br>`SpoofOptionFragment.java`<br>`SpoofOptionController.java`<br>`spoof_option_fragment.xml`<br>`spoof_option_header_card.xml`<br>`Settings.java`<br>`KeyboxChainGenerator.java`<br>`SecureSettingsValidators.java` | Centralized Play Integrity, TrickyStore & TEESimulator control center with redesigned Material card, PIF presets catalog, dynamic chip indicators, and verified boot hash spoofing |
 
 ---
 *Palapa OS - Tri-Monthly Edition | Shinkai Project (2026)*

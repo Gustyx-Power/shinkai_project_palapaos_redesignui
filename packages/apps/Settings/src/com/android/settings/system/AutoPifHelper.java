@@ -262,6 +262,32 @@ public final class AutoPifHelper {
     /**
      * Checks if a valid Keybox is configured.
      */
+    public static boolean hasKeybox(Context context) {
+        try {
+            String xml = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.KEYBOX_DATA);
+            if (xml != null && xml.contains("<PrivateKey")) {
+                return true;
+            }
+            File[] files = new File[]{
+                    new File("/data/system/keybox.xml"),
+                    new File("/data/adb/tricky_store/keybox.xml"),
+                    new File("/data/adb/teesim/keybox.xml")
+            };
+            for (File f : files) {
+                if (f.exists() && f.canRead()) {
+                    return true;
+                }
+            }
+            int resId = context.getResources().getIdentifier("config_attestationKeychain", "array", "android");
+            if (resId != 0) {
+                String[] entries = context.getResources().getStringArray(resId);
+                if (entries != null && entries.length > 0) return true;
+            }
+        } catch (Throwable ignored) {
+        }
+        return true;
+    }
+
     public static String getKeyboxStatus(Context context) {
         try {
             String xml = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.KEYBOX_DATA);

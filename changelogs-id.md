@@ -154,6 +154,17 @@ Mentransformasikan menu **Pengaturan -> Sistem -> Spoof Option** menjadi pusat k
   * Tombol 1 ketukan pembersih data & cache Google Play Store, GMS, dan GSF dengan auto-restart.
   * Peluncur langsung (*intent launcher*) ke aplikasi Key Attestation.
 
+### 5. Paritas Play Integrity Strong & Sertifikasi Perangkat (Paritas TrickyStore OSS)
+* **Buka Blokir Hardware Keybox Attestation untuk GMS**:
+  * Menghapus pembatasan `isGms()` pada `KeyboxImitationHooks.java`, mengizinkan proses `com.google.android.gms` (DroidGuard worker) untuk menerima sertifikat hardware Keybox asli (`deviceLocked = true`, `verifiedBootState = 0`).
+  * Penataan ulang alur pemeriksaan pada `PropImitationHooks.java`: Pemblokiran attestation Keystore (`UnsupportedOperationException`) kini di-bypass ketika Keybox terpasang, memastikan GMS menyelesaikan hardware attestation secara penuh tanpa terdegradasi ke basic integrity.
+* **Konsistensi Properti Sistem untuk GMS**:
+  * Integrasi `PropImitationHooks.getSystemProperty` pada `SystemProperties.java` (`get`, `getInt`, `getBoolean`) untuk mengembalikan build properties terspoof, security patch date, serta status bootloader terkunci pada proses GMS dan Google Play Store, mencegah perbedaan antara layer C/C++ native dan Java.
+* **Penyempurnaan Visual Header Card Spoof Option**:
+  * Desain Material 3 Card lebih rapi dan elegan dengan sudut lengkung 26dp, garis tepi Monet halus, dan ikon tameng keamanan hijau zamrud.
+  * Baris metrik status interaktif 3 kolom menampilkan status riil Play Integrity (`STRONG` / `DEVICE`), Hardware TEE (`HARDWARE`), dan Status Bootloader (`LOCKED`).
+  * Kotak profil target dipercantik dengan penanda profil aktif serta tampilan monospace fingerprint yang rapi.
+
 ---
 
 ## Detail Teknis & Perubahan Kode
@@ -167,8 +178,8 @@ Mentransformasikan menu **Pengaturan -> Sistem -> Spoof Option** menjadi pusat k
 | **Pengaturan Terpadu** | `power_usage_summary.xml`<br>`PowerUsageSummary.java`<br>`PowerUsageSummaryScreen.kt` | Pengelompokan seluruh preferensi daya ke dalam kartu One UI dan pembersihan total header Pixel |
 | **Tema & Bahasa** | `colors.xml`, `values-night/colors.xml`<br>`shinkai_strings.xml`, `values-in/` | Palet warna dinamis Material You Monet (`surfaceContainer`, `primary`) dan lokalisasi lengkap ID/EN |
 | **Key Attestation & Bootloader Lock** | `custom_config.xml`<br>`KeyProviderManager.java`<br>`KeyboxDataPreference.java`<br>`KeyStoreSecurityLevel.java`<br>`cmdline.c` | Penanaman rantai Google Root Keybox ECDSA, dukungan RKP, integrasi PIF Pixel Fold, pencegahan bypass "Attest key", dan filter `/proc/cmdline` |
-| **Play Integrity & Play Store Certification** | `PropImitationHooks.java`<br>`KeyboxImitationHooks.java`<br>`KeyProviderManager.java`<br>`custom_config.xml`<br>`common.mk`, `autopif` | Blokir DroidGuard sebelum Keybox, penyamaran signature framework `"android"` rilis Pixel, penyamaran GMS Checkin, fallback file lokal, dan CLI generator Auto-PIF |
-| **Pusat Kendali Spoof & Suite** | `AutoPifHelper.java`<br>`SpoofOptionFragment.java`<br>`SpoofOptionController.java`<br>`spoof_option_fragment.xml`<br>`spoof_option_header_card.xml`<br>`Settings.java`<br>`KeyboxChainGenerator.java`<br>`SecureSettingsValidators.java` | Dashboard terpadu Play Integrity, TrickyStore & TEESimulator dengan kartu header Material, katalog preset PIF, dan boot hash spoofing |
+| **Play Integrity & Play Store Certification** | `PropImitationHooks.java`<br>`KeyboxImitationHooks.java`<br>`KeyProviderManager.java`<br>`SystemProperties.java`<br>`custom_config.xml`<br>`common.mk`, `autopif` | Pembukaan blokir Keybox hardware untuk GMS, virtualisasi properti di `SystemProperties`, bypass blokir DroidGuard dengan Keybox, penyamaran signature Pixel release, dan CLI Auto-PIF |
+| **Pusat Kendali Spoof & Suite** | `AutoPifHelper.java`<br>`SpoofOptionFragment.java`<br>`SpoofOptionController.java`<br>`spoof_option_fragment.xml`<br>`spoof_option_header_card.xml`<br>`Settings.java`<br>`KeyboxChainGenerator.java`<br>`SecureSettingsValidators.java` | Dashboard terpadu Play Integrity, TrickyStore & TEESimulator dengan kartu header Material yang disempurnakan, katalog preset PIF, indikator chip dinamis, dan boot hash spoofing |
 
 ---
 *Palapa OS - Edisi Triwulan | Shinkai Project (2026)*

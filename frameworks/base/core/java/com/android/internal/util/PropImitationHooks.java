@@ -52,9 +52,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import sun.misc.Unsafe;
 
@@ -83,6 +85,7 @@ public class PropImitationHooks {
             "com.google.android.gms/.auth.uiflows.minutemaid.MinuteMaidActivity");
 
     private static volatile List<String> sCertifiedProps = new ArrayList<>();
+    private static final Map<String, String> sCertifiedPropMap = new HashMap<>();
     private static volatile String sStockFp, sNetflixModel;
 
     private static volatile String sProcessName;
@@ -282,6 +285,7 @@ public class PropImitationHooks {
     }
 
     private static void setCertifiedProps() {
+        sCertifiedPropMap.clear();
         for (String entry : sCertifiedProps) {
             // Each entry must be of the format FIELD:value
             final String[] fieldAndProp = entry.split(":", 2);
@@ -289,7 +293,13 @@ public class PropImitationHooks {
                 Log.e(TAG, "Invalid entry in certified props: " + entry);
                 continue;
             }
-            setPropValue(fieldAndProp[0], fieldAndProp[1]);
+            String key = fieldAndProp[0].trim();
+            String val = fieldAndProp[1].trim();
+            sCertifiedPropMap.put(key, val);
+            if ("VERSION_RELEASE".equals(key)) {
+                sCertifiedPropMap.put("RELEASE", val);
+            }
+            setPropValue(key, val);
         }
     }
 
@@ -362,17 +372,92 @@ public class PropImitationHooks {
             return;
         }
 
-        // Inside GMS unstable (DroidGuard worker), always block key attestation so it
-        // cleanly falls back to software-backed attestation (MEETS_DEVICE_INTEGRITY).
-        if (sIsGms || isCallerPlayIntegrity()) {
-            dlog("Blocked key attestation for play integrity (sIsGms=" + sIsGms + ")");
-            throw new UnsupportedOperationException("Play integrity fallback to software attestation");
+        // When a Keybox is available (TrickyStore mode), NEVER block key attestation!
+        // Allow GMS and banking apps to receive the genuine Keybox hardware-attested cert chain,
+        // passing MEETS_STRONG_INTEGRITY and MEETS_DEVICE_INTEGRITY.
+        if (KeyProviderManager.isKeyboxAvailable()) {
+            dlog("Key attestation blocking is bypassed because a keybox is available");
+            return;
         }
 
-        // If a keybox is found, don't block key attestation for other apps (e.g. Key Attestation app)
-        if (KeyProviderManager.isKeyboxAvailable()) {
-            dlog("Key attestation blocking is disabled because a keybox is defined to spoof");
-            return;
+        // Inside GMS unstable (DroidGuard worker), fallback to software-backed attestation
+        // only when no keybox is present.
+        if (sIsGms || isCallerPlayIntegrity()) {
+            dlog("Blocked key attestation for play integrity fallback (sIsGms=" + sIsGms + ")");
+            throw new UnsupportedOperationException("Play integrity fallback to software attestation");
+        }
+    }
+
+    public static String getSystemProperty(String key) {
+        if (!sIsGms && !sIsFinsky) {
+            return null;
+        }
+        if (key == null) return null;
+        switch (key) {
+            case "ro.build.fingerprint":
+            case "ro.bootimage.build.fingerprint":
+            case "ro.system.build.fingerprint":
+            case "ro.system_ext.build.fingerprint":
+            case "ro.vendor.build.fingerprint":
+            case "ro.odm.build.fingerprint":
+            case "ro.product.build.fingerprint":
+                return sCertifiedPropMap.get("FINGERPRINT");
+            case "ro.product.model":
+            case "ro.product.odm.model":
+            case "ro.product.system.model":
+            case "ro.product.system_ext.model":
+            case "ro.product.vendor.model":
+                return sCertifiedPropMap.get("MODEL");
+            case "ro.product.brand":
+            case "ro.product.odm.brand":
+            case "ro.product.system.brand":
+            case "ro.product.system_ext.brand":
+            case "ro.product.vendor.brand":
+                return sCertifiedPropMap.get("BRAND");
+            case "ro.product.device":
+            case "ro.product.odm.device":
+            case "ro.product.system.device":
+            case "ro.product.system_ext.device":
+            case "ro.product.vendor.device":
+                return sCertifiedPropMap.get("DEVICE");
+            case "ro.product.name":
+            case "ro.product.odm.name":
+            case "ro.product.system.name":
+            case "ro.product.system_ext.name":
+            case "ro.product.vendor.name":
+                return sCertifiedPropMap.get("PRODUCT");
+            case "ro.product.manufacturer":
+            case "ro.product.odm.manufacturer":
+            case "ro.product.system.manufacturer":
+            case "ro.product.system_ext.manufacturer":
+            case "ro.product.vendor.manufacturer":
+                return sCertifiedPropMap.get("MANUFACTURER");
+            case "ro.build.version.security_patch":
+                return sCertifiedPropMap.get("SECURITY_PATCH");
+            case "ro.build.version.release":
+                return sCertifiedPropMap.get("RELEASE");
+            case "ro.build.version.incremental":
+                return sCertifiedPropMap.get("INCREMENTAL");
+            case "ro.build.id":
+                return sCertifiedPropMap.get("ID");
+            case "ro.build.type":
+                return "user";
+            case "ro.build.tags":
+                return "release-keys";
+            case "ro.boot.flash.locked":
+                return "1";
+            case "ro.boot.verifiedbootstate":
+                return "green";
+            case "ro.boot.veritymode":
+                return "enforcing";
+            case "ro.boot.vbmeta.device_state":
+                return "locked";
+            case "ro.debuggable":
+                return "0";
+            case "ro.secure":
+                return "1";
+            default:
+                return null;
         }
     }
 

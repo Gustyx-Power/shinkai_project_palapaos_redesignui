@@ -40,10 +40,6 @@ public class KeyboxImitationHooks {
             return null;
         }
 
-        if (PropImitationHooks.isGms()) {
-            return null;
-        }
-
         if (!mSuccess) {
             return null;
         }
@@ -59,10 +55,6 @@ public class KeyboxImitationHooks {
 
     public static KeyMetadata generateKey(IKeystoreSecurityLevel level, KeyDescriptor descriptor, Collection<KeyParameter> args) {
         if (!KeyProviderManager.isKeyboxAvailable()) {
-            return null;
-        }
-
-        if (PropImitationHooks.isGms()) {
             return null;
         }
 

@@ -4,6 +4,7 @@ import android.app.settings.SettingsEnums;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -282,6 +283,9 @@ public class SpoofOptionFragment extends DashboardFragment {
         TextView chipIntegrity = (TextView) mHeaderCardPref.findViewById(R.id.spoof_chip_integrity);
         TextView chipKeybox = (TextView) mHeaderCardPref.findViewById(R.id.spoof_chip_keybox);
         TextView chipBootloader = (TextView) mHeaderCardPref.findViewById(R.id.spoof_chip_bootloader);
+        TextView statusBadge = (TextView) mHeaderCardPref.findViewById(R.id.spoof_status_badge);
+
+        boolean hasKeybox = AutoPifHelper.hasKeybox(context);
 
         if (profileTitle != null) {
             profileTitle.setText(AutoPifHelper.getActiveProfileSummary(context));
@@ -290,13 +294,19 @@ public class SpoofOptionFragment extends DashboardFragment {
             fingerprintText.setText(AutoPifHelper.getActiveFingerprint(context));
         }
         if (chipIntegrity != null) {
-            chipIntegrity.setText("DEVICE");
+            chipIntegrity.setText(hasKeybox ? "STRONG" : "DEVICE");
+            chipIntegrity.setTextColor(Color.parseColor("#10B981"));
         }
         if (chipKeybox != null) {
-            chipKeybox.setText("ACTIVE");
+            chipKeybox.setText(hasKeybox ? "HARDWARE" : "NOT SET");
+            chipKeybox.setTextColor(hasKeybox ? Color.parseColor("#06B6D4") : Color.parseColor("#F59E0B"));
         }
         if (chipBootloader != null) {
             chipBootloader.setText("LOCKED");
+            chipBootloader.setTextColor(Color.parseColor("#10B981"));
+        }
+        if (statusBadge != null) {
+            statusBadge.setText(hasKeybox ? "PROTECTED" : "ACTIVE");
         }
     }
 

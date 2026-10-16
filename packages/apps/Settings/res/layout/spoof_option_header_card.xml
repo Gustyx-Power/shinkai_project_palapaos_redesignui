@@ -22,17 +22,18 @@
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
     android:paddingTop="6dp"
-    android:paddingBottom="8dp"
+    android:paddingBottom="10dp"
     android:clipToPadding="false">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/spoof_header_card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="24dp"
+        app:cardCornerRadius="26dp"
         app:cardElevation="0dp"
-        app:strokeWidth="0dp"
-        app:cardBackgroundColor="@color/settingslib_materialColorSurfaceBright">
+        app:strokeWidth="1dp"
+        app:strokeColor="@color/settingslib_materialColorOutlineVariant"
+        app:cardBackgroundColor="@color/settingslib_materialColorSurfaceContainer">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -48,10 +49,10 @@
                 android:gravity="center_vertical">
 
                 <FrameLayout
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:background="@drawable/spoof_header_icon_bg"
-                    android:padding="10dp">
+                    android:padding="11dp">
 
                     <ImageView
                         android:layout_width="match_parent"
@@ -74,7 +75,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/spoof_card_header_title"
-                        android:textSize="17sp"
+                        android:textSize="17.5sp"
                         android:fontFamily="@font/product_sans_bold"
                         android:textColor="?android:attr/textColorPrimary"
                         android:includeFontPadding="false" />
@@ -96,14 +97,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/home_badge_pill_green"
-                    android:text="ACTIVE"
-                    android:textSize="11sp"
+                    android:text="PROTECTED"
+                    android:textSize="10.5sp"
                     android:textStyle="bold"
                     android:textColor="#FFFFFF"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
+                    android:paddingTop="3.5dp"
+                    android:paddingBottom="3.5dp"
                     android:includeFontPadding="false" />
             </LinearLayout>
 
@@ -119,7 +120,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="3dp"
                     android:background="@drawable/spoof_card_chip_bg"
                     android:orientation="vertical"
                     android:padding="10dp">
@@ -128,7 +129,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="INTEGRITY"
-                        android:textSize="10sp"
+                        android:textSize="9.5sp"
                         android:fontFamily="@font/product_sans_bold"
                         android:textColor="?android:attr/textColorSecondary"
                         android:includeFontPadding="false" />
@@ -138,20 +139,29 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="DEVICE"
-                        android:textSize="12sp"
+                        android:text="STRONG"
+                        android:textSize="13sp"
                         android:textStyle="bold"
                         android:textColor="#10B981"
                         android:includeFontPadding="false" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="CTS / Keystore"
+                        android:textSize="9.5sp"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:includeFontPadding="false" />
                 </LinearLayout>
 
-                <!-- Chip 2: Keybox -->
+                <!-- Chip 2: Keybox / TEE -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginEnd="3dp"
                     android:background="@drawable/spoof_card_chip_bg"
                     android:orientation="vertical"
                     android:padding="10dp">
@@ -159,8 +169,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="KEYBOX"
-                        android:textSize="10sp"
+                        android:text="HARDWARE TEE"
+                        android:textSize="9.5sp"
                         android:fontFamily="@font/product_sans_bold"
                         android:textColor="?android:attr/textColorSecondary"
                         android:includeFontPadding="false" />
@@ -170,10 +180,19 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="ACTIVE"
-                        android:textSize="12sp"
+                        android:text="HARDWARE"
+                        android:textSize="13sp"
                         android:textStyle="bold"
                         android:textColor="#06B6D4"
+                        android:includeFontPadding="false" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Tricky Keybox"
+                        android:textSize="9.5sp"
+                        android:textColor="?android:attr/textColorSecondary"
                         android:includeFontPadding="false" />
                 </LinearLayout>
 
@@ -182,7 +201,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="4dp"
+                    android:layout_marginStart="3dp"
                     android:background="@drawable/spoof_card_chip_bg"
                     android:orientation="vertical"
                     android:padding="10dp">
@@ -191,7 +210,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="BOOTLOADER"
-                        android:textSize="10sp"
+                        android:textSize="9.5sp"
                         android:fontFamily="@font/product_sans_bold"
                         android:textColor="?android:attr/textColorSecondary"
                         android:includeFontPadding="false" />
@@ -202,9 +221,18 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
                         android:text="LOCKED"
-                        android:textSize="12sp"
+                        android:textSize="13sp"
                         android:textStyle="bold"
                         android:textColor="#10B981"
+                        android:includeFontPadding="false" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Root Of Trust"
+                        android:textSize="9.5sp"
+                        android:textColor="?android:attr/textColorSecondary"
                         android:includeFontPadding="false" />
                 </LinearLayout>
             </LinearLayout>
@@ -224,10 +252,16 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
 
+                    <View
+                        android:layout_width="7dp"
+                        android:layout_height="7dp"
+                        android:background="@drawable/home_badge_pill_green" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Active Profile:"
+                        android:layout_marginStart="8dp"
+                        android:text="Target Profile:"
                         android:textSize="11sp"
                         android:textColor="?android:attr/textColorSecondary"
                         android:includeFontPadding="false" />
@@ -238,24 +272,33 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:text="Google Pixel 8 Pro (husky)"
-                        android:textSize="12sp"
+                        android:textSize="12.5sp"
                         android:textStyle="bold"
                         android:textColor="?android:attr/textColorPrimary"
+                        android:singleLine="true"
+                        android:ellipsize="end"
                         android:includeFontPadding="false" />
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/spoof_active_fingerprint_text"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="google/husky/husky:14/AP2A.240805.005/12025142:user/release-keys"
-                    android:textSize="10.5sp"
-                    android:fontFamily="monospace"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:maxLines="2"
-                    android:ellipsize="middle"
-                    android:includeFontPadding="false" />
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/spoof_card_chip_bg"
+                    android:padding="7dp">
+
+                    <TextView
+                        android:id="@+id/spoof_active_fingerprint_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="google/husky/husky:14/AP2A.240805.005/12025142:user/release-keys"
+                        android:textSize="10.5sp"
+                        android:fontFamily="monospace"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:maxLines="2"
+                        android:ellipsize="middle"
+                        android:includeFontPadding="false" />
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>
