@@ -102,18 +102,18 @@
     <!-- Build properties from a GMS certified device against current platform SPL level -->
     <string-array name="config_verifiedDeviceSpecs" translatable="false">
         <item>MANUFACTURER:Google</item>
-        <item>MODEL:Pixel Fold</item>
-        <item>FINGERPRINT:google/felix_beta/felix:CANARY/ZP11.260918.007/16484274:user/release-keys</item>
+        <item>MODEL:Pixel 8 Pro</item>
+        <item>FINGERPRINT:google/husky/husky:14/AP2A.240805.005/12025142:user/release-keys</item>
         <item>BRAND:google</item>
-        <item>PRODUCT:felix_beta</item>
-        <item>DEVICE:felix</item>
-        <item>VERSION.RELEASE:17</item>
-        <item>ID:ZP11.260918.007</item>
-        <item>VERSION.SECURITY_PATCH:2026-10-05</item>
-        <item>VERSION.DEVICE_INITIAL_SDK_INT:33</item>
+        <item>PRODUCT:husky</item>
+        <item>DEVICE:husky</item>
+        <item>VERSION.RELEASE:14</item>
+        <item>ID:AP2A.240805.005</item>
+        <item>VERSION.SECURITY_PATCH:2024-08-05</item>
+        <item>VERSION.DEVICE_INITIAL_SDK_INT:34</item>
         <item>TYPE:user</item>
         <item>TAGS:release-keys</item>
-        <item>VERSION.INCREMENTAL:16484274</item>
+        <item>VERSION.INCREMENTAL:12025142</item>
     </string-array>
 
     <!-- Keybox configuration for device certification -->

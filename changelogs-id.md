@@ -124,6 +124,38 @@ Halaman Pengaturan Baterai (`Settings -> Battery`) telah dirombak secara menyelu
 
 ---
 
+### 5. Integrasi Terpadu Play Integrity, TrickyStore & TEESimulator di Menu Pengaturan
+Mentransformasikan menu **Pengaturan -> Sistem -> Spoof Option** menjadi pusat kendali attestation dan Play Integrity terlengkap setara TrickyStore WebUI dan TEESimulator WebUI langsung di dalam ROM tanpa memerlukan modul root Magisk atau KernelSU:
+
+* **Header Card Material Modern dengan Diagnostik Real-Time**:
+  * Kartu hero elegan dengan ikon perisai keamanan, status badge, ringkasan fingerprint aktif, dan 3 chip status langsung:
+    * **Play Integrity**: `MEETS_DEVICE` (Hijau)
+    * **Status Keybox**: `ACTIVE` (Sian)
+    * **Status Bootloader**: `LOCKED` (Hijau)
+* **Katalog & Pemilih Profil PIF Tersertifikasi (Suite PIF)**:
+  * Pilihan profil bawaan perangkat resmi siap pakai dengan 1 ketukan:
+    * Google Pixel 8 Pro (`husky`), Pixel 7 Pro (`cheetah`), Pixel 6a (`bluejay`)
+    * Google Pixel 5 (`redfin`) dengan Initial API 30 (melewati kewajiban RKP Google)
+    * POCO F5 5G (`marble` HyperOS Global Stock)
+    * Xiaomi 13 Pro (`nuwa` Global Stock)
+    * Nothing Phone (2) (`Pong`)
+    * ASUS ROG Phone 6 (`AI2201` Initial API 31)
+  * Penerapan langsung ke `Settings.Secure.PIF_DATA`, `/data/system/pif.json`, dan auto-restart layanan Google.
+  * Tetap mempertahankan fitur pembaruan online live build Google Flash Station dan impor manual `pif.json`.
+* **Suite TrickyStore (Keybox & Root of Trust)**:
+  * Inspeksi hardware keybox aktif (kunci EC / RSA dan status sertifikat).
+  * **Custom Verified Boot Hash (`verified_boot_hash`)**: Pengguna dapat memasukkan 64 karakter SHA-256 boot hash (TrickyStore `boot_hash`) yang langsung disuntikkan ke ekstensi ASN.1 `KeyDescription` root of trust.
+  * **Filter Target Aplikasi**: Mode target fleksibel (Direkomendasikan vs Semua Aplikasi) serta dukungan file `/data/system/target.txt`.
+* **Suite TEESimulator (Perilaku Attestation & Patch Level)**:
+  * **Toggle Paksa RKP Attestation (`tee_rkp_only`)**: Mengaktifkan atau menonaktifkan kewajiban RKP sesuai rekomendasi komunitas untuk meloloskan Strong integrity pada profil Pixel 6-9 di bootloader terbuka.
+  * **Sinkronisasi Otomatis Security Patch Level (`tee_auto_spl`)**: Otomatis menyelaraskan level patch boot dan vendor simulasi TEE dengan tanggal profil sertifikasi PIF aktif.
+  * **Tingkat Keamanan Simulasi**: Pilihan antara TEE Keymaster dan StrongBox Keymaster.
+* **Pemeliharaan & Pengujian Langsung**:
+  * Tombol 1 ketukan pembersih data & cache Google Play Store, GMS, dan GSF dengan auto-restart.
+  * Peluncur langsung (*intent launcher*) ke aplikasi Key Attestation.
+
+---
+
 ## Detail Teknis & Perubahan Kode
 
 | Komponen | File Terkait | Deskripsi Perubahan |
@@ -136,7 +168,7 @@ Halaman Pengaturan Baterai (`Settings -> Battery`) telah dirombak secara menyelu
 | **Tema & Bahasa** | `colors.xml`, `values-night/colors.xml`<br>`shinkai_strings.xml`, `values-in/` | Palet warna dinamis Material You Monet (`surfaceContainer`, `primary`) dan lokalisasi lengkap ID/EN |
 | **Key Attestation & Bootloader Lock** | `custom_config.xml`<br>`KeyProviderManager.java`<br>`KeyboxDataPreference.java`<br>`KeyStoreSecurityLevel.java`<br>`cmdline.c` | Penanaman rantai Google Root Keybox ECDSA, dukungan RKP, integrasi PIF Pixel Fold, pencegahan bypass "Attest key", dan filter `/proc/cmdline` |
 | **Play Integrity & Play Store Certification** | `PropImitationHooks.java`<br>`KeyboxImitationHooks.java`<br>`KeyProviderManager.java`<br>`custom_config.xml`<br>`common.mk`, `autopif` | Blokir DroidGuard sebelum Keybox, penyamaran signature framework `"android"` rilis Pixel, penyamaran GMS Checkin, fallback file lokal, dan CLI generator Auto-PIF |
-| **Spoof Option UI & GMS Reset** | `AutoPifHelper.java`<br>`SpoofOptionFragment.java`<br>`SpoofOptionController.java`<br>`spoof_option_fragment.xml` | Integrasi generator PIF otomatis online dan fitur pembersih data/cache Google Play Store, GMS, dan GSF di menu Pengaturan |
+| **Pusat Kendali Spoof & Suite** | `AutoPifHelper.java`<br>`SpoofOptionFragment.java`<br>`SpoofOptionController.java`<br>`spoof_option_fragment.xml`<br>`spoof_option_header_card.xml`<br>`Settings.java`<br>`KeyboxChainGenerator.java`<br>`SecureSettingsValidators.java` | Dashboard terpadu Play Integrity, TrickyStore & TEESimulator dengan kartu header Material, katalog preset PIF, dan boot hash spoofing |
 
 ---
 *Palapa OS - Edisi Triwulan | Shinkai Project (2026)*

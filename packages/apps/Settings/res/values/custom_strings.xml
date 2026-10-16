@@ -361,24 +361,65 @@
     <string name="spoof_option_enable">Enable spoof option</string>
     <string name="spoof_option_summary">Configure key attestation and Play Store property spoofing</string>
 
+    <!-- Spoof Option Header Card -->
+    <string name="spoof_card_header_title">Integrity &amp; Attestation Engine</string>
+    <string name="spoof_card_header_subtitle">PIF Selector • TrickyStore • TEE Simulator</string>
+
+    <!-- Categories -->
+    <string name="category_pif_suite_title">Play Integrity Fix (PIF Suite)</string>
+    <string name="category_trickystore_suite_title">TrickyStore Suite (Keybox &amp; Boot Hash)</string>
+    <string name="category_teesim_suite_title">TEESimulator Suite (Attestation Behavior)</string>
+    <string name="category_maintenance_title">Maintenance &amp; Diagnostics</string>
+
+    <!-- PIF Presets -->
+    <string name="pif_preset_profile_title">Certified Device Profile (PIF Preset)</string>
+    <string name="pif_preset_profile_summary">Active: %1$s</string>
+    <string name="pif_preset_dialog_title">Select Certified Device Profile</string>
+    <string name="pif_preset_applied">Switched profile to %1$s. Google services refreshed!</string>
+
+    <!-- TrickyStore Suite -->
+    <string name="keybox_status_title">Hardware Keybox Status</string>
+    <string name="keybox_status_summary">Active Keybox status and attestation cryptographic keys</string>
+    <string name="verified_boot_hash_title">Custom Verified Boot Hash</string>
+    <string name="verified_boot_hash_summary">Spoof root of trust SHA-256 boot hash (TrickyStore boot_hash)</string>
+    <string name="verified_boot_hash_dialog_title">Set Verified Boot Hash</string>
+    <string name="verified_boot_hash_dialog_message">Enter a 64-character hexadecimal SHA-256 digest to spoof the verified boot hash in the KeyDescription attestation extension, or leave empty for default.</string>
+    <string name="verified_boot_hash_saved">Verified boot hash updated</string>
+    <string name="verified_boot_hash_invalid">Invalid hash: Must be a 64-character hex string or empty</string>
+    <string name="keybox_target_mode_title">Keybox Target Mode</string>
+    <string name="keybox_target_mode_summary">Select applications that receive hardware keybox attestation</string>
+
+    <!-- TEESimulator Suite -->
+    <string name="tee_rkp_only_title">Enforce RKP Attestation</string>
+    <string name="tee_rkp_only_summary">Enable Remote Key Provisioning enforcement. Turn off to pass Strong with Pixel 6-9 profiles on unlocked bootloaders.</string>
+    <string name="tee_auto_spl_title">Sync Security Patch Level with PIF</string>
+    <string name="tee_auto_spl_summary">Automatically synchronize simulated TEE boot and vendor patch levels with the active certified PIF profile date.</string>
+    <string name="tee_security_level_title">Simulated Security Level</string>
+    <string name="tee_security_level_summary">Select simulated KeyMint hardware security level</string>
+
+    <!-- Diagnostics -->
+    <string name="launch_key_attestation_title">Test Key Attestation</string>
+    <string name="launch_key_attestation_summary">Launch Key Attestation app to verify locked bootloader status and certificate chain</string>
+    <string name="launch_key_attestation_not_installed">Key Attestation app is not installed</string>
+
     <!-- Keybox Data -->
     <string name="keybox_data_title">Configure keybox XML</string>
-    <string name="keybox_data_summary">Configure system-wide key attestation spoofing. Tap Delete to reset to defaults.</string>
+    <string name="keybox_data_summary">Import custom keybox XML for system-wide attestation spoofing. Tap Delete to reset.</string>
 
     <!-- Pif Data -->
-    <string name="pif_data_title">Configure PIF JSON</string>
-    <string name="pif_data_summary">Configure PIF JSON used to spoof properties for GMS and the Play Store. Tap Delete to revert to dynamic defaults.</string>
+    <string name="pif_data_title">Configure custom pif.json</string>
+    <string name="pif_data_summary">Import custom PIF JSON used to spoof properties for GMS and the Play Store. Tap Delete to revert.</string>
 
     <!-- Auto PIF Generator -->
-    <string name="auto_pif_title">Update PIF automatically</string>
-    <string name="auto_pif_summary">Fetch latest unbanned Pixel Canary/Beta fingerprint from Google or apply verified backup</string>
+    <string name="auto_pif_title">Fetch Latest Online PIF</string>
+    <string name="auto_pif_summary">Fetch latest verified release/beta fingerprint online from Google</string>
     <string name="auto_pif_updating">Fetching latest PIF profile…</string>
     <string name="auto_pif_success">PIF profile updated successfully: %1$s</string>
     <string name="auto_pif_failed">Failed to update PIF profile</string>
 
     <!-- Clear GMS & Play Store Data -->
     <string name="clear_gms_playstore_title">Clear Play Store &amp; Play Services data</string>
-    <string name="clear_gms_playstore_summary">Clear cache and storage data for Google Play Store and GMS to refresh certification</string>
+    <string name="clear_gms_playstore_summary">Wipe cache and local storage for Google Play Store and GMS to refresh certification immediately</string>
     <string name="clear_gms_playstore_dialog_title">Clear Play Store &amp; Play Services data?</string>
     <string name="clear_gms_playstore_dialog_message">This will reset cache and local storage for Google Play Store and Google Play Services. Your Google Account will remain linked, but Play Protect certification will be re-registered immediately.</string>
     <string name="clear_gms_playstore_clearing">Clearing Play Store and Play Services data…</string>

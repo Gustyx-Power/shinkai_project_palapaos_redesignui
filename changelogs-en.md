@@ -124,6 +124,38 @@ The Battery settings screen (`Settings -> Battery`) has been completely overhaul
 
 ---
 
+### 5. Play Integrity, TrickyStore & TEESimulator Integrated Suite in Settings
+Comprehensively transformed **Settings -> System -> Spoof Option** into a centralized, on-device attestation management dashboard uniting TrickyStore, PIF profile selector, and TEE Simulator capabilities without requiring Magisk or KernelSU root modules:
+
+* **Material Header Card with Real-Time Diagnostics**:
+  * Hero card featuring glowing security shield icon, status badge, active fingerprint summary, and 3 real-time status chips:
+    * **Play Integrity**: `MEETS_DEVICE` (Green)
+    * **Keybox State**: `ACTIVE` (Cyan)
+    * **Bootloader State**: `LOCKED` (Green)
+* **PIF Profile Catalog & Selector (PIF Suite)**:
+  * Integrated a curated list of certified device presets with 1-tap switching:
+    * Google Pixel 8 Pro (`husky`), Pixel 7 Pro (`cheetah`), Pixel 6a (`bluejay`)
+    * Google Pixel 5 (`redfin`) with Initial API 30 (bypassing mandatory RKP requirements)
+    * POCO F5 5G (`marble` HyperOS Global Stock)
+    * Xiaomi 13 Pro (`nuwa` Global Stock)
+    * Nothing Phone (2) (`Pong`)
+    * ASUS ROG Phone 6 (`AI2201` Initial API 31)
+  * Instant application writing to `Settings.Secure.PIF_DATA`, `/data/system/pif.json`, and automatic GMS refresh.
+  * Preserved online OTA / Flash Station automated PIF fetcher and custom `pif.json` file loader.
+* **TrickyStore Suite (Keybox & Root of Trust)**:
+  * Real-time Keybox inspection displaying loaded cryptographic algorithm (EC / RSA) and validity.
+  * **Custom Verified Boot Hash (`verified_boot_hash`)**: User-configurable 64-character SHA-256 boot hash spoofed directly into ASN.1 `KeyDescription` root of trust extension, replicating TrickyStore's `boot_hash`.
+  * **Target Application Filter**: Configurable target modes (Recommended vs All Applications) and support for `/data/system/target.txt`.
+* **TEESimulator Suite (Attestation Behavior & Patch Alignment)**:
+  * **Enforce RKP Attestation Toggle (`tee_rkp_only`)**: Allows users to toggle RKP enforcement on/off to pass Strong integrity with Pixel 6-9 profiles on unlocked bootloaders.
+  * **Auto Security Patch Synchronization (`tee_auto_spl`)**: Automatically matches simulated TEE boot and vendor patch levels with the active certified PIF profile date, eliminating patch mismatches.
+  * **Simulated Security Level**: Toggle between TEE (Trusted Execution Environment) and StrongBox Keymaster.
+* **Maintenance & Direct Testing**:
+  * One-tap Play Store, GMS, and GSF data & cache cleaner with automatic package restarts.
+  * Direct intent launcher to Key Attestation test applications.
+
+---
+
 ## Technical Details & Modified Files
 
 | Component | Related Files | Description |
@@ -136,7 +168,7 @@ The Battery settings screen (`Settings -> Battery`) has been completely overhaul
 | **Theme & Strings** | `colors.xml`, `values-night/colors.xml`<br>`shinkai_strings.xml`, `values-in/` | Dynamic Material You Monet palettes (`surfaceContainer`, `primary`) and comprehensive EN/ID translations |
 | **Key Attestation & Bootloader Lock** | `custom_config.xml`<br>`KeyProviderManager.java`<br>`KeyboxDataPreference.java`<br>`KeyStoreSecurityLevel.java`<br>`cmdline.c` | Google Root Keybox ECDSA integration, RKP support, Pixel Fold PIF specs, "Attest key" bypass fix, and `/proc/cmdline` filter |
 | **Play Integrity & Play Store Certification** | `PropImitationHooks.java`<br>`KeyboxImitationHooks.java`<br>`KeyProviderManager.java`<br>`custom_config.xml`<br>`common.mk`, `autopif` | DroidGuard blocking before keybox, framework `"android"` Pixel release signature spoofing, GMS Checkin spoofing, multi-tier file fallbacks, and Auto-PIF CLI |
-| **Spoof Option UI & GMS Reset** | `AutoPifHelper.java`<br>`SpoofOptionFragment.java`<br>`SpoofOptionController.java`<br>`spoof_option_fragment.xml` | Integrated live PIF generation and one-tap Play Store/GMS/GSF cache and data cleaner in Settings |
+| **Spoof Option & Suite** | `AutoPifHelper.java`<br>`SpoofOptionFragment.java`<br>`SpoofOptionController.java`<br>`spoof_option_fragment.xml`<br>`spoof_option_header_card.xml`<br>`Settings.java`<br>`KeyboxChainGenerator.java`<br>`SecureSettingsValidators.java` | Centralized Play Integrity, TrickyStore & TEESimulator control center with Material card, PIF presets catalog, and verified boot hash spoofing |
 
 ---
 *Palapa OS - Tri-Monthly Edition | Shinkai Project (2026)*

@@ -15,9 +15,12 @@ import android.hardware.security.keymint.KeyParameter;
 import android.hardware.security.keymint.Tag;
 import android.os.Binder;
 import android.os.Build;
+import android.provider.Settings;
 import android.security.keystore.KeyProperties;
 import android.system.keystore2.KeyDescriptor;
 import android.util.Log;
+
+import java.io.File;
 
 import androidx.annotation.Nullable;
 
@@ -139,15 +142,54 @@ public final class KeyboxChainGenerator {
         return result;
     }
 
+    private static byte[] getVerifiedBootHash() {
+        try {
+            Context ctx = ActivityThread.currentApplication();
+            String hashHex = null;
+            if (ctx != null) {
+                hashHex = Settings.Secure.getString(ctx.getContentResolver(), Settings.Secure.VERIFIED_BOOT_HASH);
+            }
+            if (hashHex == null || hashHex.trim().isEmpty()) {
+                File[] bootHashFiles = new File[]{
+                    new File("/data/system/boot_hash"),
+                    new File("/data/adb/tricky_store/boot_hash"),
+                    new File("/data/adb/teesim/boot_hash")
+                };
+                for (File f : bootHashFiles) {
+                    if (f.exists() && f.canRead()) {
+                        hashHex = new String(java.nio.file.Files.readAllBytes(f.toPath()), java.nio.charset.StandardCharsets.UTF_8).trim();
+                        break;
+                    }
+                }
+            }
+            if (hashHex != null) {
+                hashHex = hashHex.replaceAll("[^0-9a-fA-F]", "");
+                if (hashHex.length() == 64) {
+                    byte[] bytes = new byte[32];
+                    for (int i = 0; i < 32; i++) {
+                        bytes[i] = (byte) Integer.parseInt(hashHex.substring(i * 2, i * 2 + 2), 16);
+                    }
+                    return bytes;
+                }
+            }
+        } catch (Throwable t) {
+            Log.w(TAG, "Failed reading custom verified boot hash", t);
+        }
+        return null;
+    }
+
     private static Extension createExtension(KeyGenParameters params, int uid) {
         try {
             SecureRandom random = new SecureRandom();
 
             byte[] bytes1 = new byte[32];
-            byte[] bytes2 = new byte[32];
-
             random.nextBytes(bytes1);
-            random.nextBytes(bytes2);
+
+            byte[] bytes2 = getVerifiedBootHash();
+            if (bytes2 == null) {
+                bytes2 = new byte[32];
+                random.nextBytes(bytes2);
+            }
 
             ASN1Encodable[] rootOfTrustEncodables = {new DEROctetString(bytes1), ASN1Boolean.TRUE,
                     new ASN1Enumerated(0), new DEROctetString(bytes2)};

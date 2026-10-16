@@ -5,42 +5,115 @@
     android:key="spoof_option_screen"
     android:title="@string/spoof_option_title">
 
+    <com.android.settingslib.widget.LayoutPreference
+        android:key="spoof_header_card"
+        android:layout="@layout/spoof_option_header_card"
+        android:selectable="false" />
+
     <com.android.settingslib.widget.MainSwitchPreference
         android:key="spoof_option_enabled"
         android:title="@string/spoof_option_enable"
         settings:controller="com.android.settings.system.SpoofOptionController" />
 
-    <SwitchPreferenceCompat
-        android:key="certified_props"
-        android:title="@string/cert_overlay_title"
-        android:summary="@string/cert_overlay_summary"
-        android:defaultValue="false"
-        settings:controller="com.android.settings.system.CertifiedPropsPreferenceController" /> 
+    <!-- 1. Play Integrity & Certified Fingerprint Suite -->
+    <PreferenceCategory
+        android:key="category_pif_suite"
+        android:title="@string/category_pif_suite_title">
 
-    <com.android.settings.development.KeyboxDataPreference
-        android:key="keybox_data_setting"
-        android:title="@string/keybox_data_title"
-        android:summary="@string/keybox_data_summary"
-        android:defaultValue=""
-        android:enabled="false" />
+        <ListPreference
+            android:key="pif_preset_profile"
+            android:title="@string/pif_preset_profile_title"
+            android:summary="@string/pif_preset_profile_summary"
+            android:dialogTitle="@string/pif_preset_dialog_title"
+            android:entries="@array/pif_preset_names"
+            android:entryValues="@array/pif_preset_values"
+            android:defaultValue="pixel_8_pro" />
 
-    <com.android.settings.development.PifDataPreference
-        android:key="pif_data_setting"
-        android:title="@string/pif_data_title"
-        android:summary="@string/pif_data_summary"
-        android:defaultValue=""
-        android:enabled="false" />
+        <Preference
+            android:key="auto_pif_generate"
+            android:title="@string/auto_pif_title"
+            android:summary="@string/auto_pif_summary" />
 
-    <Preference
-        android:key="auto_pif_generate"
-        android:title="@string/auto_pif_title"
-        android:summary="@string/auto_pif_summary"
-        android:enabled="false" />
+        <com.android.settings.development.PifDataPreference
+            android:key="pif_data_setting"
+            android:title="@string/pif_data_title"
+            android:summary="@string/pif_data_summary"
+            android:defaultValue="" />
+    </PreferenceCategory>
 
-    <Preference
-        android:key="clear_gms_playstore_data"
-        android:title="@string/clear_gms_playstore_title"
-        android:summary="@string/clear_gms_playstore_summary"
-        android:enabled="false" />
+    <!-- 2. TrickyStore Suite (Keybox & Attestation Config) -->
+    <PreferenceCategory
+        android:key="category_trickystore_suite"
+        android:title="@string/category_trickystore_suite_title">
+
+        <Preference
+            android:key="keybox_status_info"
+            android:title="@string/keybox_status_title"
+            android:summary="@string/keybox_status_summary"
+            android:selectable="false" />
+
+        <com.android.settings.development.KeyboxDataPreference
+            android:key="keybox_data_setting"
+            android:title="@string/keybox_data_title"
+            android:summary="@string/keybox_data_summary"
+            android:defaultValue="" />
+
+        <EditTextPreference
+            android:key="verified_boot_hash_setting"
+            android:title="@string/verified_boot_hash_title"
+            android:summary="@string/verified_boot_hash_summary"
+            android:dialogTitle="@string/verified_boot_hash_dialog_title"
+            android:dialogMessage="@string/verified_boot_hash_dialog_message" />
+
+        <ListPreference
+            android:key="keybox_target_mode"
+            android:title="@string/keybox_target_mode_title"
+            android:summary="@string/keybox_target_mode_summary"
+            android:entries="@array/keybox_target_mode_names"
+            android:entryValues="@array/keybox_target_mode_values"
+            android:defaultValue="recommended" />
+    </PreferenceCategory>
+
+    <!-- 3. TEESimulator Suite (Attestation Behavior & Environment) -->
+    <PreferenceCategory
+        android:key="category_teesim_suite"
+        android:title="@string/category_teesim_suite_title">
+
+        <SwitchPreferenceCompat
+            android:key="tee_rkp_only_setting"
+            android:title="@string/tee_rkp_only_title"
+            android:summary="@string/tee_rkp_only_summary"
+            android:defaultValue="false" />
+
+        <SwitchPreferenceCompat
+            android:key="tee_auto_spl_setting"
+            android:title="@string/tee_auto_spl_title"
+            android:summary="@string/tee_auto_spl_summary"
+            android:defaultValue="true" />
+
+        <ListPreference
+            android:key="tee_security_level"
+            android:title="@string/tee_security_level_title"
+            android:summary="@string/tee_security_level_summary"
+            android:entries="@array/tee_security_level_names"
+            android:entryValues="@array/tee_security_level_values"
+            android:defaultValue="tee" />
+    </PreferenceCategory>
+
+    <!-- 4. Maintenance & Diagnostics -->
+    <PreferenceCategory
+        android:key="category_maintenance"
+        android:title="@string/category_maintenance_title">
+
+        <Preference
+            android:key="clear_gms_playstore_data"
+            android:title="@string/clear_gms_playstore_title"
+            android:summary="@string/clear_gms_playstore_summary" />
+
+        <Preference
+            android:key="launch_key_attestation"
+            android:title="@string/launch_key_attestation_title"
+            android:summary="@string/launch_key_attestation_summary" />
+    </PreferenceCategory>
 
 </PreferenceScreen>

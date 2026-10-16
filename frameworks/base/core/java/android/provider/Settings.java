@@ -7068,6 +7068,7 @@ public final class Settings {
          * 0 = 0ff, 1 = on
          * @hide
          */
+        @Readable
         public static final String DOUBLE_TAP_SLEEP_GESTURE = "double_tap_sleep_gesture";
 
         /**
@@ -14088,6 +14089,34 @@ public final class Settings {
          */
         @Readable
         public static final String KEYBOX_DATA = "keybox_data";
+
+        /**
+         * Custom verified boot hash (SHA-256) for root of trust spoofing.
+         * @hide
+         */
+        @Readable
+        public static final String VERIFIED_BOOT_HASH = "verified_boot_hash";
+
+        /**
+         * Enforce RKP-only attestation mode in TEE simulator.
+         * @hide
+         */
+        @Readable
+        public static final String TEE_RKP_ONLY = "tee_rkp_only";
+
+        /**
+         * Auto-align TEE security patch level with active PIF profile.
+         * @hide
+         */
+        @Readable
+        public static final String TEE_AUTO_SPL = "tee_auto_spl";
+
+        /**
+         * Target filter mode for keybox attestation spoofing.
+         * @hide
+         */
+        @Readable
+        public static final String KEYBOX_TARGET_MODE = "keybox_target_mode";
 
         /**
          * Network traffic indicator mode

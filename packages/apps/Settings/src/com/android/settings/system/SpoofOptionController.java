@@ -4,8 +4,8 @@ import android.content.Context;
 import android.provider.Settings;
 
 import androidx.preference.Preference;
+import androidx.preference.PreferenceGroup;
 import androidx.preference.PreferenceScreen;
-import androidx.preference.TwoStatePreference;
 
 import com.android.settings.core.TogglePreferenceController;
 
@@ -13,11 +13,7 @@ public class SpoofOptionController extends TogglePreferenceController {
 
     private static final String SETTINGS_KEY = "spoof_option_enabled";
 
-    private Preference mCertifiedPropsPref;
-    private Preference mKeyboxPref;
-    private Preference mPifPref;
-    private Preference mAutoPifPref;
-    private Preference mClearGmsPref;
+    private PreferenceScreen mScreen;
 
     public SpoofOptionController(Context context, String key) {
         super(context, key);
@@ -31,18 +27,14 @@ public class SpoofOptionController extends TogglePreferenceController {
     @Override
     public void displayPreference(PreferenceScreen screen) {
         super.displayPreference(screen);
-        mCertifiedPropsPref = screen.findPreference("certified_props");
-        mKeyboxPref = screen.findPreference("keybox_data_setting");
-        mPifPref = screen.findPreference("pif_data_setting");
-        mAutoPifPref = screen.findPreference("auto_pif_generate");
-        mClearGmsPref = screen.findPreference("clear_gms_playstore_data");
+        mScreen = screen;
         updateDependentPreferences();
     }
 
     @Override
     public boolean isChecked() {
         return Settings.System.getInt(mContext.getContentResolver(),
-                SETTINGS_KEY, 0) != 0;
+                SETTINGS_KEY, 1) != 0;
     }
 
     @Override
@@ -54,12 +46,22 @@ public class SpoofOptionController extends TogglePreferenceController {
     }
 
     private void updateDependentPreferences() {
+        if (mScreen == null) return;
         boolean enabled = isChecked();
-        if (mCertifiedPropsPref != null) mCertifiedPropsPref.setEnabled(enabled);
-        if (mKeyboxPref != null) mKeyboxPref.setEnabled(enabled);
-        if (mPifPref != null) mPifPref.setEnabled(enabled);
-        if (mAutoPifPref != null) mAutoPifPref.setEnabled(enabled);
-        if (mClearGmsPref != null) mClearGmsPref.setEnabled(enabled);
+
+        String[] categoryKeys = new String[]{
+                "category_pif_suite",
+                "category_trickystore_suite",
+                "category_teesim_suite",
+                "category_maintenance"
+        };
+
+        for (String catKey : categoryKeys) {
+            Preference pref = mScreen.findPreference(catKey);
+            if (pref != null) {
+                pref.setEnabled(enabled);
+            }
+        }
     }
 
     @Override
