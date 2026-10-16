@@ -397,6 +397,7 @@
     <string name="verified_boot_hash_invalid">Invalid hash: Must be a 64-character hex string or empty</string>
     <string name="generate_boot_hash_title">Generate Random Boot Hash</string>
     <string name="generate_boot_hash_summary">Generate and apply a cryptographically secure 32-byte (64-hex) verified boot hash</string>
+    <string name="generate_boot_hash_success">Generated random boot hash: %1$s</string>
     <string name="keybox_target_mode_title">Keybox Target Mode</string>
     <string name="keybox_target_mode_summary">Select applications that receive hardware keybox attestation: %1$s</string>
     <string name="manage_target_apps_title">Manage Target Apps (Per-App)</string>
