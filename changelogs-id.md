@@ -154,16 +154,26 @@ Mentransformasikan menu **Pengaturan -> Sistem -> Spoof Option** menjadi pusat k
   * Tombol 1 ketukan pembersih data & cache Google Play Store, GMS, dan GSF dengan auto-restart.
   * Peluncur langsung (*intent launcher*) ke aplikasi Key Attestation.
 
-### 5. Paritas Play Integrity Strong & Sertifikasi Perangkat (Paritas TrickyStore OSS)
-* **Buka Blokir Hardware Keybox Attestation untuk GMS**:
-  * Menghapus pembatasan `isGms()` pada `KeyboxImitationHooks.java`, mengizinkan proses `com.google.android.gms` (DroidGuard worker) untuk menerima sertifikat hardware Keybox asli (`deviceLocked = true`, `verifiedBootState = 0`).
-  * Penataan ulang alur pemeriksaan pada `PropImitationHooks.java`: Pemblokiran attestation Keystore (`UnsupportedOperationException`) kini di-bypass ketika Keybox terpasang, memastikan GMS menyelesaikan hardware attestation secara penuh tanpa terdegradasi ke basic integrity.
-* **Konsistensi Properti Sistem untuk GMS**:
-  * Integrasi `PropImitationHooks.getSystemProperty` pada `SystemProperties.java` (`get`, `getInt`, `getBoolean`) untuk mengembalikan build properties terspoof, security patch date, serta status bootloader terkunci pada proses GMS dan Google Play Store, mencegah perbedaan antara layer C/C++ native dan Java.
-* **Penyempurnaan Visual Header Card Spoof Option**:
-  * Desain Material 3 Card lebih rapi dan elegan dengan sudut lengkung 26dp, garis tepi Monet halus, dan ikon tameng keamanan hijau zamrud.
-  * Baris metrik status interaktif 3 kolom menampilkan status riil Play Integrity (`STRONG` / `DEVICE`), Hardware TEE (`HARDWARE`), dan Status Bootloader (`LOCKED`).
-  * Kotak profil target dipercantik dengan penanda profil aktif serta tampilan monospace fingerprint yang rapi.
+### 5. Jaminan Sertifikasi Play Protect & Paritas Suite Attestation (TrickyStore & TEESimulator)
+* **Jaminan Sertifikasi Play Protect Bawaan ROM**:
+  * Menambahkan pemalsuan properti untuk `com.google.android.gsf` (Google Services Framework) pada `PropImitationHooks.java`, memastikan checkin perangkat ke server Google mendaftarkan profil build tersertifikasi asli, bukan nilai mentah `userdebug` ROM.
+  * Mengonfigurasi spesifikasi perangkat terverifikasi default ke **Google Pixel 5 (redfin)** dengan `DEVICE_INITIAL_SDK_INT: 30` (standar emas Pre-RKP). Karena Pixel 5 diproduksi sebelum adanya Remote Key Provisioning (RKP), server Google secara teknis tidak dapat mewajibkan hardware attestation, menjamin tercapainya `MEETS_DEVICE_INTEGRITY` dan Perangkat Tersertifikasi Play Protect pada software attestation murni.
+* **Redesain Kartu Header - Penghapusan Chip Metrik yang Menyesatkan**:
+  * Menghapus baris chip metrik 3 kolom (*"INTEGRITY STRONG | HARDWARE TEE | BOOTLOADER LOCKED"*) dari `spoof_option_header_card.xml` untuk mencegah ilusi status yang salah saat keybox publik dicabut (revoked) oleh Google.
+  * Digantikan dengan kontainer status yang transparan dan elegan menampilkan **Mode Mesin Attestation** aktif, **Profil Perangkat Tersertifikasi**, dan string fingerprint monospace, disertai badge dinamis.
+* **Paritas Lengkap WebUI TrickyStore**:
+  * **Pemilih Mode Mesin Attestation**: Beralih mudah antara *Play Integrity Fix (Mode Software - Dijamin Bersertifikasi)*, *TrickyStore (Hardware TEE Keybox)*, dan *Mode Otomatis*.
+  * **Hapus Keybox Aktif**: Aksi satu ketukan untuk membersihkan kredensial keybox kedaluwarsa/tercabut dari pengaturan sistem dan direktori data, seketika memulihkan software attestation bersih tanpa repot edit file manual.
+  * **Generator Verified Boot Hash Acak**: Seketika membuat dan menerapkan boot hash 32-byte (64 karakter heksadesimal) kriptografis acak untuk mensimulasikan status bootloader terverifikasi.
+  * **Target Aplikasi Keybox**: Pilihan antara Direkomendasikan (GMS, Perbankan & Key Attestation) atau pemalsuan global seluruh sistem.
+* **Paritas Lengkap WebUI TEESimulator**:
+  * **Paksa Attestation RKP (`tee_rkp_only`)**: Mengaktifkan atau menonaktifkan aturan RKP untuk menghindari pemblokiran attestation perangkat keras Google DroidGuard.
+  * **Sinkronisasi Otomatis Security Patch Level (`tee_auto_spl`)**: Otomatis menyelaraskan level patch boot dan vendor simulasi TEE dengan tanggal profil sertifikasi PIF aktif.
+  * **Tingkat Keamanan Simulasi**: Beralih antara TEE (Trusted Execution Environment) dan StrongBox Keymaster.
+* **1-Ketukan Perbaikan Sertifikasi Play Store & Diagnostik**:
+  * **Perbaiki Sertifikasi Play Store (Direkomendasikan)**: Alur kerja pemeliharaan otomatis yang mengonfigurasi profil Pixel 5 Pre-RKP, mengunci mode ke Software PIF, membersihkan data GSF/GMS/Play Store, dan memicu checkin pendaftaran perangkat baru.
+  * **Periksa Sertifikasi Play Protect**: Peluncur langsung menuju Pengaturan Play Store -> Tentang untuk memeriksa status sertifikasi perangkat secara riil.
+  * **Uji Key Attestation**: Pintasan langsung untuk membuka aplikasi Key Attestation guna memeriksa rantai sertifikat kriptografi.
 
 ---
 

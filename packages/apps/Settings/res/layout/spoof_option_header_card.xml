@@ -108,144 +108,16 @@
                     android:includeFontPadding="false" />
             </LinearLayout>
 
-            <!-- 2. Status Chips Row (Play Integrity | Keybox | Bootloader) -->
+            <!-- 2. Active Mode & Profile Box -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
-                android:orientation="horizontal">
-
-                <!-- Chip 1: Play Integrity -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="3dp"
-                    android:background="@drawable/spoof_card_chip_bg"
-                    android:orientation="vertical"
-                    android:padding="10dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="INTEGRITY"
-                        android:textSize="9.5sp"
-                        android:fontFamily="@font/product_sans_bold"
-                        android:textColor="?android:attr/textColorSecondary"
-                        android:includeFontPadding="false" />
-
-                    <TextView
-                        android:id="@+id/spoof_chip_integrity"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="STRONG"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:textColor="#10B981"
-                        android:includeFontPadding="false" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="CTS / Keystore"
-                        android:textSize="9.5sp"
-                        android:textColor="?android:attr/textColorSecondary"
-                        android:includeFontPadding="false" />
-                </LinearLayout>
-
-                <!-- Chip 2: Keybox / TEE -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="3dp"
-                    android:layout_marginEnd="3dp"
-                    android:background="@drawable/spoof_card_chip_bg"
-                    android:orientation="vertical"
-                    android:padding="10dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="HARDWARE TEE"
-                        android:textSize="9.5sp"
-                        android:fontFamily="@font/product_sans_bold"
-                        android:textColor="?android:attr/textColorSecondary"
-                        android:includeFontPadding="false" />
-
-                    <TextView
-                        android:id="@+id/spoof_chip_keybox"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="HARDWARE"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:textColor="#06B6D4"
-                        android:includeFontPadding="false" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Tricky Keybox"
-                        android:textSize="9.5sp"
-                        android:textColor="?android:attr/textColorSecondary"
-                        android:includeFontPadding="false" />
-                </LinearLayout>
-
-                <!-- Chip 3: Bootloader -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="3dp"
-                    android:background="@drawable/spoof_card_chip_bg"
-                    android:orientation="vertical"
-                    android:padding="10dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="BOOTLOADER"
-                        android:textSize="9.5sp"
-                        android:fontFamily="@font/product_sans_bold"
-                        android:textColor="?android:attr/textColorSecondary"
-                        android:includeFontPadding="false" />
-
-                    <TextView
-                        android:id="@+id/spoof_chip_bootloader"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="LOCKED"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:textColor="#10B981"
-                        android:includeFontPadding="false" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Root Of Trust"
-                        android:textSize="9.5sp"
-                        android:textColor="?android:attr/textColorSecondary"
-                        android:includeFontPadding="false" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- 3. Active Profile & Fingerprint Info Box -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
                 android:background="@drawable/spoof_info_box_bg"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="13dp">
 
+                <!-- Row 1: Target Certified Profile -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -271,7 +143,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:text="Google Pixel 8 Pro (husky)"
+                        android:text="Google Pixel 5 (redfin)"
                         android:textSize="12.5sp"
                         android:textStyle="bold"
                         android:textColor="?android:attr/textColorPrimary"
@@ -280,18 +152,54 @@
                         android:includeFontPadding="false" />
                 </LinearLayout>
 
+                <!-- Row 2: Attestation Mode -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:layout_width="7dp"
+                        android:layout_height="7dp"
+                        android:background="@drawable/home_circle_blue" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Attestation Engine:"
+                        android:textSize="11sp"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:includeFontPadding="false" />
+
+                    <TextView
+                        android:id="@+id/spoof_active_engine_mode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="Play Integrity Fix (Software Mode)"
+                        android:textSize="12sp"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:includeFontPadding="false" />
+                </LinearLayout>
+
+                <!-- Row 3: Fingerprint Chip Box -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="9dp"
                     android:background="@drawable/spoof_card_chip_bg"
-                    android:padding="7dp">
+                    android:padding="8dp">
 
                     <TextView
                         android:id="@+id/spoof_active_fingerprint_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="google/husky/husky:14/AP2A.240805.005/12025142:user/release-keys"
+                        android:text="google/redfin/redfin:14/UP1A.231105.001.B2/11260742:user/release-keys"
                         android:textSize="10.5sp"
                         android:fontFamily="monospace"
                         android:textColor="?android:attr/textColorSecondary"

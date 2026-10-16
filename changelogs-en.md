@@ -154,16 +154,26 @@ Comprehensively transformed **Settings -> System -> Spoof Option** into a centra
   * One-tap Play Store, GMS, and GSF data & cache cleaner with automatic package restarts.
   * Direct intent launcher to Key Attestation test applications.
 
-### 5. Play Integrity Strong & Device Certification Parity (TrickyStore OSS Parity)
-* **GMS Hardware Keybox Attestation Unblocked**:
-  * Removed restrictive `isGms()` checks in `KeyboxImitationHooks.java`, allowing `com.google.android.gms` (DroidGuard worker) to receive genuine hardware Keybox certificate chains (`deviceLocked = true`, `verifiedBootState = 0`).
-  * Re-ordered attestation handling in `PropImitationHooks.java`: Keystore attestation blocking (`UnsupportedOperationException`) is now bypassed whenever a Keybox is available, ensuring GMS successfully completes hardware attestation instead of failing to basic integrity.
-* **System Properties Consistency for GMS**:
-  * Integrated `PropImitationHooks.getSystemProperty` in `SystemProperties.java` (`get`, `getInt`, `getBoolean`) to return spoofed build properties, security patch levels, and locked boot state for GMS and Google Play Store processes, preventing native-to-Java property divergence.
-* **Refined Spoof Option Header Card**:
-  * Polished Material 3 card container with 26dp rounded squircle corners, subtle Monet outline stroke, and emerald security shield header.
-  * Responsive 3-metric status row displaying real-time Play Integrity (`STRONG` / `DEVICE`), Hardware TEE (`HARDWARE`), and Bootloader state (`LOCKED`).
-  * Enhanced Target Profile box with active profile indicator and formatted monospace fingerprint display.
+### 5. Play Protect Certification & Attestation Suite Parity (TrickyStore & TEESimulator)
+* **Guaranteed Play Protect Certified Out-of-the-Box**:
+  * Added `com.google.android.gsf` (Google Services Framework) spoofing in `PropImitationHooks.java`, ensuring device checkin to Google registers authentic certified build properties instead of uncertified `userdebug` ROM values.
+  * Configured default verified device specifications to **Google Pixel 5 (redfin)** with `DEVICE_INITIAL_SDK_INT: 30` (Pre-RKP golden standard). Because Pixel 5 was manufactured prior to Remote Key Provisioning, Google servers physically cannot mandate hardware attestation, guaranteeing `MEETS_DEVICE_INTEGRITY` and official Play Protect Certification under clean software attestation.
+* **Header Redesign - Eliminating Misleading Metric Chips**:
+  * Removed the 3-metric chip row (*"INTEGRITY STRONG | HARDWARE TEE | BOOTLOADER LOCKED"*) from `spoof_option_header_card.xml` to eliminate false security impressions when public keyboxes are revoked by Google.
+  * Replaced with a transparent, elegant status container displaying the active **Attestation Engine Mode**, **Target Certified Profile**, and monospace fingerprint string, paired with dynamic badge indicators.
+* **Full TrickyStore WebUI Parity**:
+  * **Attestation Engine Mode Selector**: Easily toggle between *Play Integrity Fix (Software Mode - Guaranteed Certified)*, *TrickyStore (Hardware TEE Keybox)*, and *Auto Mode*.
+  * **Clear Active Keybox**: One-tap action to purge revoked or stale keybox credentials from system settings and `/data/system/keybox.xml`, immediately restoring clean software attestation without manual file editing.
+  * **Random Verified Boot Hash Generator**: Instantly generates and applies a cryptographically secure 32-byte (64-character hexadecimal) boot hash to emulate verified boot state.
+  * **Application Target Modes**: Select between Recommended (GMS, Banking & Key Attestation) or system-wide global spoofing.
+* **Full TEESimulator WebUI Parity**:
+  * **Enforce RKP Attestation (`tee_rkp_only`)**: Toggle Remote Key Provisioning enforcement behavior on/off to bypass Google DroidGuard hardware attestation barriers.
+  * **Auto Security Patch Synchronization (`tee_auto_spl`)**: Automatically matches simulated TEE boot and vendor patch dates with the active certified PIF profile date.
+  * **Simulated KeyMint Security Level**: Switch between TEE (Trusted Execution Environment) and StrongBox Keymaster.
+* **1-Tap Play Store Certification Fix & Diagnostics**:
+  * **Fix Play Store Certification (Recommended)**: 1-tap automated maintenance workflow that configures the Pixel 5 Pre-RKP profile, locks attestation engine to Software PIF, wipes GSF/GMS/Play Store data, and triggers a fresh device registration checkin.
+  * **Check Play Protect Certification**: Direct intent launcher to open Google Play Store Settings -> About to inspect live certification status.
+  * **Test Key Attestation**: Direct shortcut to launch Key Attestation app to inspect cryptographic certificate chains.
 
 ---
 

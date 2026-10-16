@@ -223,13 +223,16 @@
     <string name="oneui_battery_info_entry_summary">Kesehatan baterai, siklus pengisian, kapasitas</string>
     <string name="oneui_battery_time_until_full">%1$s lagi sampai penuh</string>
     <!-- Auto PIF Generator & Clear GMS -->
-    <string name="spoof_card_header_title">Mesin Integritas &amp; Attestation</string>
-    <string name="spoof_card_header_subtitle">Pemilih PIF • TrickyStore • Simulator TEE</string>
+    <string name="spoof_card_header_title">Status Sertifikasi &amp; Attestation</string>
+    <string name="spoof_card_header_subtitle">Suite PIF • TrickyStore • Simulator TEE</string>
 
     <string name="category_pif_suite_title">Play Integrity Fix (Suite PIF)</string>
     <string name="category_trickystore_suite_title">Suite TrickyStore (Keybox &amp; Boot Hash)</string>
     <string name="category_teesim_suite_title">Suite TEESimulator (Perilaku Attestation)</string>
     <string name="category_maintenance_title">Pemeliharaan &amp; Diagnostik</string>
+
+    <string name="attestation_mode_title">Mode Mesin Attestation</string>
+    <string name="attestation_mode_summary">Pilih backend pemalsuan attestation: %1$s</string>
 
     <string name="pif_preset_profile_title">Profil Perangkat Tersertifikasi (Preset PIF)</string>
     <string name="pif_preset_profile_summary">Aktif: %1$s</string>
@@ -238,12 +241,20 @@
 
     <string name="keybox_status_title">Status Hardware Keybox</string>
     <string name="keybox_status_summary">Status Keybox aktif dan kunci kriptografi attestation</string>
+    <string name="clear_keybox_title">Hapus Keybox Aktif</string>
+    <string name="clear_keybox_summary">Hapus seluruh kredensial keybox impor dan tersimpan untuk mengembalikan sertifikasi software bersih</string>
+    <string name="clear_keybox_dialog_title">Hapus Keybox Aktif?</string>
+    <string name="clear_keybox_dialog_message">Tindakan ini akan menghapus keybox yang diimpor dari pengaturan sistem dan penyimpanan data. Jika keybox Anda telah dicabut (revoked) oleh Google, menghapusnya akan mengembalikan attestation ke Mode Software PIF (Pixel 5 First API 30) untuk menjamin Sertifikasi Play Protect.</string>
+    <string name="clear_keybox_success">Keybox aktif berhasil dihapus</string>
     <string name="verified_boot_hash_title">Custom Verified Boot Hash</string>
     <string name="verified_boot_hash_summary">Spoof root of trust SHA-256 boot hash (TrickyStore boot_hash)</string>
     <string name="verified_boot_hash_dialog_title">Atur Verified Boot Hash</string>
     <string name="verified_boot_hash_dialog_message">Masukkan 64 karakter heksadesimal SHA-256 untuk memalsukan verified boot hash pada ekstensi KeyDescription attestation, atau biarkan kosong untuk acak default.</string>
     <string name="verified_boot_hash_saved">Verified boot hash berhasil diperbarui</string>
     <string name="verified_boot_hash_invalid">Hash tidak valid: Harus 64 karakter heksadesimal atau kosong</string>
+    <string name="generate_boot_hash_title">Hasilkan Random Boot Hash</string>
+    <string name="generate_boot_hash_summary">Buat dan terapkan boot hash 32-byte (64-hex) kriptografis acak</string>
+    <string name="generate_boot_hash_success">Boot hash acak berhasil diterapkan: %1$s</string>
     <string name="keybox_target_mode_title">Target Aplikasi Keybox</string>
     <string name="keybox_target_mode_summary">Pilih aplikasi yang menerima hardware keybox attestation</string>
 
@@ -254,6 +265,14 @@
     <string name="tee_security_level_title">Tingkat Keamanan Simulasi</string>
     <string name="tee_security_level_summary">Pilih tingkat keamanan KeyMint perangkat keras yang disimulasikan</string>
 
+    <string name="fix_playstore_certification_title">Perbaiki Sertifikasi Play Store (Direkomendasikan)</string>
+    <string name="fix_playstore_certification_summary">Terapkan profil tersertifikasi Pixel 5, hapus data GSF &amp; Play Store, serta paksa pendaftaran sertifikasi perangkat baru</string>
+    <string name="fix_playstore_certification_dialog_title">Perbaiki Sertifikasi Play Store?</string>
+    <string name="fix_playstore_certification_dialog_message">Tindakan ini akan otomatis mengonfigurasi profil Google Pixel 5 (First API 30 Pre-RKP), mengalihkan Mesin Attestation ke Software PIF, menghapus data Google Services Framework (GSF) dan Play Store, serta memaksa sinkronisasi sertifikasi baru. Akun Google Anda akan tetap terhubung.</string>
+    <string name="fix_playstore_certification_running">Menerapkan perbaikan sertifikasi dan mereset GSF…</string>
+    <string name="fix_playstore_certification_success">Sertifikasi Play Store berhasil diperbarui! Buka Play Store -> Pengaturan -> Tentang untuk memastikan Perangkat tersertifikasi Play Protect.</string>
+    <string name="launch_play_store_settings_title">Periksa Sertifikasi Play Protect</string>
+    <string name="launch_play_store_settings_summary">Buka pengaturan Google Play Store untuk melihat status sertifikasi perangkat</string>
     <string name="launch_key_attestation_title">Uji Key Attestation</string>
     <string name="launch_key_attestation_summary">Buka aplikasi Key Attestation untuk memverifikasi status bootloader terkunci dan rantai sertifikat</string>
     <string name="launch_key_attestation_not_installed">Aplikasi Key Attestation belum terpasang</string>

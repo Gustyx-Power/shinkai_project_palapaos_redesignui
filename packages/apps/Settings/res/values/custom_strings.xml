@@ -362,14 +362,18 @@
     <string name="spoof_option_summary">Configure key attestation and Play Store property spoofing</string>
 
     <!-- Spoof Option Header Card -->
-    <string name="spoof_card_header_title">Integrity &amp; Attestation Engine</string>
-    <string name="spoof_card_header_subtitle">PIF Selector • TrickyStore • TEE Simulator</string>
+    <string name="spoof_card_header_title">Play Protect &amp; Attestation Engine</string>
+    <string name="spoof_card_header_subtitle">PIF Suite • TrickyStore • TEESimulator</string>
 
     <!-- Categories -->
     <string name="category_pif_suite_title">Play Integrity Fix (PIF Suite)</string>
     <string name="category_trickystore_suite_title">TrickyStore Suite (Keybox &amp; Boot Hash)</string>
     <string name="category_teesim_suite_title">TEESimulator Suite (Attestation Behavior)</string>
     <string name="category_maintenance_title">Maintenance &amp; Diagnostics</string>
+
+    <!-- Attestation Engine Selector -->
+    <string name="attestation_mode_title">Attestation Engine Mode</string>
+    <string name="attestation_mode_summary">Select attestation spoofing backend: %1$s</string>
 
     <!-- PIF Presets -->
     <string name="pif_preset_profile_title">Certified Device Profile (PIF Preset)</string>
@@ -380,12 +384,20 @@
     <!-- TrickyStore Suite -->
     <string name="keybox_status_title">Hardware Keybox Status</string>
     <string name="keybox_status_summary">Active Keybox status and attestation cryptographic keys</string>
+    <string name="clear_keybox_title">Clear Active Keybox</string>
+    <string name="clear_keybox_summary">Purge all imported and cached keybox credentials to restore clean software attestation</string>
+    <string name="clear_keybox_dialog_title">Clear Active Keybox?</string>
+    <string name="clear_keybox_dialog_message">This will remove any imported keybox from system settings and local storage. If your keybox was revoked by Google, clearing it will revert attestation to Software PIF mode (Pixel 5 First API 30) ensuring Play Protect Certification.</string>
+    <string name="clear_keybox_success">Active keybox cleared successfully</string>
     <string name="verified_boot_hash_title">Custom Verified Boot Hash</string>
     <string name="verified_boot_hash_summary">Spoof root of trust SHA-256 boot hash (TrickyStore boot_hash)</string>
     <string name="verified_boot_hash_dialog_title">Set Verified Boot Hash</string>
     <string name="verified_boot_hash_dialog_message">Enter a 64-character hexadecimal SHA-256 digest to spoof the verified boot hash in the KeyDescription attestation extension, or leave empty for default.</string>
     <string name="verified_boot_hash_saved">Verified boot hash updated</string>
     <string name="verified_boot_hash_invalid">Invalid hash: Must be a 64-character hex string or empty</string>
+    <string name="generate_boot_hash_title">Generate Random Boot Hash</string>
+    <string name="generate_boot_hash_summary">Generate and apply a cryptographically secure 32-byte (64-hex) verified boot hash</string>
+    <string name="generate_boot_hash_success">Generated random boot hash: %1$s</string>
     <string name="keybox_target_mode_title">Keybox Target Mode</string>
     <string name="keybox_target_mode_summary">Select applications that receive hardware keybox attestation</string>
 
@@ -397,7 +409,15 @@
     <string name="tee_security_level_title">Simulated Security Level</string>
     <string name="tee_security_level_summary">Select simulated KeyMint hardware security level</string>
 
-    <!-- Diagnostics -->
+    <!-- Diagnostics & Maintenance -->
+    <string name="fix_playstore_certification_title">Fix Play Store Certification (Recommended)</string>
+    <string name="fix_playstore_certification_summary">Apply Pixel 5 certified profile, wipe GSF &amp; Play Store data, and force fresh device certification checkin</string>
+    <string name="fix_playstore_certification_dialog_title">Fix Play Store Certification?</string>
+    <string name="fix_playstore_certification_dialog_message">This will automatically configure the Google Pixel 5 (First API 30 Pre-RKP) profile, switch Attestation Mode to Software PIF, wipe Google Services Framework (GSF) and Play Store data, and force an immediate re-checkin. Your Google accounts remain signed in.</string>
+    <string name="fix_playstore_certification_running">Applying certification fix and resetting GSF…</string>
+    <string name="fix_playstore_certification_success">Play Store certification refreshed! Open Play Store -> Settings -> About to verify Play Protect Certification.</string>
+    <string name="launch_play_store_settings_title">Check Play Protect Certification</string>
+    <string name="launch_play_store_settings_summary">Open Google Play Store settings to inspect device certification status</string>
     <string name="launch_key_attestation_title">Test Key Attestation</string>
     <string name="launch_key_attestation_summary">Launch Key Attestation app to verify locked bootloader status and certificate chain</string>
     <string name="launch_key_attestation_not_installed">Key Attestation app is not installed</string>

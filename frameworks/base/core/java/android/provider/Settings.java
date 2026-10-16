@@ -14112,11 +14112,25 @@ public final class Settings {
         public static final String TEE_AUTO_SPL = "tee_auto_spl";
 
         /**
+         * Attestation engine mode: auto, pif_software, trickystore_hardware.
+         * @hide
+         */
+        @Readable
+        public static final String ATTESTATION_MODE = "attestation_mode";
+
+        /**
          * Target filter mode for keybox attestation spoofing.
          * @hide
          */
         @Readable
         public static final String KEYBOX_TARGET_MODE = "keybox_target_mode";
+
+        /**
+         * Simulated security level: tee, strongbox.
+         * @hide
+         */
+        @Readable
+        public static final String TEE_SECURITY_LEVEL = "tee_security_level";
 
         /**
          * Network traffic indicator mode

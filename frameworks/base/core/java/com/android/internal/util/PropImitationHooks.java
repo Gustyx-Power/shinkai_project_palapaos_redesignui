@@ -19,6 +19,7 @@
 package com.android.internal.util;
 
 import android.app.ActivityTaskManager;
+import android.app.ActivityThread;
 import android.app.Application;
 import android.app.TaskStackListener;
 import android.content.ComponentName;
@@ -79,6 +80,7 @@ public class PropImitationHooks {
     private static final String PACKAGE_FINSKY = "com.android.vending";
     private static final String PACKAGE_GMS = "com.google.android.gms";
     private static final String PROCESS_GMS_UNSTABLE = PACKAGE_GMS + ".unstable";
+    private static final String PACKAGE_GSF = "com.google.android.gsf";
     private static final String PACKAGE_NETFLIX = "com.netflix.mediaclient";
 
     private static final ComponentName GMS_ADD_ACCOUNT_ACTIVITY = ComponentName.unflattenFromString(
@@ -89,7 +91,7 @@ public class PropImitationHooks {
     private static volatile String sStockFp, sNetflixModel;
 
     private static volatile String sProcessName;
-    private static volatile boolean sIsGms, sIsFinsky, sIsPhotos;
+    private static volatile boolean sIsGms, sIsGsf, sIsFinsky, sIsPhotos;
 
     private static final Field OFFSET_FIELD;
     private static final Unsafe UNSAFE;
@@ -133,20 +135,21 @@ public class PropImitationHooks {
         sNetflixModel = res.getString(R.string.config_movieVerifiedKey);
 
         sProcessName = processName;
-        sIsGms = packageName.equals(PACKAGE_GMS) && processName.equals(PROCESS_GMS_UNSTABLE);
+        sIsGms = packageName.equals(PACKAGE_GMS);
+        sIsGsf = packageName.equals(PACKAGE_GSF);
         sIsFinsky = packageName.equals(PACKAGE_FINSKY);
 
-        /* Set Certified Properties for GMSCore
+        /* Set Certified Properties for GMSCore, GSF, Play Store
          * Set Stock Fingerprint for ARCore
          * Set custom model for Netflix
          */
-        if (sIsGms || sIsFinsky) {
+        if (sIsGms || sIsGsf || sIsFinsky) {
             if (!android.os.Process.isIsolated()) {
                 setPlayIntegrityProps(context);
             } else {
                 dlog("Not setting Play Integrity props in isolated process");
             }
-            if (sIsGms) {
+            if (sIsGms && processName.equals(PROCESS_GMS_UNSTABLE)) {
                 spoofSignature();
             }
         } else if (!sStockFp.isEmpty() && packageName.equals(PACKAGE_ARCORE)) {
@@ -372,16 +375,27 @@ public class PropImitationHooks {
             return;
         }
 
-        // When a Keybox is available (TrickyStore mode), NEVER block key attestation!
-        // Allow GMS and banking apps to receive the genuine Keybox hardware-attested cert chain,
-        // passing MEETS_STRONG_INTEGRITY and MEETS_DEVICE_INTEGRITY.
-        if (KeyProviderManager.isKeyboxAvailable()) {
+        // Check user configured attestation mode
+        String attestationMode = null;
+        try {
+            Context ctx = ActivityThread.currentApplication();
+            if (ctx != null) {
+                attestationMode = Settings.Secure.getString(ctx.getContentResolver(), "attestation_mode");
+            }
+        } catch (Throwable ignored) {
+        }
+
+        boolean forceSoftware = "pif_software".equals(attestationMode);
+
+        // When a Keybox is available and not in forced software mode (TrickyStore mode),
+        // NEVER block key attestation.
+        if (!forceSoftware && KeyProviderManager.isKeyboxAvailable()) {
             dlog("Key attestation blocking is bypassed because a keybox is available");
             return;
         }
 
-        // Inside GMS unstable (DroidGuard worker), fallback to software-backed attestation
-        // only when no keybox is present.
+        // Inside GMS (DroidGuard worker), fallback to software-backed attestation
+        // (Guarantees MEETS_DEVICE_INTEGRITY & Play Store Certification).
         if (sIsGms || isCallerPlayIntegrity()) {
             dlog("Blocked key attestation for play integrity fallback (sIsGms=" + sIsGms + ")");
             throw new UnsupportedOperationException("Play integrity fallback to software attestation");
@@ -389,7 +403,7 @@ public class PropImitationHooks {
     }
 
     public static String getSystemProperty(String key) {
-        if (!sIsGms && !sIsFinsky) {
+        if (!sIsGms && !sIsGsf && !sIsFinsky) {
             return null;
         }
         if (key == null) return null;

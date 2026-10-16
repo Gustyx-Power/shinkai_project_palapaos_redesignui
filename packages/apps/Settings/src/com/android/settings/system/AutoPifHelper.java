@@ -260,10 +260,32 @@ public final class AutoPifHelper {
     }
 
     /**
-     * Checks if a valid Keybox is configured.
+     * Gets a human-readable summary of the active attestation engine.
+     */
+    public static String getAttestationModeSummary(Context context) {
+        try {
+            String mode = Settings.Secure.getString(context.getContentResolver(), "attestation_mode");
+            if ("pif_software".equals(mode)) {
+                return "Play Integrity Fix (Software Mode)";
+            } else if ("trickystore_hardware".equals(mode)) {
+                return "TrickyStore (Hardware TEE)";
+            } else {
+                return hasKeybox(context) ? "Auto (Hardware Keybox)" : "Auto (Software PIF)";
+            }
+        } catch (Throwable ignored) {
+            return "Play Integrity Fix (Software Mode)";
+        }
+    }
+
+    /**
+     * Checks if a valid Keybox is configured and permitted by the current mode.
      */
     public static boolean hasKeybox(Context context) {
         try {
+            String mode = Settings.Secure.getString(context.getContentResolver(), "attestation_mode");
+            if ("pif_software".equals(mode)) {
+                return false;
+            }
             String xml = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.KEYBOX_DATA);
             if (xml != null && xml.contains("<PrivateKey")) {
                 return true;
@@ -274,7 +296,7 @@ public final class AutoPifHelper {
                     new File("/data/adb/teesim/keybox.xml")
             };
             for (File f : files) {
-                if (f.exists() && f.canRead()) {
+                if (f.exists() && f.canRead() && f.length() > 0) {
                     return true;
                 }
             }
@@ -285,11 +307,15 @@ public final class AutoPifHelper {
             }
         } catch (Throwable ignored) {
         }
-        return true;
+        return false;
     }
 
     public static String getKeyboxStatus(Context context) {
         try {
+            String mode = Settings.Secure.getString(context.getContentResolver(), "attestation_mode");
+            if ("pif_software".equals(mode)) {
+                return "Bypassed (Software PIF active for guaranteed certification)";
+            }
             String xml = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.KEYBOX_DATA);
             if (xml != null && xml.contains("<PrivateKey")) {
                 return "Custom XML Keybox (Active)";
@@ -300,13 +326,81 @@ public final class AutoPifHelper {
                     new File("/data/adb/teesim/keybox.xml")
             };
             for (File f : files) {
-                if (f.exists() && f.canRead()) {
+                if (f.exists() && f.canRead() && f.length() > 0) {
                     return "File Keybox (Active: " + f.getName() + ")";
                 }
             }
+            int resId = context.getResources().getIdentifier("config_attestationKeychain", "array", "android");
+            if (resId != 0) {
+                String[] entries = context.getResources().getStringArray(resId);
+                if (entries != null && entries.length > 0) return "Built-in Hardware Keybox (Active)";
+            }
         } catch (Throwable ignored) {
         }
-        return "Built-in Hardware Keybox (Active)";
+        return "No Keybox Loaded (Using Software PIF Fallback)";
+    }
+
+    /**
+     * Clears all imported and cached Keybox configurations.
+     */
+    public static boolean clearKeybox(Context context) {
+        try {
+            Settings.Secure.putString(context.getContentResolver(), Settings.Secure.KEYBOX_DATA, "");
+            File[] files = new File[]{
+                    new File("/data/system/keybox.xml"),
+                    new File("/data/adb/tricky_store/keybox.xml"),
+                    new File("/data/adb/teesim/keybox.xml")
+            };
+            for (File f : files) {
+                if (f.exists()) {
+                    f.delete();
+                }
+            }
+            restartGooglePackages(context);
+            return true;
+        } catch (Throwable t) {
+            Log.e(TAG, "Failed clearing keybox", t);
+            return false;
+        }
+    }
+
+    /**
+     * Generates and applies a random 32-byte (64-hex) verified boot hash.
+     */
+    public static String generateRandomBootHash(Context context) {
+        java.security.SecureRandom random = new java.security.SecureRandom();
+        byte[] bytes = new byte[32];
+        random.nextBytes(bytes);
+        StringBuilder sb = new StringBuilder(64);
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        String hash = sb.toString();
+        setVerifiedBootHash(context, hash);
+        return hash;
+    }
+
+    /**
+     * 1-Tap Play Store Certification Fix:
+     * - Configures Google Pixel 5 (Pre-RKP First API 30) certified profile
+     * - Switches Attestation Mode to Software PIF (guarantees MEETS_DEVICE_INTEGRITY)
+     * - Clears GSF, GMS, and Play Store data and forces fresh registration
+     */
+    public static boolean fixPlayStoreCertification(Context context) {
+        try {
+            // 1. Force Attestation Mode to Software PIF
+            Settings.Secure.putString(context.getContentResolver(), "attestation_mode", "pif_software");
+
+            // 2. Apply Pixel 5 (redfin) preset
+            applyPreset(context, "pixel_5");
+
+            // 3. Clear Google Services Framework, Google Play Services, and Play Store data
+            clearGmsAndPlayStore(context);
+            return true;
+        } catch (Throwable t) {
+            Log.e(TAG, "Failed to apply Play Store certification fix", t);
+            return false;
+        }
     }
 
     /**

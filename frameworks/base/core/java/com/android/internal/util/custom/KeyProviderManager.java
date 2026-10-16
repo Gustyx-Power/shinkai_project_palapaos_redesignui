@@ -48,6 +48,16 @@ public final class KeyProviderManager {
                 return;
             }
 
+            String attestationMode = null;
+            try {
+                attestationMode = Settings.Secure.getString(context.getContentResolver(), "attestation_mode");
+            } catch (Throwable ignored) {
+            }
+
+            if ("pif_software".equals(attestationMode)) {
+                return;
+            }
+
             if (!loadFromXmlSetting(context) && !loadFromXmlFile()) {
                 loadFromConfigArray(context);
             }

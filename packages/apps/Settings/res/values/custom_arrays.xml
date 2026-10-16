@@ -118,6 +118,19 @@
         <item>all</item>
     </string-array>
 
+    <!-- Spoof Option: Attestation Engines -->
+    <string-array name="attestation_mode_names" translatable="false">
+        <item>Auto (Keybox if available, else Software PIF)</item>
+        <item>Play Integrity Fix (Software Mode - Guaranteed Certified)</item>
+        <item>TrickyStore (Hardware TEE Keybox)</item>
+    </string-array>
+
+    <string-array name="attestation_mode_values" translatable="false">
+        <item>auto</item>
+        <item>pif_software</item>
+        <item>trickystore_hardware</item>
+    </string-array>
+
     <!-- Spoof Option: TEE Security Levels -->
     <string-array name="tee_security_level_names" translatable="false">
         <item>TEE (Trusted Execution Environment)</item>

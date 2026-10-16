@@ -21,13 +21,22 @@
         android:title="@string/category_pif_suite_title">
 
         <ListPreference
+            android:key="attestation_mode"
+            android:title="@string/attestation_mode_title"
+            android:summary="@string/attestation_mode_summary"
+            android:dialogTitle="@string/attestation_mode_title"
+            android:entries="@array/attestation_mode_names"
+            android:entryValues="@array/attestation_mode_values"
+            android:defaultValue="pif_software" />
+
+        <ListPreference
             android:key="pif_preset_profile"
             android:title="@string/pif_preset_profile_title"
             android:summary="@string/pif_preset_profile_summary"
             android:dialogTitle="@string/pif_preset_dialog_title"
             android:entries="@array/pif_preset_names"
             android:entryValues="@array/pif_preset_values"
-            android:defaultValue="pixel_8_pro" />
+            android:defaultValue="pixel_5" />
 
         <Preference
             android:key="auto_pif_generate"
@@ -58,12 +67,22 @@
             android:summary="@string/keybox_data_summary"
             android:defaultValue="" />
 
+        <Preference
+            android:key="clear_keybox"
+            android:title="@string/clear_keybox_title"
+            android:summary="@string/clear_keybox_summary" />
+
         <EditTextPreference
             android:key="verified_boot_hash_setting"
             android:title="@string/verified_boot_hash_title"
             android:summary="@string/verified_boot_hash_summary"
             android:dialogTitle="@string/verified_boot_hash_dialog_title"
             android:dialogMessage="@string/verified_boot_hash_dialog_message" />
+
+        <Preference
+            android:key="generate_boot_hash"
+            android:title="@string/generate_boot_hash_title"
+            android:summary="@string/generate_boot_hash_summary" />
 
         <ListPreference
             android:key="keybox_target_mode"
@@ -106,9 +125,19 @@
         android:title="@string/category_maintenance_title">
 
         <Preference
+            android:key="fix_playstore_certification"
+            android:title="@string/fix_playstore_certification_title"
+            android:summary="@string/fix_playstore_certification_summary" />
+
+        <Preference
             android:key="clear_gms_playstore_data"
             android:title="@string/clear_gms_playstore_title"
             android:summary="@string/clear_gms_playstore_summary" />
+
+        <Preference
+            android:key="launch_play_store_settings"
+            android:title="@string/launch_play_store_settings_title"
+            android:summary="@string/launch_play_store_settings_summary" />
 
         <Preference
             android:key="launch_key_attestation"

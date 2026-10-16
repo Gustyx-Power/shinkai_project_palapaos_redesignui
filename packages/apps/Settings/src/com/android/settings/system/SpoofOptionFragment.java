@@ -4,11 +4,9 @@ import android.app.settings.SettingsEnums;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,17 +37,25 @@ public class SpoofOptionFragment extends DashboardFragment {
     private ActivityResultLauncher<Intent> mPifLauncher;
 
     private LayoutPreference mHeaderCardPref;
-    private KeyboxDataPreference mKeyboxPref;
-    private PifDataPreference mPifPref;
+    private ListPreference mAttestationModePref;
     private ListPreference mPresetPref;
+    private Preference mAutoPifPref;
+    private PifDataPreference mPifPref;
+
     private Preference mKeyboxStatusPref;
+    private KeyboxDataPreference mKeyboxPref;
+    private Preference mClearKeyboxPref;
     private EditTextPreference mBootHashPref;
+    private Preference mGenerateBootHashPref;
     private ListPreference mTargetModePref;
+
     private SwitchPreferenceCompat mRkpOnlyPref;
     private SwitchPreferenceCompat mAutoSplPref;
     private ListPreference mTeeSecurityLevelPref;
-    private Preference mAutoPifPref;
+
+    private Preference mFixPlayStorePref;
     private Preference mClearGmsPref;
+    private Preference mLaunchPlayStorePref;
     private Preference mLaunchKeyAttestPref;
 
     @Override
@@ -63,6 +69,9 @@ public class SpoofOptionFragment extends DashboardFragment {
                         Uri uri = result.getData().getData();
                         if (mKeyboxPref != null) {
                             mKeyboxPref.handleFileSelected(uri);
+                            if (mKeyboxStatusPref != null && getContext() != null) {
+                                mKeyboxStatusPref.setSummary(AutoPifHelper.getKeyboxStatus(getContext()));
+                            }
                             updateHeaderCard();
                         }
                     }
@@ -91,7 +100,27 @@ public class SpoofOptionFragment extends DashboardFragment {
         mHeaderCardPref = findPreference("spoof_header_card");
         updateHeaderCard();
 
-        // 2. PIF Preset Selector
+        // 2. Attestation Engine Mode
+        mAttestationModePref = findPreference("attestation_mode");
+        if (mAttestationModePref != null) {
+            String currentMode = Settings.Secure.getString(context.getContentResolver(), "attestation_mode");
+            if (currentMode == null) currentMode = "pif_software";
+            mAttestationModePref.setValue(currentMode);
+            mAttestationModePref.setSummary(getString(R.string.attestation_mode_summary, AutoPifHelper.getAttestationModeSummary(context)));
+            mAttestationModePref.setOnPreferenceChangeListener((preference, newValue) -> {
+                String mode = (String) newValue;
+                Settings.Secure.putString(context.getContentResolver(), "attestation_mode", mode);
+                AutoPifHelper.restartGooglePackages(context);
+                mAttestationModePref.setSummary(getString(R.string.attestation_mode_summary, AutoPifHelper.getAttestationModeSummary(context)));
+                if (mKeyboxStatusPref != null) {
+                    mKeyboxStatusPref.setSummary(AutoPifHelper.getKeyboxStatus(context));
+                }
+                updateHeaderCard();
+                return true;
+            });
+        }
+
+        // 3. PIF Preset Selector
         mPresetPref = findPreference("pif_preset_profile");
         if (mPresetPref != null) {
             String activeSummary = AutoPifHelper.getActiveProfileSummary(context);
@@ -108,19 +137,68 @@ public class SpoofOptionFragment extends DashboardFragment {
             });
         }
 
-        // 3. Keybox Data & Status
-        mKeyboxPref = findPreference("keybox_data_setting");
-        if (mKeyboxPref != null) mKeyboxPref.setFilePickerLauncher(mKeyboxLauncher);
-
+        // 4. Custom PIF Data & Auto Fetch
         mPifPref = findPreference("pif_data_setting");
         if (mPifPref != null) mPifPref.setFilePickerLauncher(mPifLauncher);
 
+        mAutoPifPref = findPreference("auto_pif_generate");
+        if (mAutoPifPref != null) {
+            mAutoPifPref.setOnPreferenceClickListener(preference -> {
+                Toast.makeText(context, R.string.auto_pif_updating, Toast.LENGTH_SHORT).show();
+                mAutoPifPref.setEnabled(false);
+
+                Executors.newSingleThreadExecutor().execute(() -> {
+                    String resultModel = AutoPifHelper.fetchAndApplyPif(context);
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            if (mAutoPifPref != null) mAutoPifPref.setEnabled(true);
+                            if (resultModel != null) {
+                                Toast.makeText(context,
+                                        getString(R.string.auto_pif_success, resultModel),
+                                        Toast.LENGTH_LONG).show();
+                                updateHeaderCard();
+                            } else {
+                                Toast.makeText(context, R.string.auto_pif_failed, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
+                return true;
+            });
+        }
+
+        // 5. TrickyStore Suite: Keybox Status, File Picker & Clear Keybox
         mKeyboxStatusPref = findPreference("keybox_status_info");
         if (mKeyboxStatusPref != null) {
             mKeyboxStatusPref.setSummary(AutoPifHelper.getKeyboxStatus(context));
         }
 
-        // 4. Custom Verified Boot Hash
+        mKeyboxPref = findPreference("keybox_data_setting");
+        if (mKeyboxPref != null) mKeyboxPref.setFilePickerLauncher(mKeyboxLauncher);
+
+        mClearKeyboxPref = findPreference("clear_keybox");
+        if (mClearKeyboxPref != null) {
+            mClearKeyboxPref.setOnPreferenceClickListener(preference -> {
+                new AlertDialog.Builder(context)
+                        .setTitle(R.string.clear_keybox_dialog_title)
+                        .setMessage(R.string.clear_keybox_dialog_message)
+                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                            boolean cleared = AutoPifHelper.clearKeybox(context);
+                            if (cleared) {
+                                Toast.makeText(context, R.string.clear_keybox_success, Toast.LENGTH_SHORT).show();
+                                if (mKeyboxStatusPref != null) {
+                                    mKeyboxStatusPref.setSummary(AutoPifHelper.getKeyboxStatus(context));
+                                }
+                                updateHeaderCard();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show();
+                return true;
+            });
+        }
+
+        // 6. Custom Verified Boot Hash & Random Generator
         mBootHashPref = findPreference("verified_boot_hash_setting");
         if (mBootHashPref != null) {
             String currentHash = AutoPifHelper.getVerifiedBootHash(context);
@@ -149,7 +227,20 @@ public class SpoofOptionFragment extends DashboardFragment {
             });
         }
 
-        // 5. Keybox Target Mode
+        mGenerateBootHashPref = findPreference("generate_boot_hash");
+        if (mGenerateBootHashPref != null) {
+            mGenerateBootHashPref.setOnPreferenceClickListener(preference -> {
+                String hash = AutoPifHelper.generateRandomBootHash(context);
+                if (mBootHashPref != null) {
+                    mBootHashPref.setText(hash);
+                    mBootHashPref.setSummary(hash);
+                }
+                Toast.makeText(context, getString(R.string.generate_boot_hash_success, hash.substring(0, 16) + "..."), Toast.LENGTH_LONG).show();
+                return true;
+            });
+        }
+
+        // 7. Keybox Target Mode
         mTargetModePref = findPreference("keybox_target_mode");
         if (mTargetModePref != null) {
             String mode = Settings.Secure.getString(context.getContentResolver(), "keybox_target_mode");
@@ -161,7 +252,7 @@ public class SpoofOptionFragment extends DashboardFragment {
             });
         }
 
-        // 6. TEESimulator Options
+        // 8. TEESimulator Suite: RKP Only, Auto SPL, Security Level
         mRkpOnlyPref = findPreference("tee_rkp_only_setting");
         if (mRkpOnlyPref != null) {
             boolean rkpOnly = Settings.Secure.getInt(context.getContentResolver(), "tee_rkp_only", 0) != 0;
@@ -195,34 +286,45 @@ public class SpoofOptionFragment extends DashboardFragment {
             });
         }
 
-        // 7. Auto PIF Online Fetch
-        mAutoPifPref = findPreference("auto_pif_generate");
-        if (mAutoPifPref != null) {
-            mAutoPifPref.setOnPreferenceClickListener(preference -> {
-                Toast.makeText(context, R.string.auto_pif_updating, Toast.LENGTH_SHORT).show();
-                mAutoPifPref.setEnabled(false);
-
-                Executors.newSingleThreadExecutor().execute(() -> {
-                    String resultModel = AutoPifHelper.fetchAndApplyPif(context);
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(() -> {
-                            if (mAutoPifPref != null) mAutoPifPref.setEnabled(true);
-                            if (resultModel != null) {
-                                Toast.makeText(context,
-                                        getString(R.string.auto_pif_success, resultModel),
-                                        Toast.LENGTH_LONG).show();
-                                updateHeaderCard();
-                            } else {
-                                Toast.makeText(context, R.string.auto_pif_failed, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                });
+        // 9. Fix Play Store Certification (Recommended 1-Tap Solution)
+        mFixPlayStorePref = findPreference("fix_playstore_certification");
+        if (mFixPlayStorePref != null) {
+            mFixPlayStorePref.setOnPreferenceClickListener(preference -> {
+                new AlertDialog.Builder(context)
+                        .setTitle(R.string.fix_playstore_certification_dialog_title)
+                        .setMessage(R.string.fix_playstore_certification_dialog_message)
+                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                            Toast.makeText(context, R.string.fix_playstore_certification_running, Toast.LENGTH_SHORT).show();
+                            Executors.newSingleThreadExecutor().execute(() -> {
+                                boolean fixed = AutoPifHelper.fixPlayStoreCertification(context);
+                                if (getActivity() != null) {
+                                    getActivity().runOnUiThread(() -> {
+                                        if (fixed) {
+                                            if (mAttestationModePref != null) {
+                                                mAttestationModePref.setValue("pif_software");
+                                                mAttestationModePref.setSummary(getString(R.string.attestation_mode_summary, AutoPifHelper.getAttestationModeSummary(context)));
+                                            }
+                                            if (mPresetPref != null) {
+                                                mPresetPref.setValue("pixel_5");
+                                                mPresetPref.setSummary(getString(R.string.pif_preset_profile_summary, AutoPifHelper.getActiveProfileSummary(context)));
+                                            }
+                                            if (mKeyboxStatusPref != null) {
+                                                mKeyboxStatusPref.setSummary(AutoPifHelper.getKeyboxStatus(context));
+                                            }
+                                            updateHeaderCard();
+                                            Toast.makeText(context, R.string.fix_playstore_certification_success, Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }
+                            });
+                        })
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show();
                 return true;
             });
         }
 
-        // 8. Clear GMS, GSF, Play Store Data
+        // 10. Clear GMS, GSF, Play Store Data
         mClearGmsPref = findPreference("clear_gms_playstore_data");
         if (mClearGmsPref != null) {
             mClearGmsPref.setOnPreferenceClickListener(preference -> {
@@ -249,7 +351,23 @@ public class SpoofOptionFragment extends DashboardFragment {
             });
         }
 
-        // 9. Launch Key Attestation App
+        // 11. Launch Google Play Store Settings
+        mLaunchPlayStorePref = findPreference("launch_play_store_settings");
+        if (mLaunchPlayStorePref != null) {
+            mLaunchPlayStorePref.setOnPreferenceClickListener(preference -> {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setPackage("com.android.vending");
+                    intent.setData(Uri.parse("https://play.google.com/store/apps"));
+                    context.startActivity(intent);
+                } catch (Throwable t) {
+                    Toast.makeText(context, "Google Play Store not found", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            });
+        }
+
+        // 12. Launch Key Attestation App
         mLaunchKeyAttestPref = findPreference("launch_key_attestation");
         if (mLaunchKeyAttestPref != null) {
             mLaunchKeyAttestPref.setOnPreferenceClickListener(preference -> {
@@ -279,10 +397,8 @@ public class SpoofOptionFragment extends DashboardFragment {
         if (context == null) return;
 
         TextView profileTitle = (TextView) mHeaderCardPref.findViewById(R.id.spoof_active_profile_title);
+        TextView engineMode = (TextView) mHeaderCardPref.findViewById(R.id.spoof_active_engine_mode);
         TextView fingerprintText = (TextView) mHeaderCardPref.findViewById(R.id.spoof_active_fingerprint_text);
-        TextView chipIntegrity = (TextView) mHeaderCardPref.findViewById(R.id.spoof_chip_integrity);
-        TextView chipKeybox = (TextView) mHeaderCardPref.findViewById(R.id.spoof_chip_keybox);
-        TextView chipBootloader = (TextView) mHeaderCardPref.findViewById(R.id.spoof_chip_bootloader);
         TextView statusBadge = (TextView) mHeaderCardPref.findViewById(R.id.spoof_status_badge);
 
         boolean hasKeybox = AutoPifHelper.hasKeybox(context);
@@ -290,20 +406,11 @@ public class SpoofOptionFragment extends DashboardFragment {
         if (profileTitle != null) {
             profileTitle.setText(AutoPifHelper.getActiveProfileSummary(context));
         }
+        if (engineMode != null) {
+            engineMode.setText(AutoPifHelper.getAttestationModeSummary(context));
+        }
         if (fingerprintText != null) {
             fingerprintText.setText(AutoPifHelper.getActiveFingerprint(context));
-        }
-        if (chipIntegrity != null) {
-            chipIntegrity.setText(hasKeybox ? "STRONG" : "DEVICE");
-            chipIntegrity.setTextColor(Color.parseColor("#10B981"));
-        }
-        if (chipKeybox != null) {
-            chipKeybox.setText(hasKeybox ? "HARDWARE" : "NOT SET");
-            chipKeybox.setTextColor(hasKeybox ? Color.parseColor("#06B6D4") : Color.parseColor("#F59E0B"));
-        }
-        if (chipBootloader != null) {
-            chipBootloader.setText("LOCKED");
-            chipBootloader.setTextColor(Color.parseColor("#10B981"));
         }
         if (statusBadge != null) {
             statusBadge.setText(hasKeybox ? "PROTECTED" : "ACTIVE");
