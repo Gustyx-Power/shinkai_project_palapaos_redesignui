@@ -145,6 +145,12 @@ apply_build_fixes() {
         echo -e "  ${GREEN}✓ build/make/ successfully copied!${NC}"
     fi
 
+    if [ -d "$SCRIPT_DIR/build/soong" ]; then
+        mkdir -p "$TARGET_DIR/build/soong"
+        cp -rf "$SCRIPT_DIR/build/soong/"* "$TARGET_DIR/build/soong/"
+        echo -e "  ${GREEN}✓ build/soong/ successfully copied!${NC}"
+    fi
+
     if [ -f "$SCRIPT_DIR/temp.sh" ]; then
         cp -f "$SCRIPT_DIR/temp.sh" "$TARGET_DIR/temp.sh"
         chmod +x "$TARGET_DIR/temp.sh"

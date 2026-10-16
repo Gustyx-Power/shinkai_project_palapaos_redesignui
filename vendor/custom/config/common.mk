@@ -115,8 +115,6 @@ include vendor/custom/config/version.mk
 BUILD_KEYS := release-keys
 BUILD_VERSION_TAGS := release-keys
 
-PRODUCT_BUILD_PROP_OVERRIDES += \
-    BuildTag=release-keys
 
 PRODUCT_SYSTEM_PROPERTIES += \
     ro.build.tags=release-keys \
