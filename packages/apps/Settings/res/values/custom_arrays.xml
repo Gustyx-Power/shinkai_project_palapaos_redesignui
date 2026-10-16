@@ -109,12 +109,14 @@
 
     <!-- Spoof Option: Keybox Target Modes -->
     <string-array name="keybox_target_mode_names" translatable="false">
-        <item>Recommended (GMS, Key Attestation &amp; Banking)</item>
+        <item>Recommended (GMS, Play Store &amp; Key Attestation)</item>
+        <item>Per-App Target List (Selected Apps Only)</item>
         <item>All Applications (Global Spoofing)</item>
     </string-array>
 
     <string-array name="keybox_target_mode_values" translatable="false">
         <item>recommended</item>
+        <item>per_app</item>
         <item>all</item>
     </string-array>
 

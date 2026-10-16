@@ -10,13 +10,17 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -401,6 +405,97 @@ public final class AutoPifHelper {
             Log.e(TAG, "Failed to apply Play Store certification fix", t);
             return false;
         }
+    }
+
+    /**
+     * Default recommended target packages for keybox attestation & spoofing.
+     */
+    public static final Set<String> RECOMMENDED_TARGET_PACKAGES = new LinkedHashSet<>(Arrays.asList(
+            "com.google.android.gms",
+            "com.android.vending",
+            "com.google.android.gsf",
+            "io.github.vvb2060.keyattestation",
+            "io.github.qwq233.keyattestation"
+    ));
+
+    public static Set<String> getTargetPackages(Context context) {
+        Set<String> targets = new LinkedHashSet<>();
+        try {
+            String list = Settings.Secure.getString(context.getContentResolver(), "keybox_target_packages");
+            if (list != null && !list.trim().isEmpty()) {
+                String[] items = list.split("[,;\n]");
+                for (String it : items) {
+                    String p = it.trim();
+                    if (!p.isEmpty()) targets.add(p);
+                }
+            }
+            if (targets.isEmpty()) {
+                File f = new File("/data/system/target.txt");
+                if (f.exists() && f.canRead()) {
+                    try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            line = line.trim();
+                            if (line.endsWith("!")) line = line.substring(0, line.length() - 1).trim();
+                            if (!line.isEmpty()) targets.add(line);
+                        }
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            Log.e(TAG, "Failed reading target packages", t);
+        }
+        if (targets.isEmpty()) {
+            targets.addAll(RECOMMENDED_TARGET_PACKAGES);
+        }
+        return targets;
+    }
+
+    public static boolean saveTargetPackages(Context context, Set<String> packages) {
+        try {
+            if (packages == null || packages.isEmpty()) {
+                packages = RECOMMENDED_TARGET_PACKAGES;
+            }
+            StringBuilder sb = new StringBuilder();
+            StringBuilder fileSb = new StringBuilder();
+            for (String p : packages) {
+                if (sb.length() > 0) sb.append(",");
+                sb.append(p);
+                fileSb.append(p).append("\n");
+            }
+            Settings.Secure.putString(context.getContentResolver(), "keybox_target_packages", sb.toString());
+
+            File f = new File("/data/system/target.txt");
+            try (FileOutputStream fos = new FileOutputStream(f)) {
+                fos.write(fileSb.toString().getBytes(StandardCharsets.UTF_8));
+            }
+            f.setReadable(true, false);
+
+            File trickyDir = new File("/data/adb/tricky_store");
+            if (trickyDir.exists() && trickyDir.isDirectory()) {
+                File trickyFile = new File(trickyDir, "target.txt");
+                try (FileOutputStream fos = new FileOutputStream(trickyFile)) {
+                    fos.write(fileSb.toString().getBytes(StandardCharsets.UTF_8));
+                }
+                trickyFile.setReadable(true, false);
+            }
+
+            restartGooglePackages(context);
+            return true;
+        } catch (Throwable t) {
+            Log.e(TAG, "Failed saving target packages", t);
+            return false;
+        }
+    }
+
+    public static String getTargetModeSummary(Context context) {
+        String mode = Settings.Secure.getString(context.getContentResolver(), "keybox_target_mode");
+        if ("per_app".equals(mode)) {
+            return "Per-App Target List";
+        } else if ("all".equals(mode)) {
+            return "All Applications";
+        }
+        return "Recommended (GMS & Key Attestation)";
     }
 
     /**

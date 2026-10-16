@@ -256,7 +256,14 @@
     <string name="generate_boot_hash_summary">Buat dan terapkan boot hash 32-byte (64-hex) kriptografis acak</string>
     <string name="generate_boot_hash_success">Boot hash acak berhasil diterapkan: %1$s</string>
     <string name="keybox_target_mode_title">Target Aplikasi Keybox</string>
-    <string name="keybox_target_mode_summary">Pilih aplikasi yang menerima hardware keybox attestation</string>
+    <string name="keybox_target_mode_summary">Pilih aplikasi yang menerima hardware keybox attestation: %1$s</string>
+    <string name="manage_target_apps_title">Kelola Aplikasi Target (Per-App)</string>
+    <string name="manage_target_apps_summary">%1$d aplikasi dipilih untuk pemalsuan per-app</string>
+    <string name="target_apps_dialog_title">Pilih Aplikasi Target</string>
+    <string name="target_apps_dialog_message">Pilih aplikasi yang akan menerima attestation dan properti tersertifikasi. Layanan inti Google Play selalu dilindungi.</string>
+    <string name="target_apps_reset_recommended">Rekomendasi</string>
+    <string name="target_apps_saved">Daftar aplikasi target diperbarui (%1$d aplikasi)</string>
+    <string name="target_apps_search_hint">Cari aplikasi…</string>
 
     <string name="tee_rkp_only_title">Paksa Attestation RKP</string>
     <string name="tee_rkp_only_summary">Aktifkan Remote Key Provisioning. Nonaktifkan jika ingin lolos Strong dengan profil Pixel 6-9 pada bootloader terbuka.</string>

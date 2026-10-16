@@ -14126,6 +14126,13 @@ public final class Settings {
         public static final String KEYBOX_TARGET_MODE = "keybox_target_mode";
 
         /**
+         * Target packages list for per-app spoofing.
+         * @hide
+         */
+        @Readable
+        public static final String KEYBOX_TARGET_PACKAGES = "keybox_target_packages";
+
+        /**
          * Simulated security level: tee, strongbox.
          * @hide
          */

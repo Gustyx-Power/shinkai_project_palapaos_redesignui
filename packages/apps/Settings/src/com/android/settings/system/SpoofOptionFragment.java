@@ -3,10 +3,22 @@ package com.android.settings.system;
 import android.app.settings.SettingsEnums;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +38,12 @@ import com.android.settings.search.BaseSearchIndexProvider;
 import com.android.settingslib.search.SearchIndexable;
 import com.android.settingslib.widget.LayoutPreference;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.Executors;
 
 @SearchIndexable
@@ -48,6 +66,7 @@ public class SpoofOptionFragment extends DashboardFragment {
     private EditTextPreference mBootHashPref;
     private Preference mGenerateBootHashPref;
     private ListPreference mTargetModePref;
+    private Preference mManageTargetAppsPref;
 
     private SwitchPreferenceCompat mRkpOnlyPref;
     private SwitchPreferenceCompat mAutoSplPref;
@@ -57,6 +76,20 @@ public class SpoofOptionFragment extends DashboardFragment {
     private Preference mClearGmsPref;
     private Preference mLaunchPlayStorePref;
     private Preference mLaunchKeyAttestPref;
+
+    private static class TargetAppItem {
+        final String label;
+        final String packageName;
+        final Drawable icon;
+        boolean isChecked;
+
+        TargetAppItem(String label, String packageName, Drawable icon, boolean isChecked) {
+            this.label = label;
+            this.packageName = packageName;
+            this.icon = icon;
+            this.isChecked = isChecked;
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -240,14 +273,28 @@ public class SpoofOptionFragment extends DashboardFragment {
             });
         }
 
-        // 7. Keybox Target Mode
+        // 7. Keybox Target Mode & Per-App Target Apps
         mTargetModePref = findPreference("keybox_target_mode");
+        mManageTargetAppsPref = findPreference("manage_target_apps");
+        updateTargetAppsSummary(context);
+
         if (mTargetModePref != null) {
             String mode = Settings.Secure.getString(context.getContentResolver(), "keybox_target_mode");
             if (mode == null) mode = "recommended";
             mTargetModePref.setValue(mode);
+            mTargetModePref.setSummary(getString(R.string.keybox_target_mode_summary, AutoPifHelper.getTargetModeSummary(context)));
             mTargetModePref.setOnPreferenceChangeListener((preference, newValue) -> {
-                Settings.Secure.putString(context.getContentResolver(), "keybox_target_mode", (String) newValue);
+                String newMode = (String) newValue;
+                Settings.Secure.putString(context.getContentResolver(), "keybox_target_mode", newMode);
+                mTargetModePref.setSummary(getString(R.string.keybox_target_mode_summary, AutoPifHelper.getTargetModeSummary(context)));
+                AutoPifHelper.restartGooglePackages(context);
+                return true;
+            });
+        }
+
+        if (mManageTargetAppsPref != null) {
+            mManageTargetAppsPref.setOnPreferenceClickListener(preference -> {
+                showTargetAppsDialog(context);
                 return true;
             });
         }
@@ -388,6 +435,134 @@ public class SpoofOptionFragment extends DashboardFragment {
                 }
                 return true;
             });
+        }
+    }
+
+    private void showTargetAppsDialog(Context context) {
+        PackageManager pm = context.getPackageManager();
+        List<ApplicationInfo> installed = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+        Set<String> currentTargets = new LinkedHashSet<>(AutoPifHelper.getTargetPackages(context));
+
+        List<TargetAppItem> allApps = new ArrayList<>();
+        for (ApplicationInfo info : installed) {
+            boolean isSystem = (info.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
+            boolean isCore = "com.google.android.gms".equals(info.packageName)
+                    || "com.android.vending".equals(info.packageName)
+                    || "com.google.android.gsf".equals(info.packageName)
+                    || "io.github.vvb2060.keyattestation".equals(info.packageName)
+                    || "io.github.qwq233.keyattestation".equals(info.packageName);
+            if (!isSystem || isCore) {
+                String label = info.loadLabel(pm).toString();
+                Drawable icon = info.loadIcon(pm);
+                boolean checked = currentTargets.contains(info.packageName);
+                allApps.add(new TargetAppItem(label, info.packageName, icon, checked));
+            }
+        }
+
+        Collections.sort(allApps, (a, b) -> a.label.compareToIgnoreCase(b.label));
+
+        final List<TargetAppItem> displayApps = new ArrayList<>(allApps);
+
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View dialogView = inflater.inflate(R.layout.dialog_target_apps_picker, null);
+        EditText searchBox = dialogView.findViewById(R.id.target_apps_search);
+        ListView listView = dialogView.findViewById(R.id.target_apps_list);
+
+        BaseAdapter adapter = new BaseAdapter() {
+            @Override
+            public int getCount() {
+                return displayApps.size();
+            }
+
+            @Override
+            public TargetAppItem getItem(int position) {
+                return displayApps.get(position);
+            }
+
+            @Override
+            public long getItemId(int position) {
+                return position;
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View row = convertView;
+                if (row == null) {
+                    row = inflater.inflate(R.layout.item_target_app_picker, parent, false);
+                }
+                TargetAppItem item = getItem(position);
+                ImageView iconView = row.findViewById(R.id.app_icon);
+                TextView labelView = row.findViewById(R.id.app_label);
+                TextView pkgView = row.findViewById(R.id.app_package);
+                CheckBox checkBox = row.findViewById(R.id.app_checkbox);
+
+                iconView.setImageDrawable(item.icon);
+                labelView.setText(item.label);
+                pkgView.setText(item.packageName);
+                checkBox.setChecked(item.isChecked);
+
+                return row;
+            }
+        };
+
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            TargetAppItem item = displayApps.get(position);
+            item.isChecked = !item.isChecked;
+            if (item.isChecked) {
+                currentTargets.add(item.packageName);
+            } else {
+                currentTargets.remove(item.packageName);
+            }
+            adapter.notifyDataSetChanged();
+        });
+
+        searchBox.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String query = s == null ? "" : s.toString().trim().toLowerCase(Locale.ROOT);
+                displayApps.clear();
+                for (TargetAppItem item : allApps) {
+                    if (query.isEmpty() || item.label.toLowerCase(Locale.ROOT).contains(query)
+                            || item.packageName.toLowerCase(Locale.ROOT).contains(query)) {
+                        displayApps.add(item);
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        new AlertDialog.Builder(context)
+                .setTitle(R.string.target_apps_dialog_title)
+                .setView(dialogView)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    AutoPifHelper.saveTargetPackages(context, currentTargets);
+                    updateTargetAppsSummary(context);
+                    Toast.makeText(context,
+                            getString(R.string.target_apps_saved, currentTargets.size()),
+                            Toast.LENGTH_SHORT).show();
+                })
+                .setNeutralButton(R.string.target_apps_reset_recommended, (dialog, which) -> {
+                    AutoPifHelper.saveTargetPackages(context, AutoPifHelper.RECOMMENDED_TARGET_PACKAGES);
+                    updateTargetAppsSummary(context);
+                    Toast.makeText(context,
+                            getString(R.string.target_apps_saved, AutoPifHelper.RECOMMENDED_TARGET_PACKAGES.size()),
+                            Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void updateTargetAppsSummary(Context context) {
+        if (mManageTargetAppsPref != null) {
+            int count = AutoPifHelper.getTargetPackages(context).size();
+            mManageTargetAppsPref.setSummary(getString(R.string.manage_target_apps_summary, count));
         }
     }
 

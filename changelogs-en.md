@@ -161,11 +161,13 @@ Comprehensively transformed **Settings -> System -> Spoof Option** into a centra
 * **Header Redesign - Eliminating Misleading Metric Chips**:
   * Removed the 3-metric chip row (*"INTEGRITY STRONG | HARDWARE TEE | BOOTLOADER LOCKED"*) from `spoof_option_header_card.xml` to eliminate false security impressions when public keyboxes are revoked by Google.
   * Replaced with a transparent, elegant status container displaying the active **Attestation Engine Mode**, **Target Certified Profile**, and monospace fingerprint string, paired with dynamic badge indicators.
-* **Full TrickyStore WebUI Parity**:
+* **Full TrickyStore WebUI Parity & Per-App Target Manager**:
+  * **100% Native Framework-Base (FWB) Implementation**: Operates entirely within `frameworks/base` and system settings, requiring zero root access, zero Magisk/KernelSU modules, and zero Zygisk hooks, completely evading DroidGuard's module scanners.
+  * **Per-App Target Manager (`target.txt` Parity)**: Introduced an interactive Material app picker dialog in Settings (`Manage Target Apps (Per-App)`). Users can selectively choose which installed apps (e.g. banking apps, integrity checkers) receive Keybox attestation and certified build property spoofing, while unselected apps (camera, games, social media) run natively with stock POCO F5 build properties.
+  * **Target Filter Modes**: Easily toggle between *Recommended (GMS, Play Store & Key Attestation)*, *Per-App Target List (Selected Apps)*, and *All Applications (Global)*.
   * **Attestation Engine Mode Selector**: Easily toggle between *Play Integrity Fix (Software Mode - Guaranteed Certified)*, *TrickyStore (Hardware TEE Keybox)*, and *Auto Mode*.
   * **Clear Active Keybox**: One-tap action to purge revoked or stale keybox credentials from system settings and `/data/system/keybox.xml`, immediately restoring clean software attestation without manual file editing.
   * **Random Verified Boot Hash Generator**: Instantly generates and applies a cryptographically secure 32-byte (64-character hexadecimal) boot hash to emulate verified boot state.
-  * **Application Target Modes**: Select between Recommended (GMS, Banking & Key Attestation) or system-wide global spoofing.
 * **Full TEESimulator WebUI Parity**:
   * **Enforce RKP Attestation (`tee_rkp_only`)**: Toggle Remote Key Provisioning enforcement behavior on/off to bypass Google DroidGuard hardware attestation barriers.
   * **Auto Security Patch Synchronization (`tee_auto_spl`)**: Automatically matches simulated TEE boot and vendor patch dates with the active certified PIF profile date.

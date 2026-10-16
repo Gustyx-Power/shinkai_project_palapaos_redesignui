@@ -91,6 +91,11 @@
             android:entries="@array/keybox_target_mode_names"
             android:entryValues="@array/keybox_target_mode_values"
             android:defaultValue="recommended" />
+
+        <Preference
+            android:key="manage_target_apps"
+            android:title="@string/manage_target_apps_title"
+            android:summary="@string/manage_target_apps_summary" />
     </PreferenceCategory>
 
     <!-- 3. TEESimulator Suite (Attestation Behavior & Environment) -->

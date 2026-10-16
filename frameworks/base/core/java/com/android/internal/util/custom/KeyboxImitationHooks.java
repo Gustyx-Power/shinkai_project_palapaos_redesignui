@@ -40,6 +40,12 @@ public class KeyboxImitationHooks {
             return null;
         }
 
+        android.content.Context ctx = android.app.ActivityThread.currentApplication();
+        String packageName = ctx != null ? ctx.getPackageName() : null;
+        if (!PropImitationHooks.isTargetPackage(ctx, packageName)) {
+            return null;
+        }
+
         if (!mSuccess) {
             return null;
         }
@@ -55,6 +61,12 @@ public class KeyboxImitationHooks {
 
     public static KeyMetadata generateKey(IKeystoreSecurityLevel level, KeyDescriptor descriptor, Collection<KeyParameter> args) {
         if (!KeyProviderManager.isKeyboxAvailable()) {
+            return null;
+        }
+
+        android.content.Context ctx = android.app.ActivityThread.currentApplication();
+        String packageName = ctx != null ? ctx.getPackageName() : null;
+        if (!PropImitationHooks.isTargetPackage(ctx, packageName)) {
             return null;
         }
 

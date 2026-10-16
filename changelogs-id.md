@@ -161,11 +161,13 @@ Mentransformasikan menu **Pengaturan -> Sistem -> Spoof Option** menjadi pusat k
 * **Redesain Kartu Header - Penghapusan Chip Metrik yang Menyesatkan**:
   * Menghapus baris chip metrik 3 kolom (*"INTEGRITY STRONG | HARDWARE TEE | BOOTLOADER LOCKED"*) dari `spoof_option_header_card.xml` untuk mencegah ilusi status yang salah saat keybox publik dicabut (revoked) oleh Google.
   * Digantikan dengan kontainer status yang transparan dan elegan menampilkan **Mode Mesin Attestation** aktif, **Profil Perangkat Tersertifikasi**, dan string fingerprint monospace, disertai badge dinamis.
-* **Paritas Lengkap WebUI TrickyStore**:
+* **Paritas Lengkap WebUI TrickyStore & Pengelola Aplikasi Target Per-App**:
+  * **100% Implementasi Murni Framework-Base (FWB)**: Bekerja murni di dalam `frameworks/base` dan setelan sistem Android tanpa memerlukan akses root, modul Magisk/KernelSU, maupun injeksi Zygisk, sehingga kebal dari pemindaian modul DroidGuard.
+  * **Pengelola Aplikasi Target Per-App (Paritas `target.txt`)**: Memperkenalkan dialog pemilih aplikasi Material interaktif di Pengaturan (`Kelola Aplikasi Target (Per-App)`). Pengguna dapat memilih secara spesifik aplikasi terpasang (seperti aplikasi bank atau pemeriksa integritas) yang menerima attestation Keybox dan pemalsuan properti bersertifikasi, sementara aplikasi lain (kamera, game, medsos) tetap berjalan alami dengan identitas asli POCO F5.
+  * **Mode Target Aplikasi**: Beralih mudah antara *Rekomendasi (GMS, Play Store & Key Attestation)*, *Aplikasi Terpilih (Per-App List)*, dan *Semua Aplikasi (Global)*.
   * **Pemilih Mode Mesin Attestation**: Beralih mudah antara *Play Integrity Fix (Mode Software - Dijamin Bersertifikasi)*, *TrickyStore (Hardware TEE Keybox)*, dan *Mode Otomatis*.
   * **Hapus Keybox Aktif**: Aksi satu ketukan untuk membersihkan kredensial keybox kedaluwarsa/tercabut dari pengaturan sistem dan direktori data, seketika memulihkan software attestation bersih tanpa repot edit file manual.
   * **Generator Verified Boot Hash Acak**: Seketika membuat dan menerapkan boot hash 32-byte (64 karakter heksadesimal) kriptografis acak untuk mensimulasikan status bootloader terverifikasi.
-  * **Target Aplikasi Keybox**: Pilihan antara Direkomendasikan (GMS, Perbankan & Key Attestation) atau pemalsuan global seluruh sistem.
 * **Paritas Lengkap WebUI TEESimulator**:
   * **Paksa Attestation RKP (`tee_rkp_only`)**: Mengaktifkan atau menonaktifkan aturan RKP untuk menghindari pemblokiran attestation perangkat keras Google DroidGuard.
   * **Sinkronisasi Otomatis Security Patch Level (`tee_auto_spl`)**: Otomatis menyelaraskan level patch boot dan vendor simulasi TEE dengan tanggal profil sertifikasi PIF aktif.

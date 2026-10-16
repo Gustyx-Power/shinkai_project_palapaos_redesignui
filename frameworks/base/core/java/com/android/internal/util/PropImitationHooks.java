@@ -91,7 +91,7 @@ public class PropImitationHooks {
     private static volatile String sStockFp, sNetflixModel;
 
     private static volatile String sProcessName;
-    private static volatile boolean sIsGms, sIsGsf, sIsFinsky, sIsPhotos;
+    private static volatile boolean sIsGms, sIsGsf, sIsFinsky, sIsPhotos, sIsTarget;
 
     private static final Field OFFSET_FIELD;
     private static final Unsafe UNSAFE;
@@ -116,6 +116,61 @@ public class PropImitationHooks {
         OFFSET_FIELD = offsetField;
     }
 
+    public static boolean isTargetPackage(Context context, String packageName) {
+        if (packageName == null || packageName.isEmpty()) {
+            return false;
+        }
+        if (PACKAGE_GMS.equals(packageName)
+                || PACKAGE_FINSKY.equals(packageName)
+                || PACKAGE_GSF.equals(packageName)) {
+            return true;
+        }
+        if (context == null) {
+            context = ActivityThread.currentApplication();
+        }
+        if (context == null) {
+            return false;
+        }
+        try {
+            String targetMode = Settings.Secure.getString(context.getContentResolver(), "keybox_target_mode");
+            if (targetMode == null || "recommended".equals(targetMode)) {
+                return "io.github.vvb2060.keyattestation".equals(packageName)
+                        || "io.github.qwq233.keyattestation".equals(packageName);
+            } else if ("all".equals(targetMode)) {
+                return true;
+            } else if ("per_app".equals(targetMode)) {
+                String targetList = Settings.Secure.getString(context.getContentResolver(), "keybox_target_packages");
+                if (targetList != null && !targetList.isEmpty()) {
+                    String[] pkgs = targetList.split("[,;\n]");
+                    for (String p : pkgs) {
+                        if (packageName.equalsIgnoreCase(p.trim())) {
+                            return true;
+                        }
+                    }
+                }
+                File targetFile = new File("/data/system/target.txt");
+                if (targetFile.exists() && targetFile.canRead()) {
+                    try (BufferedReader reader = new BufferedReader(new FileReader(targetFile))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            line = line.trim();
+                            if (line.endsWith("!")) {
+                                line = line.substring(0, line.length() - 1).trim();
+                            }
+                            if (packageName.equalsIgnoreCase(line)) {
+                                return true;
+                            }
+                        }
+                    } catch (Throwable ignored) {
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            Log.w(TAG, "Failed resolving target mode", t);
+        }
+        return false;
+    }
+
     public static void setProps(Context context) {
         final String packageName = context.getPackageName();
         final String processName = Application.getProcessName();
@@ -138,12 +193,13 @@ public class PropImitationHooks {
         sIsGms = packageName.equals(PACKAGE_GMS);
         sIsGsf = packageName.equals(PACKAGE_GSF);
         sIsFinsky = packageName.equals(PACKAGE_FINSKY);
+        sIsTarget = sIsGms || sIsGsf || sIsFinsky || isTargetPackage(context, packageName);
 
-        /* Set Certified Properties for GMSCore, GSF, Play Store
+        /* Set Certified Properties for GMSCore, GSF, Play Store, and Target Apps
          * Set Stock Fingerprint for ARCore
          * Set custom model for Netflix
          */
-        if (sIsGms || sIsGsf || sIsFinsky) {
+        if (sIsTarget) {
             if (!android.os.Process.isIsolated()) {
                 setPlayIntegrityProps(context);
             } else {
@@ -403,7 +459,7 @@ public class PropImitationHooks {
     }
 
     public static String getSystemProperty(String key) {
-        if (!sIsGms && !sIsGsf && !sIsFinsky) {
+        if (!sIsTarget) {
             return null;
         }
         if (key == null) return null;
