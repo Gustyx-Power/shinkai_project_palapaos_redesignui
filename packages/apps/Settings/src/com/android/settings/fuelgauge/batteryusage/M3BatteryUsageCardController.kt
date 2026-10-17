@@ -44,7 +44,7 @@ import com.android.settings.core.SubSettingLauncher
 import com.android.settings.fuelgauge.BatteryBroadcastReceiver
 import com.android.settings.fuelgauge.BatteryBroadcastReceiver.BatteryUpdateType.BATTERY_NOT_PRESENT
 import com.android.settings.fuelgauge.BatteryInfo
-import com.android.settings.spa.SpaActivity
+import com.android.settings.fuelgauge.AdvancedPowerUsageDetail
 import com.android.settingslib.fuelgauge.BatteryUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -315,14 +315,27 @@ class M3BatteryUsageCardController(context: Context, key: String) :
                 }
                 row?.setOnClickListener {
                     try {
-                        SpaActivity.startAppBatteryUsage(mContext, app.packageName)
+                        val pm = mContext.packageManager
+                        val uid = try { pm.getPackageUid(app.packageName, 0) } catch (_: Throwable) { 0 }
+                        val bundle = android.os.Bundle().apply {
+                            putString(AdvancedPowerUsageDetail.EXTRA_PACKAGE_NAME, app.packageName)
+                            putString(AdvancedPowerUsageDetail.EXTRA_POWER_USAGE_PERCENT, app.percentageStr)
+                            putInt(AdvancedPowerUsageDetail.EXTRA_UID, uid)
+                        }
+                        SubSettingLauncher(mContext)
+                            .setDestination(AdvancedPowerUsageDetail::class.java.name)
+                            .setTitleRes(R.string.battery_details_title)
+                            .setArguments(bundle)
+                            .setSourceMetricsCategory(0)
+                            .setUserHandle(Process.myUserHandle())
+                            .launch()
                     } catch (_: Throwable) {
                         try {
-                            AdvancedPowerUsageDetail.startBatteryDetailPage(
-                                mContext,
-                                null,
-                                app.packageName
-                            )
+                            val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                data = android.net.Uri.fromParts("package", app.packageName, null)
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            mContext.startActivity(intent)
                         } catch (_: Throwable) {}
                     }
                 }

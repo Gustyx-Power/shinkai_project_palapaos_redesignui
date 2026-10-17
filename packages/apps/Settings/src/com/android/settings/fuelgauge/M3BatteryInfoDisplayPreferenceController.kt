@@ -45,7 +45,7 @@ class M3BatteryInfoDisplayPreferenceController(context: Context, key: String) :
     BasePreferenceController(context, key), LifecycleEventObserver {
 
     companion object {
-        private const val SETTING_PERCENT = Settings.System.STATUS_BAR_SHOW_BATTERY_PERCENT
+        private const val SETTING_PERCENT = Settings.System.SHOW_BATTERY_PERCENT
         private const val SETTING_LOCKSCREEN_INFO = "lockscreen_battery_info"
     }
 
