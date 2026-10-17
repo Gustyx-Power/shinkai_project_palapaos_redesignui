@@ -35,7 +35,7 @@ import com.android.settings.core.SubSettingLauncher
 import com.android.settings.fuelgauge.BatteryBroadcastReceiver.BatteryUpdateType.BATTERY_NOT_PRESENT
 import com.android.settings.fuelgauge.batteryusage.M3BatteryInfoFragment
 import com.android.settingslib.fuelgauge.BatteryUtils
-import com.google.android.material.materialswitch.MaterialSwitch
+import android.widget.Switch
 import java.io.File
 import java.util.Locale
 import kotlin.math.abs
@@ -100,31 +100,29 @@ class M3BatteryInfoDisplayPreferenceController(context: Context, key: String) :
 
         // 1. Percentage Switch
         val rowPercent = holder.findViewById(R.id.m3_row_battery_percent)
-        val switchPercent = holder.findViewById(R.id.m3_switch_battery_percent) as? MaterialSwitch
+        val switchPercent = holder.findViewById(R.id.m3_switch_battery_percent) as? Switch
         val isPercentOn = Settings.System.getInt(cr, SETTING_PERCENT, 0) == 1
+        switchPercent?.setOnCheckedChangeListener(null)
         switchPercent?.isChecked = isPercentOn
-
-        val togglePercentAction = View.OnClickListener {
-            val newState = !(switchPercent?.isChecked ?: false)
-            switchPercent?.isChecked = newState
-            Settings.System.putInt(cr, SETTING_PERCENT, if (newState) 1 else 0)
+        switchPercent?.setOnCheckedChangeListener { _, isChecked ->
+            Settings.System.putInt(cr, SETTING_PERCENT, if (isChecked) 1 else 0)
         }
-        rowPercent?.setOnClickListener(togglePercentAction)
-        switchPercent?.setOnClickListener(togglePercentAction)
+        rowPercent?.setOnClickListener {
+            switchPercent?.toggle()
+        }
 
         // 2. Lockscreen Charging Info Switch & Telemetry Chip
         val rowLockscreen = holder.findViewById(R.id.m3_row_lockscreen_info)
-        val switchLockscreen = holder.findViewById(R.id.m3_switch_lockscreen_info) as? MaterialSwitch
+        val switchLockscreen = holder.findViewById(R.id.m3_switch_lockscreen_info) as? Switch
         val isLockscreenOn = Settings.System.getInt(cr, SETTING_LOCKSCREEN_INFO, 1) == 1
+        switchLockscreen?.setOnCheckedChangeListener(null)
         switchLockscreen?.isChecked = isLockscreenOn
-
-        val toggleLockscreenAction = View.OnClickListener {
-            val newState = !(switchLockscreen?.isChecked ?: false)
-            switchLockscreen?.isChecked = newState
-            Settings.System.putInt(cr, SETTING_LOCKSCREEN_INFO, if (newState) 1 else 0)
+        switchLockscreen?.setOnCheckedChangeListener { _, isChecked ->
+            Settings.System.putInt(cr, SETTING_LOCKSCREEN_INFO, if (isChecked) 1 else 0)
         }
-        rowLockscreen?.setOnClickListener(toggleLockscreenAction)
-        switchLockscreen?.setOnClickListener(toggleLockscreenAction)
+        rowLockscreen?.setOnClickListener {
+            switchLockscreen?.toggle()
+        }
 
         // Real Telemetry for chip: 1.420 mA • 3,90 V • 5,5 W • 38,9 °C
         val previewText = holder.findViewById(R.id.m3_lockscreen_preview_text) as? TextView

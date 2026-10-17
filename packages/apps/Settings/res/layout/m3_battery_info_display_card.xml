@@ -87,14 +87,17 @@
                     android:fontFamily="sans-serif" />
             </LinearLayout>
 
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <Switch
                 android:id="@+id/m3_switch_battery_percent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                app:thumbTint="@color/m3_battery_switch_thumb_color"
-                app:trackTint="@color/m3_battery_switch_track_color" />
+                android:showText="false"
+                android:textOn=""
+                android:textOff=""
+                android:thumbTint="@color/m3_battery_switch_thumb_color"
+                android:trackTint="@color/m3_battery_switch_track_color" />
         </RelativeLayout>
 
         <!-- Divider -->
@@ -179,14 +182,17 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <com.google.android.material.materialswitch.MaterialSwitch
+            <Switch
                 android:id="@+id/m3_switch_lockscreen_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                app:thumbTint="@color/m3_battery_switch_thumb_color"
-                app:trackTint="@color/m3_battery_switch_track_color" />
+                android:showText="false"
+                android:textOn=""
+                android:textOff=""
+                android:thumbTint="@color/m3_battery_switch_thumb_color"
+                android:trackTint="@color/m3_battery_switch_track_color" />
         </RelativeLayout>
 
         <!-- Divider -->
