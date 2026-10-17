@@ -1,7 +1,7 @@
-# System Update Changelog: Palapa OS (Triwulan Edition)
+# System Update Changelog: Palapa OS (Trowulan Edition)
 Target Device: POCO F5 (marble) / AOSP Generic  
 Android Version: Android 17 (CP2A)  
-Branch: `palapa-triwulan`  
+Branch: `palapa-trowulan`  
 Release Status: Stable & Verified  
 
 Document Navigation:
@@ -10,9 +10,9 @@ Document Navigation:
 
 ---
 
-## Update Summary (Triwulan Edition)
+## Update Summary (Trowulan Edition)
 
-The new **`palapa-triwulan`** branch introduces a comprehensive system interface overhaul inspired by **Samsung One UI 9**, a complete redesign of the Battery settings page, enhanced Quick Settings / Control Center, an interactive punch-hole Dynamic Island, and deep kernel-level memory optimizations:
+The new **`palapa-trowulan`** branch introduces a comprehensive system interface overhaul inspired by **Samsung One UI 9**, a complete redesign of the Battery settings page, enhanced Quick Settings / Control Center, an interactive punch-hole Dynamic Island, and deep kernel-level memory optimizations:
 
 ---
 
@@ -194,4 +194,4 @@ Comprehensively transformed **Settings -> System -> Spoof Option** into a centra
 | **Spoof Option & Suite** | `AutoPifHelper.java`<br>`SpoofOptionFragment.java`<br>`SpoofOptionController.java`<br>`spoof_option_fragment.xml`<br>`spoof_option_header_card.xml`<br>`Settings.java`<br>`KeyboxChainGenerator.java`<br>`SecureSettingsValidators.java` | Centralized Play Integrity, TrickyStore & TEESimulator control center with redesigned Material card, PIF presets catalog, dynamic chip indicators, and verified boot hash spoofing |
 
 ---
-*Palapa OS - Tri-Monthly Edition | Shinkai Project (2026)*
+*Palapa OS - Trowulan Edition | Shinkai Project (2026)*

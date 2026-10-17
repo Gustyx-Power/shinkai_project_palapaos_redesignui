@@ -1,7 +1,7 @@
-# Log Perubahan Pembaruan Sistem: Palapa OS (Edisi Triwulan)
+# Log Perubahan Pembaruan Sistem: Palapa OS (Edisi Trowulan)
 Target Perangkat: POCO F5 (marble) / AOSP Generic  
 Versi Android: Android 17 (CP2A)  
-Branch: `palapa-triwulan`  
+Branch: `palapa-trowulan`  
 Status Rilis: Stabil & Terverifikasi  
 
 Navigasi Dokumen:
@@ -10,9 +10,9 @@ Navigasi Dokumen:
 
 ---
 
-## Ringkasan Pembaruan (Edisi Triwulan)
+## Ringkasan Pembaruan (Edisi Trowulan)
 
-Pembaruan cabang baru **`palapa-triwulan`** menghadirkan pembaruan besar antarmuka sistem (UI Redesign) yang terinspirasi oleh **Samsung One UI 9**, penyegaran total halaman Pengaturan Baterai, penyempurnaan Pusat Kontrol (Control Center), fitur interaktif Dynamic Island, serta optimasi performa kernel dan memori:
+Pembaruan cabang baru **`palapa-trowulan`** menghadirkan pembaruan besar antarmuka sistem (UI Redesign) yang terinspirasi oleh **Samsung One UI 9**, penyegaran total halaman Pengaturan Baterai, penyempurnaan Pusat Kontrol (Control Center), fitur interaktif Dynamic Island, serta optimasi performa kernel dan memori:
 
 ---
 
@@ -194,4 +194,4 @@ Mentransformasikan menu **Pengaturan -> Sistem -> Spoof Option** menjadi pusat k
 | **Pusat Kendali Spoof & Suite** | `AutoPifHelper.java`<br>`SpoofOptionFragment.java`<br>`SpoofOptionController.java`<br>`spoof_option_fragment.xml`<br>`spoof_option_header_card.xml`<br>`Settings.java`<br>`KeyboxChainGenerator.java`<br>`SecureSettingsValidators.java` | Dashboard terpadu Play Integrity, TrickyStore & TEESimulator dengan kartu header Material yang disempurnakan, katalog preset PIF, indikator chip dinamis, dan boot hash spoofing |
 
 ---
-*Palapa OS - Edisi Triwulan | Shinkai Project (2026)*
+*Palapa OS - Edisi Trowulan | Shinkai Project (2026)*
