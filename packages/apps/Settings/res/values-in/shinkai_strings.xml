@@ -222,6 +222,72 @@
     <string name="oneui_battery_info_category">Info &amp; tampilan baterai</string>
     <string name="oneui_battery_info_entry_summary">Kesehatan baterai, siklus pengisian, kapasitas</string>
     <string name="oneui_battery_time_until_full">%1$s lagi sampai penuh</string>
+
+    <!-- Material Design 3 Expressive Battery Strings (ID) -->
+    <string name="m3_battery_charging_slow_adaptive">Mengisi daya lambat • Adaptif</string>
+    <string name="m3_battery_charging_fast">Mengisi daya cepat</string>
+    <string name="m3_battery_charging_normal">Mengisi daya</string>
+    <string name="m3_battery_discharging_optimal">Baterai optimal</string>
+    <string name="m3_battery_full_in">Penuh dlm ~%1$s</string>
+    <string name="m3_battery_time_left">Sisa waktu ~%1$s</string>
+    <string name="m3_battery_capacity_format">%1$s / %2$s mAh</string>
+    <string name="m3_battery_temp_title">Suhu</string>
+    <string name="m3_battery_volt_title">Voltase</string>
+    <string name="m3_battery_health_title">Kesehatan</string>
+    <string name="m3_battery_health_good_format">%1$d%% Baik</string>
+    <string name="m3_battery_cycles_recorded_format">Mengisi daya • %1$d siklus pengisian tercatat</string>
+    <string name="m3_battery_cycles_discharging_format">Baterai aktif • %1$d siklus pengisian tercatat</string>
+    <string name="m3_battery_detail_btn">Detail &gt;</string>
+
+    <string name="m3_battery_avg_format">Rata-rata: %1$d%%</string>
+    <string name="m3_battery_day_summary_optimal">Optimal</string>
+    <string name="m3_battery_day_summary_desc">Konsumsi sistem sangat rendah saat layar siaga</string>
+    <string name="m3_battery_bg_system">Sistem latar belakang</string>
+    <string name="m3_battery_active_min_format">&lt; %1$d mnt aktif</string>
+    <string name="m3_battery_hide_app_details">Sembunyikan detail aplikasi</string>
+    <string name="m3_battery_show_app_details">Lihat detail aplikasi</string>
+
+    <string name="m3_battery_management_title">MANAJEMEN DAYA</string>
+    <string name="m3_battery_saver_title">Penghemat Baterai</string>
+    <string name="m3_battery_saver_desc">Batasi efek visual &amp; aktivitas latar belakang</string>
+    <string name="m3_battery_saver_on">Aktif</string>
+    <string name="m3_battery_saver_off">Nonaktif</string>
+    <string name="m3_battery_health_title_card">Kesehatan baterai</string>
+    <string name="m3_battery_health_card_desc">%1$d siklus • Kapasitas terukur %2$d mAh</string>
+    <string name="m3_battery_manager_title">Pengelola Baterai</string>
+    <string name="m3_battery_manager_badge">AI Adaptif</string>
+    <string name="m3_battery_manager_desc">Tidak ada aplikasi yang menguras daya berlebih</string>
+    <string name="m3_battery_widget_title">Widget baterai</string>
+    <string name="m3_battery_widget_badge">+ Tambah</string>
+    <string name="m3_battery_widget_desc">Tambahkan ke layar utama untuk melihat level perangkat</string>
+
+    <string name="m3_battery_charging_title">PENGATURAN PENGISIAN DAYA</string>
+    <string name="m3_charging_control_header">Kontrol pengisian daya</string>
+    <string name="m3_charging_control_sub">Sesuaikan jadwal dan batas pengisian daya untuk baterai</string>
+    <string name="m3_charging_mode_adaptive">Adaptif Otomatis</string>
+    <string name="m3_charging_mode_adaptive_sub">Penuh saat bangun</string>
+    <string name="m3_charging_mode_limit80">Batas 80%</string>
+    <string name="m3_charging_mode_limit80_sub">Jaga kesehatan sel</string>
+    <string name="m3_charging_mode_standard100">Standar 100%</string>
+    <string name="m3_charging_mode_standard100_sub">Isi penuh langsung</string>
+
+    <string name="m3_battery_display_info_title">INFO &amp; TAMPILAN BATERAI</string>
+    <string name="m3_battery_percentage_title">Persentase baterai</string>
+    <string name="m3_battery_percentage_sub">Tampilkan persentase baterai di status bar</string>
+    <string name="m3_lockscreen_info_title">Info Pengisian Daya di Layar Kunci</string>
+    <string name="m3_lockscreen_info_sub">Menampilkan arus, tegangan, daya, dan suhu saat mengisi daya</string>
+    <string name="m3_battery_info_sub_desc">Kesehatan baterai (%1$d%%), siklus pengisian (%2$dx), kapasitas (%3$d mAh)</string>
+
+    <string name="m3_info_status_level_header">STATUS &amp; TINGKAT BATERAI</string>
+    <string name="m3_info_health_desc_format">Kapasitas terukur %1$d mAh dari %2$d mAh (tipikal)</string>
+    <string name="m3_info_cycles_desc">Total siklus pengisian penuh sejak aktif</string>
+    <string name="m3_info_cycles_count_format">%1$d kali</string>
+    <string name="m3_info_capacity_col_title">Kapasitas</string>
+    <string name="m3_info_capacity_col_sub">Tipikal</string>
+    <string name="m3_info_temp_col_title">Suhu baterai</string>
+    <string name="m3_info_temp_col_sub">Hangat normal</string>
+    <string name="m3_info_volt_col_title">Voltase baterai</string>
+    <string name="m3_info_volt_col_sub">Stabil</string>
     <!-- Auto PIF Generator & Clear GMS -->
     <string name="spoof_card_header_title">Status Sertifikasi &amp; Attestation</string>
     <string name="spoof_card_header_subtitle">Suite PIF • TrickyStore • Simulator TEE</string>
@@ -301,5 +367,76 @@
     <string name="clear_gms_playstore_dialog_message">Tindakan ini akan mereset cache dan penyimpanan lokal Google Play Store serta Play Services. Akun Google Anda tidak akan hilang, namun Play Store akan langsung mendaftarkan ulang status sertifikasi perangkat.</string>
     <string name="clear_gms_playstore_clearing">Membersihkan data Play Store dan Layanan Google…</string>
     <string name="clear_gms_playstore_success">Data Play Store dan Layanan Google berhasil dibersihkan</string>
+
+    <!-- Material Design 3 Expressive Battery Strings (Indonesian) -->
+    <string name="m3_battery_charging_slow_adaptive">Mengisi daya lambat • Adaptif</string>
+    <string name="m3_battery_charging_fast">Mengisi daya cepat</string>
+    <string name="m3_battery_charging_normal">Mengisi daya</string>
+    <string name="m3_battery_discharging_optimal">Baterai optimal</string>
+    <string name="m3_battery_full_in">Penuh dlm ~%1$s</string>
+    <string name="m3_battery_time_left">~%1$s tersisa</string>
+    <string name="m3_battery_capacity_format">%1$s / %2$s mAh</string>
+    <string name="m3_battery_temp_title">Suhu</string>
+    <string name="m3_battery_volt_title">Voltase</string>
+    <string name="m3_battery_health_title">Kesehatan</string>
+    <string name="m3_battery_cycle_count_title">Siklus pengisian</string>
+    <string name="m3_battery_health_good_format">%1$d%% Baik</string>
+    <string name="m3_battery_cycles_recorded_format">Mengisi daya • %1$d siklus pengisian tercatat</string>
+    <string name="m3_battery_cycles_discharging_format">Baterai aktif • %1$d siklus pengisian tercatat</string>
+    <string name="m3_battery_detail_btn">Detail &gt;</string>
+
+    <string name="m3_battery_daily_usage">Penggunaan harian</string>
+    <string name="m3_battery_avg_format">Rata-rata: %1$d%%</string>
+    <string name="m3_battery_this_week">Minggu ini</string>
+    <string name="m3_battery_day_summary_title">Hari %1$s • Penggunaan baterai: %2$d%%</string>
+    <string name="m3_battery_day_summary_optimal">Optimal</string>
+    <string name="m3_battery_day_summary_desc">Konsumsi sistem sangat rendah saat layar siaga</string>
+    <string name="m3_battery_bg_system">Sistem latar belakang</string>
+    <string name="m3_battery_active_min_format">&lt; %1$d mnt aktif</string>
+    <string name="m3_battery_hide_app_details">Sembunyikan detail aplikasi</string>
+    <string name="m3_battery_show_app_details">Tampilkan detail aplikasi</string>
+
+    <string name="m3_battery_management_title">MANAJEMEN DAYA</string>
+    <string name="m3_battery_saver_title">Penghemat Baterai</string>
+    <string name="m3_battery_saver_desc">Batasi efek visual &amp; aktivitas latar belakang</string>
+    <string name="m3_battery_saver_on">Aktif</string>
+    <string name="m3_battery_saver_off">Nonaktif</string>
+    <string name="m3_battery_health_title_card">Kesehatan baterai</string>
+    <string name="m3_battery_health_card_desc">%1$d siklus • Kapasitas terukur %2$d mAh</string>
+    <string name="m3_battery_manager_title">Pengelola Baterai</string>
+    <string name="m3_battery_manager_badge">AI Adaptif</string>
+    <string name="m3_battery_manager_desc">Tidak ada aplikasi yang menguras daya berlebih</string>
+    <string name="m3_battery_widget_title">Widget baterai</string>
+    <string name="m3_battery_widget_badge">+ Tambah</string>
+    <string name="m3_battery_widget_desc">Tambahkan ke layar utama untuk melihat level perangkat</string>
+
+    <string name="m3_battery_charging_title">PENGATURAN PENGISIAN DAYA</string>
+    <string name="m3_charging_control_header">Kontrol pengisian daya</string>
+    <string name="m3_charging_control_sub">Sesuaikan jadwal dan batas pengisian daya untuk baterai</string>
+    <string name="m3_charging_mode_adaptive">Adaptif Otomatis</string>
+    <string name="m3_charging_mode_adaptive_sub">Penuh saat bangun</string>
+    <string name="m3_charging_mode_limit80">Batas 80%</string>
+    <string name="m3_charging_mode_limit80_sub">Jaga kesehatan sel</string>
+    <string name="m3_charging_mode_standard100">Standar 100%</string>
+    <string name="m3_charging_mode_standard100_sub">Isi penuh langsung</string>
+
+    <string name="m3_battery_display_info_title">INFO &amp; TAMPILAN BATERAI</string>
+    <string name="m3_battery_percentage_title">Persentase baterai</string>
+    <string name="m3_battery_percentage_sub">Tampilkan persentase baterai di status bar</string>
+    <string name="m3_lockscreen_info_title">Info Pengisian Daya di Layar Kunci</string>
+    <string name="m3_lockscreen_info_sub">Menampilkan arus, tegangan, daya, dan suhu saat mengisi daya</string>
+    <string name="m3_battery_info_sub_desc">Kesehatan baterai (%1$d%%), siklus pengisian (%2$dx), kapasitas (%3$d mAh)</string>
+
+    <string name="m3_info_status_level_header">STATUS &amp; TINGKAT BATERAI</string>
+    <string name="m3_info_health_desc_format">Kapasitas terukur %1$d mAh dari %2$d mAh (tipikal)</string>
+    <string name="m3_info_cycles_desc">Total siklus pengisian penuh sejak aktif</string>
+    <string name="m3_info_cycles_count_format">%1$d kali</string>
+    <string name="m3_info_capacity_col_title">Kapasitas</string>
+    <string name="m3_info_capacity_col_sub">Tipikal</string>
+    <string name="m3_info_temp_col_title">Suhu baterai</string>
+    <string name="m3_info_temp_col_sub">Hangat normal</string>
+    <string name="m3_info_volt_col_title">Voltase baterai</string>
+    <string name="m3_info_volt_col_sub">Stabil</string>
+    <string name="m3_battery_disclaimer">Kapasitas tipikal telah diuji dalam kondisi laboratorium pihak ketiga. Kapasitas tipikal adalah perkiraan kapasitas rata-rata dengan mempertimbangkan deviasi kapasitas baterai di antara sampel baterai yang diuji berdasarkan standar IEC 61960. Kapasitas terukur adalah %1$d mAh. Daya tahan baterai sebenarnya dapat bervariasi bergantung pada lingkungan jaringan, pola penggunaan, dan faktor lainnya.</string>
 </resources>
 

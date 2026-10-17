@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2026 Palapa OS / Shinkai Project
+  Material Design 3 Expressive - Daily Usage Chart & App Breakdown Card
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="8dp">
+
+    <!-- Card Container (M3 Dark Surface #161E19) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/m3_battery_card_surface"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Header: Dropdown Title (Penggunaan harian ▾) -->
+        <LinearLayout
+            android:id="@+id/m3_mode_selector_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/m3_battery_sub_chip_bg"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="8dp">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_m3_voltage"
+                app:tint="#7EE2A7"
+                android:layout_marginEnd="6dp"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/m3_mode_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/m3_battery_daily_usage"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:fontFamily="sans-serif-bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="▾"
+                android:textColor="#A3C6B1"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- Subheader: Pill Badge "Rata-rata: 23%" • Minggu ini -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/m3_chart_avg_pill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/m3_battery_badge_green_pill"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:text="Rata-rata: 23%"
+                android:textColor="#7EE2A7"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="• Minggu ini"
+                android:textColor="#A3C6B1"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
+
+        <!-- M3 Battery Chart View (Thick Capsule Bars + Dashed Average Line) -->
+        <com.android.settings.fuelgauge.batteryusage.M3BatteryChartView
+            android:id="@+id/m3_battery_chart"
+            android:layout_width="match_parent"
+            android:layout_height="210dp"
+            android:layout_marginTop="16dp" />
+
+        <!-- Active Day Summary Card: Hari Sabtu • Penggunaan baterai: 5% | Optimal -->
+        <RelativeLayout
+            android:id="@+id/m3_day_summary_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/m3_battery_day_summary_bg"
+            android:padding="14dp">
+
+            <ImageView
+                android:id="@+id/m3_day_summary_icon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_m3_calendar"
+                app:tint="#7EE2A7"
+                android:contentDescription="@null" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/m3_day_summary_icon"
+                android:layout_toStartOf="@id/m3_day_summary_badge"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/m3_day_summary_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hari Sabtu • Penggunaan baterai: 5%"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13.5sp"
+                    android:fontFamily="sans-serif-bold" />
+
+                <TextView
+                    android:id="@+id/m3_day_summary_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/m3_battery_day_summary_desc"
+                    android:textColor="#A3C6B1"
+                    android:textSize="11.5sp"
+                    android:fontFamily="sans-serif" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/m3_day_summary_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/m3_battery_sub_chip_bg"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:text="@string/m3_battery_day_summary_optimal"
+                android:textColor="#7EE2A7"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-bold" />
+        </RelativeLayout>
+
+        <!-- Segmented M3 App Usage List (.m3-group style) -->
+        <LinearLayout
+            android:id="@+id/m3_app_list_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="vertical">
+
+            <!-- App Row 1 -->
+            <RelativeLayout
+                android:id="@+id/m3_app_row_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/m3_battery_tile_bg"
+                android:padding="12dp"
+                android:layout_marginBottom="6dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/m3_app_icon_1"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/m3_battery_sub_chip_bg"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_settings_battery_filled"
+                    android:contentDescription="@null" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/m3_app_icon_1"
+                    android:layout_toStartOf="@id/m3_app_pct_1"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/m3_app_name_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-bold"
+                        android:singleLine="true"
+                        android:ellipsize="end" />
+
+                    <TextView
+                        android:id="@+id/m3_app_sub_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Sistem latar belakang • &lt; 1 mnt aktif"
+                        android:textColor="#A3C6B1"
+                        android:textSize="11.5sp"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/m3_app_pct_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/m3_battery_dark_pill"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-bold" />
+            </RelativeLayout>
+
+            <!-- App Row 2 -->
+            <RelativeLayout
+                android:id="@+id/m3_app_row_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/m3_battery_tile_bg"
+                android:padding="12dp"
+                android:layout_marginBottom="6dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/m3_app_icon_2"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/m3_battery_sub_chip_bg"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_settings_battery_filled"
+                    android:contentDescription="@null" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/m3_app_icon_2"
+                    android:layout_toStartOf="@id/m3_app_pct_2"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/m3_app_name_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-bold"
+                        android:singleLine="true"
+                        android:ellipsize="end" />
+
+                    <TextView
+                        android:id="@+id/m3_app_sub_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Sistem latar belakang • &lt; 1 mnt aktif"
+                        android:textColor="#A3C6B1"
+                        android:textSize="11.5sp"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/m3_app_pct_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/m3_battery_dark_pill"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-bold" />
+            </RelativeLayout>
+
+            <!-- App Row 3 -->
+            <RelativeLayout
+                android:id="@+id/m3_app_row_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/m3_battery_tile_bg"
+                android:padding="12dp"
+                android:layout_marginBottom="6dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/m3_app_icon_3"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/m3_battery_sub_chip_bg"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_settings_battery_filled"
+                    android:contentDescription="@null" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/m3_app_icon_3"
+                    android:layout_toStartOf="@id/m3_app_pct_3"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/m3_app_name_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-bold"
+                        android:singleLine="true"
+                        android:ellipsize="end" />
+
+                    <TextView
+                        android:id="@+id/m3_app_sub_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Sistem latar belakang • &lt; 1 mnt aktif"
+                        android:textColor="#A3C6B1"
+                        android:textSize="11.5sp"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/m3_app_pct_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/m3_battery_dark_pill"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-bold" />
+            </RelativeLayout>
+
+            <!-- App Row 4 -->
+            <RelativeLayout
+                android:id="@+id/m3_app_row_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/m3_battery_tile_bg"
+                android:padding="12dp"
+                android:layout_marginBottom="6dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/m3_app_icon_4"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/m3_battery_sub_chip_bg"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_settings_battery_filled"
+                    android:contentDescription="@null" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/m3_app_icon_4"
+                    android:layout_toStartOf="@id/m3_app_pct_4"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/m3_app_name_4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-bold"
+                        android:singleLine="true"
+                        android:ellipsize="end" />
+
+                    <TextView
+                        android:id="@+id/m3_app_sub_4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Sistem latar belakang • &lt; 1 mnt aktif"
+                        android:textColor="#A3C6B1"
+                        android:textSize="11.5sp"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/m3_app_pct_4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/m3_battery_dark_pill"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-bold" />
+            </RelativeLayout>
+
+            <!-- App Row 5 -->
+            <RelativeLayout
+                android:id="@+id/m3_app_row_5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/m3_battery_tile_bg"
+                android:padding="12dp"
+                android:layout_marginBottom="6dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/m3_app_icon_5"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/m3_battery_sub_chip_bg"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_settings_battery_filled"
+                    android:contentDescription="@null" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/m3_app_icon_5"
+                    android:layout_toStartOf="@id/m3_app_pct_5"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/m3_app_name_5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-bold"
+                        android:singleLine="true"
+                        android:ellipsize="end" />
+
+                    <TextView
+                        android:id="@+id/m3_app_sub_5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Sistem latar belakang • &lt; 1 mnt aktif"
+                        android:textColor="#A3C6B1"
+                        android:textSize="11.5sp"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/m3_app_pct_5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/m3_battery_dark_pill"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-bold" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <!-- Toggle Button: ⌃ Sembunyikan detail aplikasi -->
+        <FrameLayout
+            android:id="@+id/m3_btn_toggle_apps"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/m3_battery_sub_chip_bg"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:id="@+id/m3_btn_toggle_apps_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="⌃ Sembunyikan detail aplikasi"
+                android:textColor="#B4F0CE"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-bold" />
+        </FrameLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

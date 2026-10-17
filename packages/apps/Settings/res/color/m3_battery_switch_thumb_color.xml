@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2026 Palapa OS / Shinkai Project
+  Material Design 3 Switch Thumb Tint
+  -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="#044426" android:state_checked="true" />
+    <item android:color="#8A9A90" />
+</selector>

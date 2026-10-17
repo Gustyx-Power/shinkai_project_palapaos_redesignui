@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2026 Palapa OS / Shinkai Project
+  Material Design 3 Expressive - Charging Control Card (3-Capsule Selector)
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="8dp">
+
+    <!-- Section Category Header: PENGATURAN PENGISIAN DAYA -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/m3_battery_charging_title"
+        android:textColor="#56D08B"
+        android:textSize="12sp"
+        android:fontFamily="sans-serif-bold"
+        android:letterSpacing="0.08" />
+
+    <!-- Card Container (M3 Dark Surface #161E19) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/m3_battery_card_surface"
+        android:orientation="vertical"
+        android:padding="18dp">
+
+        <!-- Header Row (Clickable -> ChargingControlSettings) -->
+        <RelativeLayout
+            android:id="@+id/m3_charging_control_header_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true">
+
+            <FrameLayout
+                android:id="@+id/m3_charging_icon_box"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/m3_battery_sub_chip_bg">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_m3_charging_control"
+                    app:tint="#7EE2A7"
+                    android:contentDescription="@null" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/m3_charging_icon_box"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="12dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/m3_charging_control_header"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/m3_charging_control_sub"
+                    android:textColor="#A3C6B1"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <!-- 3 Button Capsule Selector -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <!-- Button 1: Adaptif Otomatis -->
+            <LinearLayout
+                android:id="@+id/m3_btn_charge_adaptive"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/m3_battery_btn_selector_normal"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="12dp"
+                android:layout_marginEnd="4dp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:id="@+id/m3_btn_charge_adaptive_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/m3_charging_mode_adaptive"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/m3_btn_charge_adaptive_sub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="@string/m3_charging_mode_adaptive_sub"
+                    android:textColor="#A3C6B1"
+                    android:textSize="10.5sp"
+                    android:gravity="center" />
+            </LinearLayout>
+
+            <!-- Button 2: Batas 80% -->
+            <LinearLayout
+                android:id="@+id/m3_btn_charge_limit80"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/m3_battery_btn_selector_active"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="12dp"
+                android:layout_marginHorizontal="2dp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:id="@+id/m3_btn_charge_limit80_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/m3_charging_mode_limit80"
+                    android:textColor="#044426"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/m3_btn_charge_limit80_sub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="@string/m3_charging_mode_limit80_sub"
+                    android:textColor="#044426"
+                    android:textSize="10.5sp"
+                    android:gravity="center" />
+            </LinearLayout>
+
+            <!-- Button 3: Standar 100% -->
+            <LinearLayout
+                android:id="@+id/m3_btn_charge_standard100"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/m3_battery_btn_selector_normal"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="12dp"
+                android:layout_marginStart="4dp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:id="@+id/m3_btn_charge_standard100_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/m3_charging_mode_standard100"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/m3_btn_charge_standard100_sub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="@string/m3_charging_mode_standard100_sub"
+                    android:textColor="#A3C6B1"
+                    android:textSize="10.5sp"
+                    android:gravity="center" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

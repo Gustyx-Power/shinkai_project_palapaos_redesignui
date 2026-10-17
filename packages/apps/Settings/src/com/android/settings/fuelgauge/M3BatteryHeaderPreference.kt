@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2026 Shinkai Project
+ * Copyright (C) 2026 Palapa OS / Shinkai Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,19 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import com.android.settings.R
 
-class OneUIBatteryHeaderPreference @JvmOverloads constructor(
+class M3BatteryHeaderPreference @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : Preference(context, attrs) {
 
-    private var mController: OneUIBatteryHeaderPreferenceController? = null
+    private var mController: M3BatteryHeaderPreferenceController? = null
 
     init {
-        layoutResource = R.layout.oneui_battery_header_card
+        layoutResource = R.layout.m3_battery_header_card
         isSelectable = false
     }
 
-    fun setController(controller: OneUIBatteryHeaderPreferenceController) {
+    fun setController(controller: M3BatteryHeaderPreferenceController) {
         mController = controller
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2026 Shinkai Project
+ * Copyright (C) 2026 Palapa OS / Shinkai Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.settings.fuelgauge.batteryusage
+package com.android.settings.fuelgauge
 
 import android.content.Context
 import android.util.AttributeSet
@@ -22,19 +22,19 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import com.android.settings.R
 
-class OneUIBatteryUsageCardPreference @JvmOverloads constructor(
+class M3BatteryChargingPreference @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : Preference(context, attrs) {
 
-    private var mController: OneUIBatteryUsageCardController? = null
+    private var mController: M3BatteryChargingPreferenceController? = null
 
     init {
-        layoutResource = R.layout.oneui_battery_usage_card
+        layoutResource = R.layout.m3_battery_charging_card
         isSelectable = false
     }
 
-    fun setController(controller: OneUIBatteryUsageCardController) {
+    fun setController(controller: M3BatteryChargingPreferenceController) {
         mController = controller
     }
 

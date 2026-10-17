@@ -308,5 +308,74 @@
     <string name="oneui_battery_info_category">Battery info &amp; display</string>
     <string name="oneui_battery_info_entry_summary">Battery health, cycle count, capacity</string>
     <string name="oneui_battery_time_until_full">%1$s until full</string>
+
+    <!-- Material Design 3 Expressive Battery Strings -->
+    <string name="m3_battery_charging_slow_adaptive">Slow charging • Adaptive</string>
+    <string name="m3_battery_charging_fast">Fast charging</string>
+    <string name="m3_battery_charging_normal">Charging</string>
+    <string name="m3_battery_discharging_optimal">Battery optimal</string>
+    <string name="m3_battery_full_in">Full in ~%1$s</string>
+    <string name="m3_battery_time_left">~%1$s left</string>
+    <string name="m3_battery_capacity_format">%1$s / %2$s mAh</string>
+    <string name="m3_battery_temp_title">Temperature</string>
+    <string name="m3_battery_volt_title">Voltage</string>
+    <string name="m3_battery_health_title">Health</string>
+    <string name="m3_battery_cycle_count_title">Cycle count</string>
+    <string name="m3_battery_health_good_format">%1$d%% Good</string>
+    <string name="m3_battery_cycles_recorded_format">Charging • %1$d charge cycles recorded</string>
+    <string name="m3_battery_cycles_discharging_format">Active battery • %1$d charge cycles recorded</string>
+    <string name="m3_battery_detail_btn">Details &gt;</string>
+
+    <string name="m3_battery_avg_format">Average: %1$d%%</string>
+    <string name="m3_battery_day_summary_optimal">Optimal</string>
+    <string name="m3_battery_day_summary_desc">System consumption is very low during screen standby</string>
+    <string name="m3_battery_bg_system">Background system</string>
+    <string name="m3_battery_active_min_format">&lt; %1$d min active</string>
+    <string name="m3_battery_hide_app_details">Hide app details</string>
+    <string name="m3_battery_show_app_details">Show app details</string>
+
+    <string name="m3_battery_management_title">POWER MANAGEMENT</string>
+    <string name="m3_battery_saver_title">Battery Saver</string>
+    <string name="m3_battery_saver_desc">Limit visual effects &amp; background activity</string>
+    <string name="m3_battery_saver_on">Active</string>
+    <string name="m3_battery_saver_off">Inactive</string>
+    <string name="m3_battery_health_title_card">Battery health</string>
+    <string name="m3_battery_health_card_desc">%1$d cycles • Measured capacity %2$d mAh</string>
+    <string name="m3_battery_manager_title">Battery Manager</string>
+    <string name="m3_battery_manager_badge">Adaptive AI</string>
+    <string name="m3_battery_manager_desc">No apps are draining excessive battery</string>
+    <string name="m3_battery_widget_title">Battery widget</string>
+    <string name="m3_battery_widget_badge">+ Add</string>
+    <string name="m3_battery_widget_desc">Add to home screen to view device levels</string>
+
+    <string name="m3_battery_charging_title">CHARGING SETTINGS</string>
+    <string name="m3_charging_control_header">Charging control</string>
+    <string name="m3_charging_control_sub">Adjust schedule and charging limits for battery</string>
+    <string name="m3_charging_mode_adaptive">Adaptive Auto</string>
+    <string name="m3_charging_mode_adaptive_sub">Full upon wakeup</string>
+    <string name="m3_charging_mode_limit80">Limit 80%</string>
+    <string name="m3_charging_mode_limit80_sub">Preserve cell health</string>
+    <string name="m3_charging_mode_standard100">Standard 100%</string>
+    <string name="m3_charging_mode_standard100_sub">Fill fully immediately</string>
+
+    <string name="m3_battery_display_info_title">BATTERY INFO &amp; DISPLAY</string>
+    <string name="m3_battery_percentage_title">Battery percentage</string>
+    <string name="m3_battery_percentage_sub">Show battery percentage in status bar</string>
+    <string name="m3_lockscreen_info_title">Charging Info on Lock Screen</string>
+    <string name="m3_lockscreen_info_sub">Display current, voltage, wattage, and temp while charging</string>
+    <string name="m3_battery_info_sub_desc">Battery health (%1$d%%), charge cycles (%2$dx), capacity (%3$d mAh)</string>
+
+    <string name="m3_info_status_level_header">STATUS &amp; BATTERY LEVEL</string>
+    <string name="m3_info_health_desc_format">Measured capacity %1$d mAh of %2$d mAh (typical)</string>
+    <string name="m3_info_cycles_desc">Total complete charge cycles since activation</string>
+    <string name="m3_info_cycles_count_format">%1$d times</string>
+    <string name="m3_info_capacity_col_title">Capacity</string>
+    <string name="m3_info_capacity_col_sub">Typical</string>
+    <string name="m3_info_temp_col_title">Battery temp</string>
+    <string name="m3_info_temp_col_sub">Warm normal</string>
+    <string name="m3_info_volt_col_title">Battery voltage</string>
+    <string name="m3_info_volt_col_sub">Stable</string>
+    <string name="m3_battery_day_summary_title">Day %1$s • Battery usage: %2$d%%</string>
+    <string name="m3_battery_disclaimer">The typical capacity has been tested under third-party laboratory conditions. The typical capacity is the estimated average capacity considering the deviation in battery capacity among the battery samples tested under the IEC 61960 standard. The rated capacity is %1$d mAh. Actual battery life may vary depending on network environment, usage patterns, and other factors.</string>
 </resources>
 

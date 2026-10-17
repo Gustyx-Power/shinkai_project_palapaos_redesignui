@@ -351,12 +351,17 @@
     <color name="about_text_secondary">@color/settingslib_materialColorOnSurfaceVariant</color>
     <color name="about_icon_circle_bg_color">@color/settingslib_materialColorSecondaryContainer</color>
 
-    <!-- One UI 9 Battery Colors (Light - Monet Engine) -->
-    <color name="oneui_battery_card_bg">@color/settingslib_materialColorSurfaceContainer</color>
-    <color name="oneui_battery_track">@color/settingslib_materialColorSurfaceContainerHighest</color>
-    <color name="oneui_battery_green">#2ED158</color>
-    <color name="oneui_battery_blue">@color/settingslib_materialColorPrimary</color>
-    <color name="oneui_battery_text_primary">@color/settingslib_materialColorOnSurface</color>
-    <color name="oneui_battery_text_secondary">@color/settingslib_materialColorOnSurfaceVariant</color>
-    <color name="oneui_battery_divider">@color/settingslib_materialColorOutlineVariant</color>
+    <!-- M3 Battery Expressive Colors -->
+    <color name="m3_battery_hero_bg">#044426</color>
+    <color name="m3_battery_pill_badge_bg">#0D5C36</color>
+    <color name="m3_battery_hero_icon_bg">#76D79B</color>
+    <color name="m3_battery_progress_track">#032F1A</color>
+    <color name="m3_battery_progress_fill">#2ED158</color>
+    <color name="m3_battery_card_surface">#161E19</color>
+    <color name="m3_battery_tile_bg">#1F2E24</color>
+    <color name="m3_battery_mint_accent">#7EE2A7</color>
+    <color name="m3_battery_mint_light">#B4F0CE</color>
+    <color name="m3_battery_sub_chip_bg">#04321C</color>
+    <color name="m3_battery_dark_pill">#2E3D33</color>
+    <color name="m3_battery_divider">#233028</color>
 </resources>
