@@ -132,8 +132,8 @@ class ShinkaiLogoPreference : PreferenceMetadata, PreferenceBinding {
             copyToClipboard(v.context, context.getString(R.string.shinkai_version), shinkaiVerDisplay)
         }
 
-        // 3. Versi Palapa OS Row (Majapahit)
-        val palapaVerDisplay = SystemProperties.get("ro.palapa.os.version", SystemProperties.get("ro.wowo.os.version", "Majapahit"))
+        // 3. Versi Palapa OS Row (Trowulan)
+        val palapaVerDisplay = SystemProperties.get("ro.palapa.os.version", SystemProperties.get("ro.wowo.os.version", "Trowulan"))
         layoutPreference.findViewById<TextView>(R.id.palapa_val_palapa_version)?.text = palapaVerDisplay
         layoutPreference.findViewById<View>(R.id.palapa_row_palapa_version)?.setOnClickListener { v ->
             copyToClipboard(v.context, context.getString(R.string.palapa_os_version), palapaVerDisplay)

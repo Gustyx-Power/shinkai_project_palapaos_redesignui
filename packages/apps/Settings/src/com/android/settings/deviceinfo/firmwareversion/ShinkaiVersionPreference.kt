@@ -63,10 +63,10 @@ class ShinkaiVersionPreference :
     override fun isAvailable(context: Context) = context.getVersion().isNotEmpty()
 
     override fun getSummary(context: Context): CharSequence {
-        val edition = SystemProperties.get(KEY_PALAPA_EDITION, SystemProperties.get(KEY_LEGACY_EDITION, "Majapahit Edition"))
+        val edition = SystemProperties.get(KEY_PALAPA_EDITION, SystemProperties.get(KEY_LEGACY_EDITION, "Trowulan Edition"))
         val rawVersion = context.getVersion()
         return if (rawVersion.isNotEmpty() && rawVersion != context.getString(R.string.unknown)) {
-            if (rawVersion.contains("Majapahit", ignoreCase = true)) {
+            if (rawVersion.contains("Trowulan", ignoreCase = true) || rawVersion.contains("Majapahit", ignoreCase = true)) {
                 rawVersion
             } else {
                 "$edition • $rawVersion"

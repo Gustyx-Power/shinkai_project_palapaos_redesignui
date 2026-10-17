@@ -35,8 +35,8 @@
     <!-- Palapa OS Version & Branding -->
     <string name="palapa_os_title">Palapa OS</string>
     <string name="palapa_os_version">Palapa OS version</string>
-    <string name="palapa_edition_badge_text">Majapahit Edition</string>
-    <string name="palapa_version_edition">Version Majapahit Edition</string>
+    <string name="palapa_edition_badge_text">Trowulan Edition</string>
+    <string name="palapa_version_edition">Version Trowulan Edition</string>
     <string name="palapa_official_badge">Official</string>
     <string name="palapa_stat_os_label">Android</string>
     <string name="palapa_stat_edition_label">Edition</string>
@@ -143,7 +143,7 @@
     <string name="home_glance_greeting">Hi, User! 👋</string>
     <string name="home_glance_shinkai_top">Shinkai Project On Top 🚀</string>
     <string name="home_glance_karya_bangsa">Proudly Made in Indonesia 🇮🇩</string>
-    <string name="home_glance_palapa_edition">Palapa OS • Majapahit Edition ⚡</string>
+    <string name="home_glance_palapa_edition">Palapa OS • Trowulan Edition ⚡</string>
     <string name="home_glance_smooth_perf">Smooth &amp; Pure Performance 🔥</string>
 
     <!-- Homepage Quick Dashboard: Device & Stats -->

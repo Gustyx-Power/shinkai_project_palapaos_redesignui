@@ -198,7 +198,7 @@ class AboutPhoneDashboardPreferenceController(context: Context, key: String) :
             layoutPreference.findViewById<TextView>(R.id.about_footer_android_text)?.text = androidVer
 
             // Banner Title
-            val palapaEdition = SystemProperties.get("ro.palapa.edition", SystemProperties.get("ro.wowo.edition", "Majapahit Edition"))
+            val palapaEdition = SystemProperties.get("ro.palapa.edition", SystemProperties.get("ro.wowo.edition", "Trowulan Edition"))
             val palapaTitle = SystemProperties.get("ro.palapa.os.name", SystemProperties.get("ro.wowo.os.name", "Palapa OS"))
             layoutPreference.findViewById<TextView>(R.id.about_iqoo_banner_os_title)?.text = palapaTitle
             layoutPreference.findViewById<TextView>(R.id.about_iqoo_banner_os_subtitle)?.text =

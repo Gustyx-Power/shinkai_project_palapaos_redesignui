@@ -14,12 +14,12 @@ PRODUCT_PRODUCT_PROPERTIES += \
     ro.custom.device=$(CUSTOM_BUILD) \
     ro.shinkai.maintainer=$(SHINKAI_MAINTAINER) \
     ro.shinkai.version=$(SHINKAI_PLATFORM_VERSION)-$(CUSTOM_BUILD)-$(SHINKAI_BUILD_DATE) \
-    ro.palapa.edition=Majapahit Edition \
+    ro.palapa.edition=Trowulan Edition \
     ro.palapa.os.name=Palapa OS \
-    ro.palapa.os.version=Majapahit \
-    ro.wowo.edition=Majapahit Edition \
+    ro.palapa.os.version=Trowulan \
+    ro.wowo.edition=Trowulan Edition \
     ro.wowo.os.name=Palapa OS \
-    ro.wowo.os.version=Majapahit \
+    ro.wowo.os.version=Trowulan \
     net.shinkai.version=$(SHINKAI_VERSION_PROP)
 
 # Updater
