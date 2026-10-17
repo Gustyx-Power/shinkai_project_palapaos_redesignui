@@ -54,6 +54,7 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import kotlin.math.roundToInt
 
 class M3BatteryUsageCardController(context: Context, key: String) :
     BasePreferenceController(context, key), LifecycleEventObserver {
@@ -181,7 +182,50 @@ class M3BatteryUsageCardController(context: Context, key: String) :
 
         parsedApps.sortByDescending { it.percentageStr.replace("%", "").replace(",", ".").toDoubleOrNull() ?: 0.0 }
 
-        // Fallback: If device was recently booted, add standard apps with real package icons
+        // Query real daily usage across the past 7 days from UsageStatsManager
+        val usm = mContext.getSystemService(Context.USAGE_STATS_SERVICE) as? UsageStatsManager
+        if (usm != null) {
+            val now = System.currentTimeMillis()
+            val dayUsageList = FloatArray(7)
+            var sum = 0f
+            var validDays = 0
+            for (i in 0 until 7) {
+                val startCal = Calendar.getInstance().apply {
+                    add(Calendar.DAY_OF_YEAR, i - 6)
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }
+                val endCal = Calendar.getInstance().apply {
+                    timeInMillis = startCal.timeInMillis + 86400000L - 1
+                }
+                val queryEnd = if (i == 6) now else endCal.timeInMillis
+                val statsList = usm.queryUsageStats(
+                    UsageStatsManager.INTERVAL_DAILY,
+                    startCal.timeInMillis,
+                    queryEnd
+                )
+                val totalForegroundMs = statsList?.sumOf { it.totalTimeInForeground } ?: 0L
+                if (totalForegroundMs > 0) {
+                    val hours = totalForegroundMs / (1000f * 3600f)
+                    val calculatedPct = (hours * 12.5f).coerceIn(3f, 100f)
+                    dayUsageList[i] = calculatedPct
+                    sum += calculatedPct
+                    validDays++
+                } else {
+                    dayUsageList[i] = mDailyChartValues[i]
+                    sum += mDailyChartValues[i]
+                }
+            }
+            if (validDays > 0) {
+                mDailyChartValues = dayUsageList
+                mDailyAvg = (sum / 7f).roundToInt().coerceIn(5, 100)
+                mActiveDayUsage = dayUsageList[6].roundToInt().coerceIn(1, 100)
+            }
+        }
+
+        // Fallback: If device was recently booted and has no battery consumers recorded yet,
         if (parsedApps.isEmpty()) {
             val standardPkgs = listOf(
                 "com.google.android.packageinstaller" to "Installer paket",
