@@ -326,7 +326,9 @@
     <string name="m3_battery_cycles_discharging_format">Active battery • %1$d charge cycles recorded</string>
     <string name="m3_battery_detail_btn">Details &gt;</string>
 
+    <string name="m3_battery_daily_usage">Daily usage</string>
     <string name="m3_battery_avg_format">Average: %1$d%%</string>
+    <string name="m3_battery_this_week">This week</string>
     <string name="m3_battery_day_summary_optimal">Optimal</string>
     <string name="m3_battery_day_summary_desc">System consumption is very low during screen standby</string>
     <string name="m3_battery_bg_system">Background system</string>
