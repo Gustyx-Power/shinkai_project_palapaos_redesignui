@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2026 Shinkai Project
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="44dp"
+    android:height="44dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <!-- Crisp White Circular Badge -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M 50,4 A 46,46 0 1,0 50,96 A 46,46 0 1,0 50,4 Z" />
+
+    <!-- Central 5-Point Star -->
+    <path
+        android:fillColor="#FF111111"
+        android:pathData="M 58,33 L 62.5,45 L 75.5,45.5 L 65.5,53.5 L 69.5,65.5 L 58,58 L 46.5,65.5 L 50.5,53.5 L 40.5,45.5 L 53.5,45 Z" />
+
+    <!-- Shooting star / comet motion particles -->
+    <path
+        android:fillColor="#FF111111"
+        android:pathData="M 35,33 A 4.5,4.5 0 1,0 35,42 A 4.5,4.5 0 1,0 35,33 Z" />
+
+    <path
+        android:fillColor="#FF111111"
+        android:pathData="M 27,25 A 3.5,3.5 0 1,0 27,32 A 3.5,3.5 0 1,0 27,25 Z" />
+
+    <path
+        android:fillColor="#FF111111"
+        android:pathData="M 43,24 A 3.5,3.5 0 1,0 43,31 A 3.5,3.5 0 1,0 43,24 Z" />
+
+</vector>

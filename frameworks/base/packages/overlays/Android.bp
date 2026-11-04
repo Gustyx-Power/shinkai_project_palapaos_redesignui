@@ -35,7 +35,6 @@ phony {
         "NavigationBarModeGesturalHiddenBarSysuiOverlay",
         "NavigationBarModeGesturalHiddenBarLauncherOverlay",
         "NavigationBarModeGesturalHiddenBarLauncher3Overlay",
-        "NavigationBarModeGesturalHiddenImeOverlay",
         "TransparentNavigationBarOverlay",
         "NotesRoleEnabledOverlay",
         "preinstalled-packages-platform-overlays.xml",

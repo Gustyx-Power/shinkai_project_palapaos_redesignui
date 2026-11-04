@@ -89,7 +89,7 @@ class AboutPhoneDashboardPreferenceController(context: Context, key: String) :
             } else {
                 "POCO F5"
             }
-            layoutPreference.findViewById<TextView>(R.id.about_iqoo_marketing_name)?.text = marketingName
+            layoutPreference.findViewById<TextView>(R.id.about_iqoo_marketing_name)?.text = "Redmi Note 13 5G"
 
             // 2. Device Name (Nama perangkat)
             var deviceName = Settings.Global.getString(
@@ -113,14 +113,14 @@ class AboutPhoneDashboardPreferenceController(context: Context, key: String) :
             } else {
                 val soc = SystemProperties.get("ro.soc.model", "")
                 if (soc.isNotBlank()) {
-                    "Qualcomm® $soc Octa-core"
+                    "MediaTek Dimensity 6080 Octa-core"
                 } else if (!Build.HARDWARE.isNullOrBlank() && Build.HARDWARE != "unknown") {
                     Build.HARDWARE
                 } else {
-                    "Qualcomm® Snapdragon® Octa-core"
+                    "MediaTek Dimensity 6080 Octa-core"
                 }
             }
-            layoutPreference.findViewById<TextView>(R.id.about_spec_processor_value)?.text = processor
+            layoutPreference.findViewById<TextView>(R.id.about_spec_processor_value)?.text = "MediaTek Dimensity 6080 Octa-core"
 
             // 4. Storage (Penyimpanan telepon)
             try {
@@ -202,7 +202,7 @@ class AboutPhoneDashboardPreferenceController(context: Context, key: String) :
             val palapaTitle = SystemProperties.get("ro.palapa.os.name", SystemProperties.get("ro.wowo.os.name", "Palapa OS"))
             layoutPreference.findViewById<TextView>(R.id.about_iqoo_banner_os_title)?.text = palapaTitle
             layoutPreference.findViewById<TextView>(R.id.about_iqoo_banner_os_subtitle)?.text =
-                "$palapaEdition • Shinkai Project"
+                "$palapaEdition • crDroid 13.0"
 
             // CLICK LISTENERS
 

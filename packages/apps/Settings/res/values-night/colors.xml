@@ -125,10 +125,10 @@
     <color name="sc_materialColorOutline">@android:color/system_outline_dark</color>
     <color name="sc_materialColorOutlineVariant">@android:color/system_outline_variant_dark</color>
 
-    <!-- Shinkai Logo Dark (Monet Engine) -->
-    <color name="shinkai_logo_accent">@color/settingslib_materialColorPrimary</color>
+    <color name="setup_compat_footer_primary_button_bg_color">@*android:color/system_primary_dark</color>
+    <color name="setup_compat_footer_primary_button_text_color">@*android:color/system_on_primary_dark</color>
 
-    <!-- Palapa OS Colors (Dark - Monet Engine) -->
+    <color name="shinkai_logo_accent">@color/settingslib_materialColorPrimary</color>
     <color name="palapa_banner_bg">@color/settingslib_materialColorSurfaceBright</color>
     <color name="palapa_card_stroke">@android:color/transparent</color>
     <color name="palapa_logo_container_bg">#FFFFFFFF</color>
@@ -138,8 +138,6 @@
     <color name="palapa_chip_bg">@color/settingslib_materialColorSecondaryContainer</color>
     <color name="palapa_stat_box_bg">@color/settingslib_materialColorSurfaceContainer</color>
     <color name="palapa_divider_color">@color/settingslib_materialColorOutlineVariant</color>
-
-    <!-- About Phone Redesign Colors (Dark - Monet Engine) -->
     <color name="about_card_bg">@color/settingslib_materialColorSurfaceBright</color>
     <color name="about_storage_track">@color/settingslib_materialColorSurfaceContainerHighest</color>
     <color name="about_storage_progress">@color/settingslib_materialColorPrimary</color>

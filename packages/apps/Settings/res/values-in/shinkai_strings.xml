@@ -27,7 +27,7 @@
     <string name="about_specs_platform_title">Platform</string>
     <string name="about_phone_dashboard_purpose">Menampilkan dashboard info perangkat Tentang Ponsel</string>
     <string name="about_copied_to_clipboard">%1$s disalin ke papan klip</string>
-    <string name="shinkai_version">Versi Shinkai</string>
+    <string name="shinkai_version">Versi crDroid</string>
     <string name="shinkai_version_purpose">Menampilkan versi build Shinkai yang terpasang</string>
     <string name="palapa_os_version">Versi Palapa OS</string>
     <string name="shinkai_maintainer">Maintainer Device</string>
@@ -55,7 +55,7 @@
 
     <!-- Homepage Header & At a Glance Card -->
     <string name="home_glance_greeting">Hai, User! 👋</string>
-    <string name="home_glance_shinkai_top">Shinkai Project On Top 🚀</string>
+    <string name="home_glance_shinkai_top">crDroid 13.0 On Top 🚀</string>
     <string name="home_glance_karya_bangsa">Karya Anak Bangsa Indonesia 🇮🇩</string>
     <string name="home_glance_palapa_edition">Palapa OS • Edisi Majapahit ⚡</string>
     <string name="home_glance_smooth_perf">Performa Halus &amp; Murni 🔥</string>

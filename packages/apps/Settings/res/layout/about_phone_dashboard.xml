@@ -90,7 +90,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="Majapahit Edition • Shinkai Project"
+                        android:text="Majapahit • crDroid 13.0"
                         android:textSize="12sp"
                         android:textColor="#CCFFFFFF"
                         android:fontFamily="sans-serif"
@@ -103,14 +103,14 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- 2. Device Marketing Name Title (iQOO Z9x 5G style -> POCO F5) -->
+    <!-- 2. Device Marketing Name Title (iQOO Z9x 5G style -> Redmi Note 13 5G) -->
     <TextView
         android:id="@+id/about_iqoo_marketing_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="16dp"
-        android:text="POCO F5"
+        android:text="Redmi Note 13 5G"
         android:textSize="26sp"
         android:fontFamily="@font/product_sans_bold"
         android:textStyle="bold"
@@ -174,7 +174,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="11dp"
             android:layout_marginTop="4dp"
-            android:text="Gustyx POCO F5"
+            android:text="Gustyx Redmi Note 13 5G"
             android:textSize="14.5sp"
             android:fontFamily="@font/product_sans_bold"
             android:textStyle="bold"
@@ -221,7 +221,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="11dp"
             android:layout_marginTop="4dp"
-            android:text="2.91 GHz Qualcomm® Snapdragon® 7+ Gen 2 Mobile Platform Octa-core"
+            android:text="2.91 GHz Qualcomm® MediaTek Dimensity 6080 Octa-core Octa-core"
             android:textSize="14.5sp"
             android:fontFamily="@font/product_sans_bold"
             android:textStyle="bold"

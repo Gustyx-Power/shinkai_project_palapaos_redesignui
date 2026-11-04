@@ -41,13 +41,13 @@
     <string name="palapa_stat_os_label">Android</string>
     <string name="palapa_stat_edition_label">Edition</string>
     <string name="palapa_stat_device_label">Device</string>
-    <string name="shinkai_version">Shinkai version</string>
+    <string name="shinkai_version">crDroid version</string>
     <string name="shinkai_version_purpose">Shows the installed Shinkai build version</string>
     <string name="shinkai_logo_purpose">Displays the Palapa OS hero banner</string>
     <string name="palapa_system_specs_title">System Specifications</string>
     <string name="palapa_copied_toast">%1$s copied to clipboard</string>
-    <string name="palapa_based_shinkai_project">Based by Shinkai Project</string>
-    <string name="palapa_shinkai_hashtag">#ShinkaiProjectOnTop!</string>
+    <string name="palapa_based_shinkai_project">Based on crDroid</string>
+    <string name="palapa_shinkai_hashtag">#crDroidOnTop!</string>
 
     <!-- Redesigned About Phone Dashboard -->
     <string name="about_device_name_label">Device Name</string>
@@ -141,7 +141,7 @@
 
     <!-- Homepage Header & At a Glance Card -->
     <string name="home_glance_greeting">Hi, User! 👋</string>
-    <string name="home_glance_shinkai_top">Shinkai Project On Top 🚀</string>
+    <string name="home_glance_shinkai_top">crDroid 13.0 On Top 🚀</string>
     <string name="home_glance_karya_bangsa">Proudly Made in Indonesia 🇮🇩</string>
     <string name="home_glance_palapa_edition">Palapa OS • Majapahit Edition ⚡</string>
     <string name="home_glance_smooth_perf">Smooth &amp; Pure Performance 🔥</string>

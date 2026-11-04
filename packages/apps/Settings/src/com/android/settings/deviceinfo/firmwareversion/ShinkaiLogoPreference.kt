@@ -92,9 +92,9 @@ class ShinkaiLogoPreference : PreferenceMetadata, PreferenceBinding {
         } else {
             "Marble"
         }
-        layoutPreference.findViewById<TextView>(R.id.palapa_stat_device_name)?.text = deviceName
+        layoutPreference.findViewById<TextView>(R.id.palapa_stat_device_name)?.text = "Redmi Note 13 5G"
         layoutPreference.findViewById<View>(R.id.palapa_shinkai_credit_bar)?.setOnClickListener { v ->
-            Toast.makeText(v.context, "Shinkai Project • #ShinkaiProjectOnTop!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(v.context, "crDroid 13.0 • #crDroidOnTop!", Toast.LENGTH_SHORT).show()
         }
 
         // 1. Versi Android Row
@@ -121,12 +121,7 @@ class ShinkaiLogoPreference : PreferenceMetadata, PreferenceBinding {
         }
 
         // 2. Versi Shinkai Row
-        val shinkaiVer = SystemProperties.get("ro.shinkai.version", "")
-        val shinkaiVerDisplay = if (shinkaiVer.isNotEmpty()) {
-            shinkaiVer
-        } else {
-            "heptakaideka-marble-20260921-2138"
-        }
+        val shinkaiVerDisplay = "13.0"
         layoutPreference.findViewById<TextView>(R.id.palapa_val_shinkai_version)?.text = shinkaiVerDisplay
         layoutPreference.findViewById<View>(R.id.palapa_row_shinkai_version)?.setOnClickListener { v ->
             copyToClipboard(v.context, context.getString(R.string.shinkai_version), shinkaiVerDisplay)

@@ -74,7 +74,7 @@ class HomepageQuickDashboardPreferenceController(
         } else {
             "Marble"
         }
-        pref.findViewById<TextView>(R.id.home_device_title)?.text = deviceName
+        pref.findViewById<TextView>(R.id.home_device_title)?.text = "Redmi Note 13 5G"
 
         val androidVer = if (Build.VERSION.RELEASE_OR_PREVIEW_DISPLAY.isNullOrBlank() || Build.VERSION.RELEASE_OR_PREVIEW_DISPLAY == "unknown" || Build.VERSION.RELEASE_OR_PREVIEW_DISPLAY == "15") {
             "Android 17"
@@ -104,7 +104,7 @@ class HomepageQuickDashboardPreferenceController(
         } catch (e: Exception) {
             8
         }
-        pref.findViewById<TextView>(R.id.home_val_ram_cpu)?.text = "${ramGb}GB • 7+ Gen2"
+        pref.findViewById<TextView>(R.id.home_val_ram_cpu)?.text = "${ramGb}GB • D6080"
 
         pref.findViewById<View>(R.id.home_card_device)?.setOnClickListener {
             launchIntent(

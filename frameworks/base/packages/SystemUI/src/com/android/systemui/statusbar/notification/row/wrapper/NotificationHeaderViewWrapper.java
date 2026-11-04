@@ -23,9 +23,6 @@ import static com.android.systemui.statusbar.notification.TransformState.TRANSFO
 
 import android.app.Notification;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
-import android.provider.Settings;
 import android.util.ArraySet;
 import android.view.NotificationHeaderView;
 import android.view.NotificationTopLineView;
@@ -217,24 +214,6 @@ public class NotificationHeaderViewWrapper extends NotificationViewWrapper imple
         updateCropToPaddingForImageViews();
         Notification n = row.getEntryAdapter().getSbn().getNotification();
         mIcon.setTag(ImageTransformState.ICON_TAG, n.getSmallIcon());
-
-        boolean coloredIcons = Settings.System.getInt(row.getContext().getContentResolver(),
-                "notification_colored_icons", 0) == 1;
-        if (coloredIcons && mIcon != null && row.getEntryAdapter() != null
-                && row.getEntryAdapter().getSbn() != null) {
-            try {
-                String pkg = row.getEntryAdapter().getSbn().getPackageName();
-                PackageManager pm = row.getContext().getPackageManager();
-                Drawable appIcon = pm.getApplicationIcon(pkg);
-                if (appIcon != null) {
-                    mIcon.setImageDrawable(appIcon);
-                    mIcon.setColorFilter(null);
-                    mIcon.setBackground(null);
-                    mIcon.setPadding(0, 0, 0, 0);
-                }
-            } catch (Exception ignored) {
-            }
-        }
 
         // We need to reset all views that are no longer transforming in case a view was previously
         // transformed, but now we decided to transform its container instead.

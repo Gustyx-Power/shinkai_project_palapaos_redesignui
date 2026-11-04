@@ -26,7 +26,6 @@ import android.annotation.IntDef;
 import android.app.Notification;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -35,6 +34,7 @@ import android.graphics.Color;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.graphics.drawable.AdaptiveIconDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
@@ -71,6 +71,7 @@ import com.android.systemui.util.drawable.DrawableSize;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -96,6 +97,8 @@ public class StatusBarIconView extends AnimatedImageView implements StatusIconDi
     public static final int STATE_ICON = 0;
     public static final int STATE_DOT = 1;
     public static final int STATE_HIDDEN = 2;
+
+    private static final String SYSUI_PKG = "com.android.systemui";
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({STATE_ICON, STATE_DOT, STATE_HIDDEN})
@@ -148,6 +151,11 @@ public class StatusBarIconView extends AnimatedImageView implements StatusIconDi
     private StatusBarIcon mIcon;
     private int mLayoutDirectionForLoadedDrawable = LayoutDirection.UNDEFINED;
     @ViewDebug.ExportedProperty private String mSlot;
+    private Drawable mNumberBackground;
+    private Paint mNumberPain;
+    private int mNumberX;
+    private int mNumberY;
+    private String mNumberText;
     @Nullable private StatusBarNotification mNotification;
     @Nullable private BundleEntry mBundleEntry;
     private final boolean mBlocked;
@@ -184,6 +192,8 @@ public class StatusBarIconView extends AnimatedImageView implements StatusIconDi
     private boolean mShowsConversation;
     private float mDozeAmount;
     private final NotificationDozeHelper mDozer;
+    private boolean mNewIconStyle;
+    private boolean mShowNotificationCount;
 
     public StatusBarIconView(Context context, String slot, StatusBarNotification sbn) {
         this(context, slot, sbn, false);
@@ -201,6 +211,16 @@ public class StatusBarIconView extends AnimatedImageView implements StatusIconDi
         mDozer = new NotificationDozeHelper();
         mBlocked = blocked;
         mSlot = slot;
+        mNewIconStyle = Settings.System.getIntForUser(context.getContentResolver(),
+            Settings.System.STATUSBAR_COLORED_ICONS, 0, UserHandle.USER_CURRENT) == 1;
+        mShowNotificationCount = Settings.System.getIntForUser(context.getContentResolver(),
+            Settings.System.STATUSBAR_NOTIF_COUNT, 0, UserHandle.USER_CURRENT) == 1;
+        mNumberPain = new Paint();
+        mNumberPain.setTextAlign(Paint.Align.CENTER);
+        mNumberPain.setColor(context.getColor(R.color.notification_number_text_color));
+        mNumberPain.setAntiAlias(true);
+        mNumberPain.setTypeface(Typeface.DEFAULT_BOLD);
+        mNumberPain.setTextSize(8 * getResources().getDisplayMetrics().density);
         setNotification(sbn);
         setScaleType(ScaleType.CENTER);
         mConfiguration = new Configuration(context.getResources().getConfiguration());
@@ -374,28 +394,11 @@ public class StatusBarIconView extends AnimatedImageView implements StatusIconDi
      */
     public void setNotification(@Nullable StatusBarNotification notification,
             @Nullable CharSequence notificationContentDescription) {
-        boolean hadNotification = mNotification != null;
         mNotification = notification;
         if (!TextUtils.isEmpty(notificationContentDescription)) {
             setContentDescription(notificationContentDescription);
         }
         maybeUpdateIconScaleDimens();
-        if (!hadNotification && mNotification != null && isColoredNotificationIcon()) {
-            updateDrawable();
-            updateIconColor();
-        }
-    }
-
-    private boolean isColoredNotificationIcon() {
-        if (!isNotification() || mNotification == null) {
-            return false;
-        }
-        try {
-            return Settings.System.getInt(getContext().getContentResolver(),
-                    "notification_colored_icons", 0) == 1;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     private boolean isNotification() {
@@ -419,31 +422,69 @@ public class StatusBarIconView extends AnimatedImageView implements StatusIconDi
                 return false;
         }
     }
+
+    public void setIconStyle(boolean iconStyle) {
+        if (mNewIconStyle == iconStyle) return;
+        mNewIconStyle = iconStyle;
+        updateDrawable(true);
+        updateIconColor();
+    }
+
+    public void setShowCount(boolean showCount) {
+        mShowNotificationCount = showCount;
+    }
+
     /**
      * Returns whether the set succeeded.
      */
     public boolean set(StatusBarIcon icon) {
+        return set(icon, false);
+    }
+
+    public boolean updateIconForced() {
+        return set(mIcon, true);
+    }
+
+    private boolean set(StatusBarIcon icon, boolean force) {
         final boolean iconEquals = mIcon != null && equalIcons(mIcon.icon, icon.icon);
         final boolean levelEquals = iconEquals
                 && mIcon.iconLevel == icon.iconLevel;
         final boolean visibilityEquals = mIcon != null
                 && mIcon.visible == icon.visible;
+        final boolean numberEquals = mIcon != null
+                && mIcon.number == icon.number;
+        if (icon == null) {
+            return false;
+        }
         mIcon = icon.clone();
         setContentDescription(icon.contentDescription);
-        if (!iconEquals) {
+        if (!iconEquals || force) {
             if (!updateDrawable(false /* no clear */)) return false;
             // we have to clear the grayscale tag since it may have changed
             setTag(R.id.icon_is_grayscale, null);
             // Maybe set scale based on icon height
             maybeUpdateIconScaleDimens();
         }
-        if (!levelEquals) {
+        if (!levelEquals || force) {
             setImageLevel(icon.iconLevel);
         }
         if (icon.shape == Shape.FIXED_SPACE) {
             setScaleType(ScaleType.FIT_CENTER);
         }
-        if (!visibilityEquals) {
+        if (!numberEquals || force) {
+            if (icon.number > 0 && mShowNotificationCount) {
+                if (mNumberBackground == null) {
+                    mNumberBackground = getContext().getResources().getDrawable(
+                            R.drawable.ic_notification_overlay);
+                }
+                placeNumber();
+            } else {
+                mNumberBackground = null;
+                mNumberText = null;
+            }
+            invalidate();
+        }
+        if (!visibilityEquals || force) {
             setVisibility(icon.visible && !mBlocked ? VISIBLE : GONE);
         }
         return true;
@@ -530,19 +571,21 @@ public class StatusBarIconView extends AnimatedImageView implements StatusIconDi
 
     @Nullable
     private Drawable loadDrawable(Context context, StatusBarIcon statusBarIcon) {
-        if (isColoredNotificationIcon()) {
-            try {
-                String pkg = mNotification != null ? mNotification.getPackageName() : null;
-                if (pkg != null) {
-                    PackageManager pm = context.getPackageManager();
-                    Drawable appIcon = pm.getApplicationIcon(pkg);
-                    if (appIcon != null) {
-                        return appIcon;
-                    }
-                }
-            } catch (Exception ignored) {
+        Drawable icon;
+        String pkgName = statusBarIcon.pkg;
+        try {
+            if (mNewIconStyle && !TextUtils.equals(pkgName, SYSUI_PKG)) {
+                icon = context.getPackageManager().getApplicationIcon(pkgName);
+            } else {
+                icon = getIcon(context, statusBarIcon);
             }
+        } catch (android.content.pm.PackageManager.NameNotFoundException e) {
+            icon = getIcon(context, statusBarIcon);
         }
+        return icon;
+    }
+
+    private Drawable getIcon(Context context, StatusBarIcon statusBarIcon) {
         if (statusBarIcon.preloadedIcon != null) {
             Drawable.ConstantState cached = statusBarIcon.preloadedIcon.getConstantState();
             if (cached != null) {
@@ -584,6 +627,14 @@ public class StatusBarIconView extends AnimatedImageView implements StatusIconDi
     }
 
     @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if (mNumberBackground != null) {
+            placeNumber();
+        }
+    }
+
+    @Override
     public void onRtlPropertiesChanged(int layoutDirection) {
         super.onRtlPropertiesChanged(layoutDirection);
         if (!SceneContainerFlag.isEnabled()
@@ -620,6 +671,11 @@ public class StatusBarIconView extends AnimatedImageView implements StatusIconDi
             canvas.restore();
         }
 
+        if (mNumberBackground != null) {
+            mNumberBackground.draw(canvas);
+            canvas.drawText(mNumberText, mNumberX, mNumberY, mNumberPain);
+        }
+
         if (mDotAppearAmount != 0.0f) {
             float radius;
             float alpha = Color.alpha(mDecorColor) / 255.f;
@@ -645,6 +701,38 @@ public class StatusBarIconView extends AnimatedImageView implements StatusIconDi
         super.debug(depth);
         Log.d("View", debugIndent(depth) + "slot=" + mSlot);
         Log.d("View", debugIndent(depth) + "icon=" + mIcon);
+    }
+
+    void placeNumber() {
+        final String str;
+        final int tooBig = getContext().getResources().getInteger(
+                R.integer.status_bar_notification_info_maxnum);
+        if (mIcon.number > tooBig) {
+            str = getContext().getResources().getString(
+                        R.string.status_bar_notification_info_overflow);
+        } else {
+            NumberFormat f = NumberFormat.getIntegerInstance();
+            str = f.format(mIcon.number);
+        }
+        mNumberText = str;
+        final int w = getWidth();
+        final int h = getHeight();
+        final Rect r = new Rect();
+        mNumberPain.getTextBounds(str, 0, str.length(), r);
+        final int tw = r.right - r.left;
+        final int th = r.bottom - r.top;
+        mNumberBackground.getPadding(r);
+        int dw = r.left + tw + r.right;
+        if (dw < mNumberBackground.getMinimumWidth()) {
+            dw = mNumberBackground.getMinimumWidth();
+        }
+        mNumberX = w-r.right-((dw-r.right-r.left)/2);
+        int dh = r.top + th + r.bottom;
+        if (dh < mNumberBackground.getMinimumWidth()) {
+            dh = mNumberBackground.getMinimumWidth();
+        }
+        mNumberY = h-r.bottom-((dh-r.top-th-r.bottom)/2);
+        mNumberBackground.setBounds(w-dw, h-dh, w, h);
     }
 
     @Override
@@ -701,6 +789,10 @@ public class StatusBarIconView extends AnimatedImageView implements StatusIconDi
      * transitioning this also immediately sets the color.
      */
     public void setStaticDrawableColor(int color) {
+        if (mNewIconStyle && isNotification() &&
+                (mIcon != null && !TextUtils.equals(mIcon.pkg, SYSUI_PKG))) {
+            color = NO_COLOR;
+        }
         mDrawableColor = color;
         setColorInternal(color);
         updateContrastedStaticColor();
@@ -718,12 +810,10 @@ public class StatusBarIconView extends AnimatedImageView implements StatusIconDi
             return;
         }
 
-        if (isColoredNotificationIcon()) {
-            if (mDozeAmount > 0) {
-                mDozer.updateGrayscale(this, mDozeAmount);
-            } else {
-                setColorFilter(null);
-            }
+        if (mNewIconStyle && isNotification()
+                && mIcon != null && !TextUtils.equals(mIcon.pkg, SYSUI_PKG)) {
+            setColorFilter(null);
+            setImageTintList(null);
             return;
         }
 
@@ -1014,6 +1104,15 @@ public class StatusBarIconView extends AnimatedImageView implements StatusIconDi
     @Override
     public void onDarkChanged(ArrayList<Rect> areas, float darkIntensity, int tint) {
         int areaTint = getTint(areas, this, tint);
+
+        if (mNewIconStyle && isNotification()
+                && mIcon != null && !TextUtils.equals(mIcon.pkg, SYSUI_PKG)) {
+            setImageTintList(null);
+            setColorFilter(null);
+            setDecorColor(areaTint);
+            return;
+        }
+
         ColorStateList color = ColorStateList.valueOf(areaTint);
         setImageTintList(color);
         setDecorColor(areaTint);
