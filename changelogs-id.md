@@ -1,7 +1,7 @@
 # Log Perubahan Pembaruan Sistem: Palapa OS
-(POCO F5 / marble)
+(Redmi Note 13 5G / gold)
 
-Target Perangkat: POCO F5 (marble)  
+Target Perangkat: Redmi Note 13 5G (gold)  
 Versi Android: Android 17 (CP2A)  
 Ukuran Paket: ~2.9 GB  
 Status Kompilasi: Berhasil Disiapkan (Exit Code 0)  
@@ -16,7 +16,7 @@ Navigasi Dokumen:
 
 Pembaruan ini membawa perombakan menyeluruh pada antarmuka pengguna (UI Redesign) bergaya One UI 9, penambahan fitur interaktif Dynamic Island, penyempurnaan menu Pengaturan, serta peningkatan performa dan audio:
 
-1. Dynamic Island Interaktif (Punch-Hole POCO F5)
+1. Dynamic Island Interaktif (Punch-Hole Redmi Note 13 5G)
    - Indikator Pengisian Daya: Menampilkan animasi petir hijau dan persentase baterai selama 7.8 detik saat ponsel dicolokkan ke pengisi daya.
    - Indikator Senter: Kapsul senter ringkas minimalis dengan ikon kustom modern dan status "On". Ketuk sekali untuk langsung mematikan senter.
    - Indikator Perekam Layar (Screen Recording): Kapsul ringkas serasi dengan titik merah berdenyut dan penghitung waktu digital.
@@ -33,11 +33,11 @@ Pembaruan ini membawa perombakan menyeluruh pada antarmuka pengguna (UI Redesign
    - Dashboard Halaman Utama: Kartu status cepat untuk memantau Baterai, Penyimpanan, RAM, Tampilan, dan Suara secara langsung.
    - Tombol Notifikasi Baru: Panel Aksesibilitas pada dashboard kini digantikan tombol Notifikasi untuk akses cepat. Menu Aksesibilitas tetap tersedia utuh di daftar pengaturan utama.
    - Colored Notification Icons: Opsi baru pada Pengaturan Notifikasi untuk menampilkan ikon asli aplikasi yang berwarna penuh di status bar dan panel notifikasi, bukan sekadar siluet putih.
-   - Halaman Tentang Ponsel (About Phone): Banner visual Shinkai Project dengan kartu spesifikasi perangkat secara langsung (prosesor, layar, kamera) dan kredit kontributor.
+   - Halaman Tentang Ponsel (About Phone): Banner visual crDroid 13.0 dengan kartu spesifikasi perangkat secara langsung (prosesor, layar, kamera) dan kredit kontributor.
 
 4. Peningkatan Sistem & Performa
    - Dynamic RAM Expansion (zRAM): Pengaturan zRAM nyata yang terhubung langsung ke kernel Linux (Pilihan: Nonaktif, 2 GB, 4 GB, 8 GB, 16 GB), terbukti aktif di aplikasi monitor sistem.
-   - Hardware Dolby Atmos Asli: Dukungan DSP perangkat keras bawaan dengan aplikasi kontrol MarbleDolby (AutoEQ dan 10-band equalizer) aktif tanpa memerlukan root atau modul KernelSU.
+   - Hardware Dolby Atmos Asli: Dukungan DSP perangkat keras bawaan dengan aplikasi kontrol GoldDolby (AutoEQ dan 10-band equalizer) aktif tanpa memerlukan root atau modul KernelSU.
    - Navigasi Bersih: Opsi untuk menyembunyikan bilah navigasi bawah (navbar pill) dan menghilangkan ruang kosong di bawah keyboard.
 
 ---
@@ -103,7 +103,7 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - Menetapkan 8 multi-streams dan algoritma kompresi `lz4`, dilanjutkan dengan `mkswap`, `swapon`, dan swappiness bernilai 100.
    - Langsung terverifikasi di `/proc/swaps`, DevCheck, dan Kernel Manager.
 4. Halaman Tentang Ponsel / Versi Firmware:
-   - Baris khusus untuk **Versi Shinkai** (`ro.shinkai.version`).
+   - Baris khusus untuk **Versi crDroid** (`ro.crdroid.version`).
    - Baris khusus untuk **Versi Wowo OS** dengan nilai **Embegeh-1T**.
 5. Ekspansi RAM bersifat sepenuhnya dinamis: memilih +8 GB (atau ukuran lainnya) langsung memperbarui `/sys/block/zram0/disksize` pada tingkat kernel, tercermin akurat di DevCheck dan Tentang Ponsel (misal: 8 GB + 8 GB), dan tetap bertahan setelah boot ulang.
 6. Kompilasi sistem penuh selesai bersih tanpa peringatan kompilator, kesalahan sintaks, maupun pelanggaran SELinux.
@@ -154,7 +154,7 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
 #### Komponen yang Terpengaruh:
 - `ram_expansion.sh`
 - `init.kernel.post_boot.sh`
-- `init.marble.rc`
+- `init.gold.rc`
 - `device.mk`
 - `property.te`
 - `property_contexts`
@@ -171,7 +171,7 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - Mendeklarasikan `vendor_public_prop(vendor_ram_expansion_prop)` di `property.te`.
    - Memetakan `persist.vendor.ram_expansion` dan `vendor.ram_expansion` ke `vendor_ram_expansion_prop:s0` di `property_contexts`.
 2. **Sinkronisasi Root Init**:
-   - Menambahkan pemicu di `init.marble.rc` pada `persist.sys.ram_expansion=*`, `sys.boot_completed=1`, dan `post-fs-data` untuk menyinkronkan nilai ke `persist.vendor.ram_expansion`.
+   - Menambahkan pemicu di `init.gold.rc` pada `persist.sys.ram_expansion=*`, `sys.boot_completed=1`, dan `post-fs-data` untuk menyinkronkan nilai ke `persist.vendor.ram_expansion`.
    - Mendaftarkan `/vendor/bin/ram_expansion.sh` di bawah layanan `vendor.ram_expansion` dengan `seclabel u:r:vendor_qti_init_shell:s0`.
 3. **Akses Kebijakan SELinux**:
    - Memberi label `ram_expansion.sh` sebagai `vendor_qti_init_shell_exec:s0` di `file_contexts`.
@@ -197,7 +197,7 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
 | `RamExpansionPreferenceController.kt` | Pengaturan / Inti | Pengikatan ringkasan preferensi ke properti persisten |
 | `ram_expansion.sh` | Daemon / Subsistem | Skrip swapoff runtime, reset zRAM, dan alokasi disksize dinamis |
 | `init.kernel.post_boot.sh` | Kernel / Boot | Konfigurasi zRAM pasca-boot memanfaatkan properti vendor persisten |
-| `init.marble.rc` | Init / Pemicu | Pemicu sinkronisasi properti, pendaftaran layanan, dan pemetaan seclabel |
+| `init.gold.rc` | Init / Pemicu | Pemicu sinkronisasi properti, pendaftaran layanan, dan pemetaan seclabel |
 | `device.mk` | Aturan Build | Mendaftarkan `ram_expansion.sh` ke dalam `PRODUCT_COPY_FILES` vendor |
 | `file_contexts` | Konteks SELinux | Pemetaan konteks untuk `ram_expansion.sh` |
 | `property.te` | Kebijakan SELinux | Mendeklarasikan properti vendor publik `vendor_ram_expansion_prop` |
@@ -206,7 +206,7 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
 | `device.mk` (dolby) | Device Tree / Konfigurasi | Mengaktifkan pewarisan produk `hardware/dolby/dolby.mk` |
 | `BoardConfig.mk` (dolby) | VINTF / Build | Memulihkan manifes HAL Dolby & C2 serta matriks kerangka kerja |
 | `vendor.dolby.hardware.dms@2.0-service` | Vendor HAL | Daemon HIDL DMS asli untuk pengelolaan efek audio Dolby |
-| `MarbleDolby` | UI / Aplikasi | Aplikasi kontrol Dolby Atmos berbasis Compose dengan AutoEQ & QS tile |
+| `GoldDolby` | UI / Aplikasi | Aplikasi kontrol Dolby Atmos berbasis Compose dengan AutoEQ & QS tile |
 
 ---
 
@@ -228,19 +228,19 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
 ### 3. Kontroler Ekspansi zRAM Sesuai Standar POSIX
 - Menggantikan perintah `let` khusus bash dengan aritmatika standar POSIX `$((ramExpansion * 1024))` di `/vendor/bin/sh` (toybox ash).
 - Dukungan penuh untuk mode `0` dan `off` dengan eksekusi `swapoff` yang tepat dan reset perangkat zRAM.
-- Sinkronisasi properti multi-tahap di `init.marble.rc` pada pemicu `boot`, `post-fs-data`, dan perubahan properti untuk menjamin persistensi setelah boot ulang.
+- Sinkronisasi properti multi-tahap di `init.gold.rc` pada pemicu `boot`, `post-fs-data`, dan perubahan properti untuk menjamin persistensi setelah boot ulang.
 
 ---
 
-## Bagian V: Integrasi Perangkat Keras Asli Dolby Atmos & MarbleDolby
+## Bagian V: Integrasi Perangkat Keras Asli Dolby Atmos & GoldDolby
 
 ### 1. Kebutuhan & Gambaran Umum Sistem
-- **Verifikasi Dukungan Perangkat Keras Dolby**: Dikonfirmasi bahwa perangkat keras POCO F5 (`marble`) (Snapdragon 7+ Gen 2 / SM7475) secara native mendukung offload perangkat keras Qualcomm Hexagon DSP untuk Pemrosesan Audio Dolby (DAP).
+- **Verifikasi Dukungan Perangkat Keras Dolby**: Dikonfirmasi bahwa perangkat keras Redmi Note 13 5G (`gold`) (MediaTek Dimensity 6080 / MT6833) secara native mendukung offload perangkat keras Qualcomm Hexagon DSP untuk Pemrosesan Audio Dolby (DAP).
 - **Pelepasan Ketergantungan Modul Root Pihak Ketiga**: Menggantikan ketergantungan sebelumnya pada modul eksternal KernelSU/Magisk (OnePlus 9 Pro Dolby Atmos + OPlus Core), yang memerlukan modul overlayfs invasif (`mountify`), framework non-native ColorOS (`oplus-framework-res`), dan penghentian paksa daemon runtime (`killall audioserver`/layanan kamera) pada sistem AOSP.
-- **Integrasi Pohon Penuh (In-Tree)**: Mengintegrasikan seluruh subsistem perangkat keras Dolby Atmos langsung ke dalam pohon build ROM melalui `hardware/dolby` (cabang `audio-fixed` marble-indonesia).
+- **Integrasi Pohon Penuh (In-Tree)**: Mengintegrasikan seluruh subsistem perangkat keras Dolby Atmos langsung ke dalam pohon build ROM melalui `hardware/dolby` (cabang `audio-fixed` gold-indonesia).
 
 ### 2. Detail Implementasi Arsitektur & Build
-1. **Integrasi Pohon Perangkat (`device/xiaomi/marble`)**:
+1. **Integrasi Pohon Perangkat (`device/xiaomi/gold`)**:
    - `device.mk`: Mengaktifkan kembali pewarisan untuk `hardware/dolby/dolby.mk` (`$(call inherit-product, hardware/dolby/dolby.mk)`).
    - `BoardConfig.mk`: Memulihkan manifes VINTF HAL (`vendor.dolby.hardware.dms@2.0-service.xml`, `vendor.dolby.media.c2.xml`) dan matriks kompatibilitas framework (`dolby_framework_matrix.xml`).
    - `PRODUCT_SOONG_NAMESPACES`: Mendaftarkan `hardware/dolby` ke dalam namespace Soong secara bersih.
@@ -253,8 +253,8 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
      * `libswgamedap.so` & `libswvqe.so`: Dolby Game DAP dan Voice Quality Enhancement.
    - Dekoder Codec 2.0: AC4 (`libcodec2_soft_ac4dec`) dan DDP (`libcodec2_soft_ddpdec`) bersama dengan `c2.dolby.*`.
    - Lapisan kompatibilitas: `libstagefright_foundation-v33.so` disediakan melalui `hardware/lineage/compat`.
-3. **Aplikasi Antarmuka Pengguna (`MarbleDolby`)**:
-   - UI Material 3 modern yang dibangun dengan Jetpack Compose (`org.lunaris.dolby`), diinstal langsung sebagai aplikasi sistem dengan hak istimewa di `system_ext/priv-app/MarbleDolby`.
+3. **Aplikasi Antarmuka Pengguna (`GoldDolby`)**:
+   - UI Material 3 modern yang dibangun dengan Jetpack Compose (`org.lunaris.dolby`), diinstal langsung sebagai aplikasi sistem dengan hak istimewa di `system_ext/priv-app/GoldDolby`.
    - Fitur Utama:
      * Equalizer grafis interaktif 10-band dengan kurva respons frekuensi langsung.
      * Integrasi database AutoEQ (ratusan model headphone/earphone yang telah dikalibrasi).
@@ -264,7 +264,7 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
      * Otomatisasi profil audio per aplikasi.
 
 ### 3. Status Verifikasi & Kompilasi
-- Target `MarbleDolby`: Berhasil dikompilasi, melalui proses DEX-preopt, dan terverifikasi bersih (`out/target/product/marble/system_ext/priv-app/MarbleDolby/MarbleDolby.apk`).
+- Target `GoldDolby`: Berhasil dikompilasi, melalui proses DEX-preopt, dan terverifikasi bersih (`out/target/product/gold/system_ext/priv-app/GoldDolby/GoldDolby.apk`).
 - Target `vendor.dolby.hardware.dms@2.0-service`: Ditautkan, diverifikasi terhadap aturan ELF, dan diinstal bersih ke dalam `/vendor/bin/hw/`.
 - Pemeriksaan build penuh berhasil dengan kode keluar 0 (`#### build completed successfully ####`).
 
@@ -413,10 +413,10 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
 
 ---
 
-## Bagian X: Kapsul Pengisian Daya Dynamic Island untuk POCO F5 (marble) [Eksperimental]
+## Bagian X: Kapsul Pengisian Daya Dynamic Island untuk Redmi Note 13 5G (gold) [Eksperimental]
 
 ### 1. Kebutuhan & Gambaran Umum
-- **Dynamic Island Terintegrasi Punch-Hole**: Menerapkan kapsul pengisian daya Dynamic Island elegan yang disesuaikan secara geometris untuk punch-hole kamera tengah POCO F5 (`device/xiaomi/marble`, cutout: `M 0,0 H -28 V 94 H 28 V 0 H 0 Z`).
+- **Dynamic Island Terintegrasi Punch-Hole**: Menerapkan kapsul pengisian daya Dynamic Island elegan yang disesuaikan secara geometris untuk punch-hole kamera tengah Redmi Note 13 5G (`device/xiaomi/gold`, cutout: `M 0,0 H -28 V 94 H 28 V 0 H 0 Z`).
 - **Animasi Dipicu Pengisian Daya**: Aktif secara eksklusif saat pengisian daya dimulai (kabel dicolokkan), berekspansi mulus dari kamera tengah menjadi kapsul status bar.
 - **Desain Visual Presisi**:
   * Cangkang Kapsul: Hitam pekat (`#000000`) dengan ujung membulat (radius sudut 100dp, bentuk stadion/pill, tinggi 35dp), tepian translusen halus (`#24FFFFFF`), dan lapisan z-order tepat di atas konten status bar.
@@ -428,7 +428,7 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
 
 ### 2. Detail Implementasi
 1. **Hierarki Status Bar & Custom View (`SystemUI`)**:
-   - `status_bar.xml`: Menempatkan `DynamicIslandChargingView` (`@+id/dynamic_island_charging`) di dalam `PhoneStatusBarView` dengan `layout_gravity="center_horizontal|center_vertical"`, sejajar langsung di atas punch-hole kamera tengah POCO F5.
+   - `status_bar.xml`: Menempatkan `DynamicIslandChargingView` (`@+id/dynamic_island_charging`) di dalam `PhoneStatusBarView` dengan `layout_gravity="center_horizontal|center_vertical"`, sejajar langsung di atas punch-hole kamera tengah Redmi Note 13 5G.
    - `DynamicIslandChargingView.kt`: `FrameLayout` kustom yang mendengarkan sticky broadcast `Intent.ACTION_BATTERY_CHANGED`. Mendeteksi transisi status pengisian daya (`!wasPluggedIn && isPluggedIn`), mengukur metrik layar, dan mengelola animasi pegas `AnimatorSet` yang halus.
    - `dynamic_island_charging.xml` & `dynamic_island_pill_bg.xml`: Tata letak kapsul khusus dan drawable kapsul stadion.
    - `ic_dynamic_island_bolt.xml`: Aset vektor petir 16dp kustom berwarna hijau neon (`#00E676`).
@@ -527,7 +527,7 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
 - **Permintaan Pengguna**:
   1. Mengubah Dynamic Island menjadi sistem Dynamic Island yang komprehensif dan nyata, melampaui sekadar animasi pengisian daya baterai.
   2. Menerapkan fisika **Pegas & Overshoot (Spring Physics)** ala iOS yang sangat halus:
-     - Pembukaan: Ekspansi horizontal ke kiri dan ke kanan dari lubang kamera tengah POCO F5 dengan pantulan pegas yang elastis.
+     - Pembukaan: Ekspansi horizontal ke kiri dan ke kanan dari lubang kamera tengah Redmi Note 13 5G dengan pantulan pegas yang elastis.
      - Penutupan: Rekoil elastis dua tahap (sedikit peregangan karet horizontal sebelum menyusut cepat kembali ke dalam lubang kamera).
   3. Mendukung tiga peristiwa inti sistem:
      - **Pengisian Daya (Charging)**: Tampilan efemeral selama 7.8 detik dengan persentase baterai langsung dan animasi petir hijau neon berdenyut.
@@ -713,7 +713,7 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
 
 ### 1. Kebutuhan & Gambaran Umum
 - **Latar Belakang & Masalah**:
-  1. **Geometri Kapsul Punch-Hole Tertutup Kamera**: Pada perangkat berlubang kamera tengah (seperti POCO F5 / `marble`), kapsul compact senter dan perekam layar terlalu pendek sehingga logo senter, teks status "On", titik merah perekam, dan waktu durasi tertutup oleh punch-hole fisik kamera.
+  1. **Geometri Kapsul Punch-Hole Tertutup Kamera**: Pada perangkat berlubang kamera tengah (seperti Redmi Note 13 5G / `gold`), kapsul compact senter dan perekam layar terlalu pendek sehingga logo senter, teks status "On", titik merah perekam, dan waktu durasi tertutup oleh punch-hole fisik kamera.
   2. **Duplikasi Indikator Status Bar (Chip Perekam Android)**: Saat Dynamic Island aktif merekam, chip/pill merah perekaman bawaan Android (Ongoing Activity Chip) di sebelah kanan jam status bar tetap muncul bersamaan, menyebabkan redundansi visual yang mengganggu. Chip bawaan seharusnya disupresi saat Dynamic Island aktif dan hanya muncul kembali jika fitur Dynamic Island dinonaktifkan oleh pengguna.
   3. **Penyesuaian Kontrol Expanded Island**: Fitur jeda (`pause`) tidak memiliki dukungan native pada arsitektur pipeline MediaProjection AOSP, dan tombol ornamen pendukung lainnya kurang fungsional. Seluruh kontrol selain tombol Stop diubah menjadi 6 opsi pengaturan perekaman layar bawaan Android yang interaktif: Rekam audio perangkat, Rekam mikrofon, Tampilkan sentuhan, Kualitas lebih rendah (SD), Batas ukuran file lebih besar, dan Pengodean HEVC (yang secara default aktif otomatis dan berfungsi). Tombol Stop tetap dipertahankan dan berfungsi penuh.
 
@@ -1003,7 +1003,7 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
 ### 1. Kebutuhan & Gambaran Umum
 - **Permintaan Pengguna**:
   - Mengonfigurasi berkas citra kopdes_ontop di root project menjadi wallpaper bawaan sistem (default wallpaper) secara menyeluruh pada ROM.
-  - Memastikan wallpaper tampil dengan resolusi penuh, tajam, dan proporsional untuk rasio layar perangkat (POCO F5 marble, 1080x2400).
+  - Memastikan wallpaper tampil dengan resolusi penuh, tajam, dan proporsional untuk rasio layar perangkat (Redmi Note 13 5G gold, 1080x2400).
 
 ### 2. Detail Implementasi
 1. **Pemrosesan Citra & Konversi Format**:
@@ -1051,11 +1051,11 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
 
 ---
 
-## Bagian XXXII: Pembaruan Identitas Perangkat Power Menu (POCO F5) dan Penerapan Tema Dinamis Material You (Monet Color)
+## Bagian XXXII: Pembaruan Identitas Perangkat Power Menu (Redmi Note 13 5G) dan Penerapan Tema Dinamis Material You (Monet Color)
 
 ### 1. Kebutuhan & Gambaran Umum
 - **Permintaan Pengguna**:
-  - Mengoreksi label kapsul atas pada Power Menu: mengganti string "Material 3 Expressive • Pixel 9 Pro XL" menjadi "Material 3 Expressive • POCO F5" sesuai perangkat target utama (POCO F5 / marble).
+  - Mengoreksi label kapsul atas pada Power Menu: mengganti string "Material 3 Expressive • Pixel 9 Pro XL" menjadi "Material 3 Expressive • Redmi Note 13 5G" sesuai perangkat target utama (Redmi Note 13 5G / gold).
   - Mengubah skema warna Power Menu yang sebelumnya menggunakan warna hijau solid statis (#042D1C, #9EE4B4, #2B3830, dll.) menjadi tema warna dinamis Monet (Material You) berbasis sistem Android, sehingga tampilan Power Menu secara otomatis menyatu dan beradaptasi dengan palet wallpaper pengguna.
 
 ### 2. Detail Implementasi
@@ -1063,7 +1063,7 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - Memperbarui resource string power_menu_tag_pill pada:
      * frameworks/base/packages/SystemUI/res/values/shinkai_strings.xml
      * frameworks/base/packages/SystemUI/res/values-in/shinkai_strings.xml
-   - Nilai baru: "Material 3 Expressive • POCO F5".
+   - Nilai baru: "Material 3 Expressive • Redmi Note 13 5G".
 2. **Refaktor Drawable Power Menu ke Token Warna Dinamis Monet**:
    - Menghapus seluruh kode warna hex hijau statis dan menerapkan token palet sistem Material You (@android:color/system_*):
      * power_menu_tag_pill_bg.xml: Menggunakan solid @android:color/system_accent1_900 dan stroke @android:color/system_accent1_700.
@@ -1108,7 +1108,7 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
      * Memperbarui ro.wowo.edition=Majapahit Edition, ro.wowo.os.name=Palapa OS, ro.wowo.os.version=Majapahit untuk kompatibilitas mundur.
    - Memperbarui nama berkas paket target OTA pada vendor/lineage/build/tasks/bacon.mk menjadi PalapaOS-Majapahit-$(TARGET_DEVICE)-17.zip.
    - Memperbarui label power_menu_vip_tag pada SystemUI strings (values & values-in) menjadi "Palapa OS".
-   - Memperbarui skrip penginstal apply.sh menjadi Shinkai Project / PalapaOS Redesign UI.
+   - Memperbarui skrip penginstal apply.sh menjadi crDroid 13.0 / PalapaOS Redesign UI.
 2. **Penggantian Wallpaper Default (palapa_os.jpg)**:
    - Mengonversi palapa_os.jpg ke format PNG resolusi 1080 x 2400 piksel menggunakan resampling Lanczos berkualitas tinggi (ImageOps.fit).
    - Memperbarui aset default_wallpaper.png di seluruh target:
@@ -1124,7 +1124,7 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
      * bootanimation_720.zip
 4. **Pembaruan Layar Info Versi Android & Dashboard Tentang Ponsel**:
    - Menghapus kartu mini wowo_stat_edition_card (kartu edisi Kopdes) pada packages/apps/Settings/res/layout/shinkai_logo.xml, menyisakan 2 kartu utama (Versi Android dan Perangkat) dengan rasio seimbang.
-   - Mengubah judul banner Tentang Ponsel pada about_phone_dashboard.xml dari "Wowo OS 19jt" menjadi "Palapa OS" dan subjudul menjadi "Majapahit Edition • Shinkai Project".
+   - Mengubah judul banner Tentang Ponsel pada about_phone_dashboard.xml dari "Wowo OS 19jt" menjadi "Palapa OS" dan subjudul menjadi "Majapahit Edition • crDroid 13.0".
    - Mengubah teks baris versi pada shinkai_logo.xml dari "Embegeh-1T" menjadi "Majapahit".
    - Memperbarui controller AboutPhoneDashboardPreferenceController.kt, ShinkaiLogoPreference.kt, dan ShinkaiVersionPreference.kt agar secara dinamis memuat nama Palapa OS dan versi Majapahit.
 5. **Render & Integrasi Logo Satelit Palapa**:
@@ -1180,9 +1180,9 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - ShinkaiLogoPreference.kt: Menghubungkan seluruh binding tampilan ke R.id.palapa_* dan R.string.palapa_*.
    - ShinkaiVersionPreference.kt: Mengarahkan pengambilan properti sistem ke KEY_PALAPA_EDITION (ro.palapa.edition) dengan fallback mundur yang aman ke KEY_LEGACY_EDITION (ro.wowo.edition).
    - AboutPhoneDashboardPreferenceController.kt: Memperbarui penanganan nama Palapa OS dan versi Majapahit.
-   - Memperbarui komentar lisensi pada 58 berkas pengontrol antarmuka menjadi Copyright (C) 2026 Palapa OS / Shinkai Project.
+   - Memperbarui komentar lisensi pada 58 berkas pengontrol antarmuka menjadi Copyright (C) 2026 Palapa OS / crDroid 13.0.
 5. **Sinkronisasi Dokumentasi dan README.md**:
-   - Memperbarui README.md pada judul utama dan ringkasan implementasi menjadi Shinkai Project - PalapaOS Redesign UI (POCO F5 & Generic Android 17).
+   - Memperbarui README.md pada judul utama dan ringkasan implementasi menjadi crDroid 13.0 - PalapaOS Redesign UI (Redmi Note 13 5G & Generic Android 17).
    - Menyinkronkan seluruh catatan teknis pada changelogs.md, changelogs-id.md, dan changelogs-en.md dengan verifikasi ketat 0 emoji.
 ---
 
@@ -1190,13 +1190,13 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
 
 ### 1. Kebutuhan & Gambaran Umum
 - **Permintaan Pengguna**:
-  - Menambahkan dan mengaktifkan fitur DT2W (Double Tap to Wake) dan DT2S (Double Tap to Sleep) untuk PalapaOS (POCO F5 / `marble`).
+  - Menambahkan dan mengaktifkan fitur DT2W (Double Tap to Wake) dan DT2S (Double Tap to Sleep) untuk PalapaOS (Redmi Note 13 5G / `gold`).
   - Memastikan kedua fitur terintegrasi secara mulus antara driver perangkat keras layar sentuh, Power HAL, framework AOSP, SystemUI, dan Pengaturan Tampilan.
   - Memastikan seluruh berkas changelog tetap mematuhi aturan ketat tanpa emoji (zero emojis).
 
 ### 2. Analisis Subsistem & Arsitektur Perangkat Keras
-1. **Dukungan Kernel & Sysfs POCO F5 (`marble`)**:
-   - Node sysfs `/sys/class/touch/touch_dev/gesture_double_tap_enabled` dan `gesture_double_tap_state` telah terkonfigurasi pada `init.marble.rc` dengan izin akses system.
+1. **Dukungan Kernel & Sysfs Redmi Note 13 5G (`gold`)**:
+   - Node sysfs `/sys/class/touch/touch_dev/gesture_double_tap_enabled` dan `gesture_double_tap_state` telah terkonfigurasi pada `init.gold.rc` dengan izin akses system.
    - Sensor ketukan ganda vendor terdaftar melalui `NonUiNotifier.cpp` dan tipe sensor `org.lineageos.sensor.double_tap`.
 2. **Double Tap to Wake (DT2W)**:
    - Integrasi `PowerManagerService` mengelola mode `Mode::DOUBLE_TAP_TO_WAKE` yang diteruskan ke Power HAL saat konfigurasi boolean `config_supportDoubleTapWake` bernilai true.
@@ -1207,8 +1207,8 @@ Selama sesi pengujian dan peninjauan, beberapa ketidaksesuaian antarmuka inti da
    - Konfigurasi `config_supportDoubleTapSleep` dan `config_dt2sGestureEnabledByDefault` mengaktifkan fitur ini secara langsung sejak awal boot.
 
 ### 3. Detail Implementasi & Modifikasi Berkas
-1. **Pohon Perangkat & Overlay Framework (`device/xiaomi/marble`)**:
-   - `overlay/xiaomi/Frameworks/res/values/config.xml` & `overlay/marble/Frameworks/res/values/config.xml`:
+1. **Pohon Perangkat & Overlay Framework (`device/xiaomi/gold`)**:
+   - `overlay/xiaomi/Frameworks/res/values/config.xml` & `overlay/gold/Frameworks/res/values/config.xml`:
      * Menambahkan `<bool name="config_supportDoubleTapWake">true</bool>` untuk mengaktifkan DT2W pada level kerangka kerja dan antarmuka Settings.
      * Menambahkan `<bool name="config_supportDoubleTapSleep">true</bool>` untuk mengaktifkan dukungan DT2S pada level sistem.
      * Menambahkan `<bool name="config_dt2sGestureEnabledByDefault">true</bool>` agar gestur DT2S aktif secara default pada status bar dan lockscreen.

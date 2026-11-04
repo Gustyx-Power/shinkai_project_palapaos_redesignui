@@ -1,7 +1,7 @@
 # System Update Changelog: Palapa OS
-(POCO F5 / marble)
+(Redmi Note 13 5G / gold)
 
-Target Device: POCO F5 (marble)  
+Target Device: Redmi Note 13 5G (gold)  
 Android Version: Android 17 (CP2A)  
 Package Size: ~2.9 GB  
 Compilation Status: Cleanly Prepared (Exit Code 0)  
@@ -16,7 +16,7 @@ Document Navigation:
 
 This update delivers a complete overhaul of the user interface (UI Redesign) inspired by One UI 9, introduces the interactive Dynamic Island feature, enhances the Settings menu, and boosts system performance and hardware audio:
 
-1. Interactive Dynamic Island (POCO F5 Punch-Hole)
+1. Interactive Dynamic Island (Redmi Note 13 5G Punch-Hole)
    - Charging Indicator: Displays an animated green lightning bolt and live battery percentage for 7.8 seconds when plugged in.
    - Flashlight Indicator: Minimalist compact pill with modern bespoke torch icon and bold "On" status. Tap once to toggle off.
    - Screen Recording Indicator: Compact pill matching flashlight dimensions with pulsing red record dot and running digital timer.
@@ -33,11 +33,11 @@ This update delivers a complete overhaul of the user interface (UI Redesign) ins
    - Homepage Quick Dashboard: Real-time status cards to monitor Battery, Storage, RAM, Display, and Sound at a glance.
    - New Notification Panel Button: The Accessibility card on the dashboard has been replaced with a direct Notification shortcut. Accessibility remains intact in the primary settings list.
    - Colored Notification Icons: New option in Notification Settings to show genuine, full-color app logos on status bar icons and shade notification cards instead of monochrome silhouettes.
-   - About Phone Dashboard: Shinkai Project visual banner with hardware spec meters (SoC, display, camera) and community contributor credits.
+   - About Phone Dashboard: crDroid 13.0 visual banner with hardware spec meters (SoC, display, camera) and community contributor credits.
 
 4. System & Performance Improvements
    - Dynamic RAM Expansion (zRAM): True zRAM configuration directly tied to the Linux kernel (Options: Disabled, 2 GB, 4 GB, 8 GB, 16 GB), verifiable in system monitoring tools.
-   - Native Hardware Dolby Atmos: Built-in hardware DSP offload with MarbleDolby application (AutoEQ and 10-band equalizer) without requiring root or KernelSU modules.
+   - Native Hardware Dolby Atmos: Built-in hardware DSP offload with GoldDolby application (AutoEQ and 10-band equalizer) without requiring root or KernelSU modules.
    - Clean Navigation: Toggles to hide the bottom navigation pill and eliminate empty space below the keyboard.
 
 ---
@@ -103,7 +103,7 @@ During testing and review sessions, several core interface discrepancies and sub
    - Sets 8 multi-streams and `lz4` compression algorithm, followed by `mkswap`, `swapon`, and swappiness 100.
    - Immediately verifiable in `/proc/swaps`, DevCheck, and Kernel Manager.
 4. About Phone / Firmware Version:
-   - Dedicated row for **Versi Shinkai** (`ro.shinkai.version`).
+   - Dedicated row for **Versi crDroid** (`ro.crdroid.version`).
    - Dedicated row for **Versi Wowo OS** with value **Embegeh-1T**.
 5. RAM Expansion is fully dynamic: selecting +8 GB (or any other size) immediately updates `/sys/block/zram0/disksize` at kernel level, reflects accurately in DevCheck and About Phone (e.g. 8 GB + 8 GB), and persists across reboots.
 6. Full system compilation finished cleanly without compiler warnings, syntax errors, or SELinux violations.
@@ -154,7 +154,7 @@ During testing and review sessions, several core interface discrepancies and sub
 #### Affected Components:
 - `ram_expansion.sh`
 - `init.kernel.post_boot.sh`
-- `init.marble.rc`
+- `init.gold.rc`
 - `device.mk`
 - `property.te`
 - `property_contexts`
@@ -171,7 +171,7 @@ During testing and review sessions, several core interface discrepancies and sub
    - Declared `vendor_public_prop(vendor_ram_expansion_prop)` in `property.te`.
    - Mapped `persist.vendor.ram_expansion` and `vendor.ram_expansion` to `vendor_ram_expansion_prop:s0` in `property_contexts`.
 2. **Init Root Synchronization**:
-   - Added triggers in `init.marble.rc` on `persist.sys.ram_expansion=*`, `sys.boot_completed=1`, and `post-fs-data` to synchronize values to `persist.vendor.ram_expansion`.
+   - Added triggers in `init.gold.rc` on `persist.sys.ram_expansion=*`, `sys.boot_completed=1`, and `post-fs-data` to synchronize values to `persist.vendor.ram_expansion`.
    - Registered `/vendor/bin/ram_expansion.sh` under `vendor.ram_expansion` service with `seclabel u:r:vendor_qti_init_shell:s0`.
 3. **SELinux Policy Access**:
    - Labeled `ram_expansion.sh` as `vendor_qti_init_shell_exec:s0` in `file_contexts`.
@@ -197,7 +197,7 @@ During testing and review sessions, several core interface discrepancies and sub
 | `RamExpansionPreferenceController.kt` | Settings / Core | Preference summary binding to persistent property |
 | `ram_expansion.sh` | Daemon / Subsystem | Runtime swapoff, zRAM reset, and dynamic disksize allocation script |
 | `init.kernel.post_boot.sh` | Kernel / Boot | Post-boot zRAM configuration utilizing persistent vendor property |
-| `init.marble.rc` | Init / Triggers | Property synchronization triggers, service registration, and seclabel mapping |
+| `init.gold.rc` | Init / Triggers | Property synchronization triggers, service registration, and seclabel mapping |
 | `device.mk` | Build Rules | Registered `ram_expansion.sh` into vendor `PRODUCT_COPY_FILES` |
 | `file_contexts` | SELinux Context | Context mapping for `ram_expansion.sh` |
 | `property.te` | SELinux Policy | Declared `vendor_ram_expansion_prop` public vendor property |
@@ -206,7 +206,7 @@ During testing and review sessions, several core interface discrepancies and sub
 | `device.mk` (dolby) | Device Tree / Config | Enabled `hardware/dolby/dolby.mk` product inheritance |
 | `BoardConfig.mk` (dolby) | VINTF / Build | Restored Dolby HAL & C2 manifests and framework matrix |
 | `vendor.dolby.hardware.dms@2.0-service` | Vendor HAL | Native DMS HIDL daemon for Dolby effect management |
-| `MarbleDolby` | UI / Application | Compose-based Dolby Atmos control app with AutoEQ & QS tile |
+| `GoldDolby` | UI / Application | Compose-based Dolby Atmos control app with AutoEQ & QS tile |
 
 ---
 
@@ -228,19 +228,19 @@ During testing and review sessions, several core interface discrepancies and sub
 ### 3. POSIX-Compliant zRAM Expansion Controller
 - Replaced bash-only `let` commands with POSIX standard arithmetic `$((ramExpansion * 1024))` in `/vendor/bin/sh` (toybox ash).
 - Full support for `0` and `off` modes with proper `swapoff` execution and zRAM device resets.
-- Multi-stage property synchronization in `init.marble.rc` on `boot`, `post-fs-data`, and property change triggers to guarantee persistence across reboots.
+- Multi-stage property synchronization in `init.gold.rc` on `boot`, `post-fs-data`, and property change triggers to guarantee persistence across reboots.
 
 ---
 
-## Section V: Native Hardware Dolby Atmos & MarbleDolby Integration
+## Section V: Native Hardware Dolby Atmos & GoldDolby Integration
 
 ### 1. Requirements & System Overview
-- **Hardware Dolby Support Verification**: Confirmed that POCO F5 (`marble`) hardware (Snapdragon 7+ Gen 2 / SM7475) natively supports Qualcomm Hexagon DSP hardware offload for Dolby Audio Processing (DAP).
+- **Hardware Dolby Support Verification**: Confirmed that Redmi Note 13 5G (`gold`) hardware (MediaTek Dimensity 6080 / MT6833) natively supports Qualcomm Hexagon DSP hardware offload for Dolby Audio Processing (DAP).
 - **Decoupling from Third-Party Root Modules**: Replaced the previous reliance on external KernelSU/Magisk modules (OnePlus 9 Pro Dolby Atmos + OPlus Core), which required intrusive overlayfs modules (`mountify`), non-native ColorOS frameworks (`oplus-framework-res`), and aggressive runtime daemon killing (`killall audioserver`/camera services) on AOSP systems.
-- **Full In-Tree Integration**: Integrated the complete hardware Dolby Atmos subsystem directly into the ROM build tree via `hardware/dolby` (marble-indonesia `audio-fixed` branch).
+- **Full In-Tree Integration**: Integrated the complete hardware Dolby Atmos subsystem directly into the ROM build tree via `hardware/dolby` (gold-indonesia `audio-fixed` branch).
 
 ### 2. Architectural & Build Implementation Details
-1. **Device Tree Integration (`device/xiaomi/marble`)**:
+1. **Device Tree Integration (`device/xiaomi/gold`)**:
    - `device.mk`: Re-enabled inheritance for `hardware/dolby/dolby.mk` (`$(call inherit-product, hardware/dolby/dolby.mk)`).
    - `BoardConfig.mk`: Restored VINTF HAL manifests (`vendor.dolby.hardware.dms@2.0-service.xml`, `vendor.dolby.media.c2.xml`) and the framework compatibility matrix (`dolby_framework_matrix.xml`).
    - `PRODUCT_SOONG_NAMESPACES`: Registered `hardware/dolby` into Soong namespaces cleanly.
@@ -253,8 +253,8 @@ During testing and review sessions, several core interface discrepancies and sub
      * `libswgamedap.so` & `libswvqe.so`: Dolby Game DAP and Voice Quality Enhancement.
    - Codec 2.0 decoders: AC4 (`libcodec2_soft_ac4dec`) and DDP (`libcodec2_soft_ddpdec`) alongside `c2.dolby.*`.
    - Compatibility shim: `libstagefright_foundation-v33.so` provided via `hardware/lineage/compat`.
-3. **Frontend Application (`MarbleDolby`)**:
-   - Modern Material 3 UI built with Jetpack Compose (`org.lunaris.dolby`), installed directly as a privileged system app at `system_ext/priv-app/MarbleDolby`.
+3. **Frontend Application (`GoldDolby`)**:
+   - Modern Material 3 UI built with Jetpack Compose (`org.lunaris.dolby`), installed directly as a privileged system app at `system_ext/priv-app/GoldDolby`.
    - Key Features:
      * 10-band interactive graphical equalizer with live frequency response curve.
      * AutoEQ database integration (hundreds of pre-calibrated headphone/earphone models).
@@ -264,7 +264,7 @@ During testing and review sessions, several core interface discrepancies and sub
      * Per-app audio profile automation.
 
 ### 3. Verification & Compilation Status
-- Target `MarbleDolby`: Successfully compiled, DEX-preopted, and verified cleanly (`out/target/product/marble/system_ext/priv-app/MarbleDolby/MarbleDolby.apk`).
+- Target `GoldDolby`: Successfully compiled, DEX-preopted, and verified cleanly (`out/target/product/gold/system_ext/priv-app/GoldDolby/GoldDolby.apk`).
 - Target `vendor.dolby.hardware.dms@2.0-service`: Linked, verified against ELF rules, and installed cleanly into `/vendor/bin/hw/`.
 - Full build check passed with exit code 0 (`#### build completed successfully ####`).
 
@@ -413,10 +413,10 @@ During testing and review sessions, several core interface discrepancies and sub
 
 ---
 
-## Section X: Dynamic Island Charging Capsule for POCO F5 (marble) [Experimental]
+## Section X: Dynamic Island Charging Capsule for Redmi Note 13 5G (gold) [Experimental]
 
 ### 1. Requirements & Overview
-- **Punch-Hole Integrated Dynamic Island**: Implemented a sleek Dynamic Island charging pill tailored for the centered camera punch-hole cutout of POCO F5 (`device/xiaomi/marble`, cutout: `M 0,0 H -28 V 94 H 28 V 0 H 0 Z`).
+- **Punch-Hole Integrated Dynamic Island**: Implemented a sleek Dynamic Island charging pill tailored for the centered camera punch-hole cutout of Redmi Note 13 5G (`device/xiaomi/gold`, cutout: `M 0,0 H -28 V 94 H 28 V 0 H 0 Z`).
 - **Charging-Triggered Animation**: Activates exclusively when charging commences (cable plugged in), smoothly expanding from the center camera notch into a capsule status bar pill.
 - **Visual Design Matching Reference**:
   * Capsule Shell: Pitch black (`#000000`) with rounded ends (100dp corner radius, stadium pill shape, height 35dp), subtle translucent rim (`#24FFFFFF`), and z-order layered directly above status bar contents.
@@ -428,7 +428,7 @@ During testing and review sessions, several core interface discrepancies and sub
 
 ### 2. Implementation Details
 1. **Status Bar Hierarchy & Custom View (`SystemUI`)**:
-   - `status_bar.xml`: Placed `DynamicIslandChargingView` (`@+id/dynamic_island_charging`) inside `PhoneStatusBarView` with `layout_gravity="center_horizontal|center_vertical"`, aligning directly over the POCO F5 centered camera cutout.
+   - `status_bar.xml`: Placed `DynamicIslandChargingView` (`@+id/dynamic_island_charging`) inside `PhoneStatusBarView` with `layout_gravity="center_horizontal|center_vertical"`, aligning directly over the Redmi Note 13 5G centered camera cutout.
    - `DynamicIslandChargingView.kt`: Custom `FrameLayout` listening to sticky `Intent.ACTION_BATTERY_CHANGED`. Detects charging state transitions (`!wasPluggedIn && isPluggedIn`), measures display metrics, and manages fluid `AnimatorSet` spring animations.
    - `dynamic_island_charging.xml` & `dynamic_island_pill_bg.xml`: Dedicated capsule layout and stadium pill drawable.
    - `ic_dynamic_island_bolt.xml`: Custom neon green (`#00E676`) 16dp lightning bolt vector asset.
@@ -527,7 +527,7 @@ During testing and review sessions, several core interface discrepancies and sub
 - **User Request**:
   1. Transform the Dynamic Island into a comprehensive, true Dynamic Island system beyond just charging.
   2. Implement iOS-style fluid **Spring & Overshoot physics**:
-     - Expansion: Horizontal expansion left and right from the POCO F5 centered camera punch-hole with bouncy spring overshoot.
+     - Expansion: Horizontal expansion left and right from the Redmi Note 13 5G centered camera punch-hole with bouncy spring overshoot.
      - Closing: Two-phase elastic recoil (slight horizontal rubber stretch before rapidly collapsing into the punch-hole).
   3. Support three core events:
      - **Charging**: Ephemeral 7.8s hold with live battery percentage and green neon pulsing bolt.
@@ -713,7 +713,7 @@ During testing and review sessions, several core interface discrepancies and sub
 
 ### 1. Requirements & Overview
 - **Background & Issues**:
-  1. **Punch-Hole Cutout Camera Obstruction**: On center punch-hole cutout displays (e.g., POCO F5 / `marble`), the compact Dynamic Island capsule for flashlight and screen recording was too narrow. Consequently, the flashlight glyph, "On" status text, pulsing red recording dot, and digital timer were physically obscured by the device front camera cutout.
+  1. **Punch-Hole Cutout Camera Obstruction**: On center punch-hole cutout displays (e.g., Redmi Note 13 5G / `gold`), the compact Dynamic Island capsule for flashlight and screen recording was too narrow. Consequently, the flashlight glyph, "On" status text, pulsing red recording dot, and digital timer were physically obscured by the device front camera cutout.
   2. **Status Bar Chip Duplication (Native Android Recording Pill)**: When Dynamic Island was recording, the native Android red ongoing recording chip adjacent to the status bar clock also displayed simultaneously, creating distracting visual duplication. The native chip must be suppressed whenever Dynamic Island is enabled and only reappear if Dynamic Island is toggled off by the user.
   3. **Expanded Island Control Redesign**: The pause feature lacked native support in the AOSP MediaProjection recording pipeline, and secondary decorative buttons lacked functional utility. All controls other than Stop are replaced with 6 native Android screen recording configuration switches: Record device audio, Record microphone, Show touches, Lower quality (SD), Larger file size limit, and HEVC encoding (which defaults to ON and operates functionally). The Stop button remains accessible and fully functional.
 
@@ -1003,7 +1003,7 @@ During testing and review sessions, several core interface discrepancies and sub
 ### 1. Requirements & Overview
 - **User Request**:
   - Configure the kopdes_ontop image in the root project as the out-of-the-box default wallpaper across the ROM.
-  - Ensure the wallpaper is rendered in full sharpness and aspect ratio tailored for the device display (POCO F5 marble, 1080x2400).
+  - Ensure the wallpaper is rendered in full sharpness and aspect ratio tailored for the device display (Redmi Note 13 5G gold, 1080x2400).
 
 ### 2. Implementation Details
 1. **Image Processing & Format Conversion**:
@@ -1051,11 +1051,11 @@ During testing and review sessions, several core interface discrepancies and sub
 
 ---
 
-## Section XXXII: Power Menu Device Tag Rebranding (POCO F5) and Dynamic Material You Monet Color Adaptation
+## Section XXXII: Power Menu Device Tag Rebranding (Redmi Note 13 5G) and Dynamic Material You Monet Color Adaptation
 
 ### 1. Requirements & Overview
 - **User Request**:
-  - Correct the top capsule pill tag in the Power Menu: replace "Material 3 Expressive • Pixel 9 Pro XL" with "Material 3 Expressive • POCO F5" to accurately reflect the target device (POCO F5 / marble).
+  - Correct the top capsule pill tag in the Power Menu: replace "Material 3 Expressive • Pixel 9 Pro XL" with "Material 3 Expressive • Redmi Note 13 5G" to accurately reflect the target device (Redmi Note 13 5G / gold).
   - Transition the Power Menu color scheme from static solid green shades (#042D1C, #9EE4B4, #2B3830, etc.) to Android Material You dynamic Monet color tokens, enabling the menu to organically harmonize with the user's active wallpaper palette.
 
 ### 2. Implementation Details
@@ -1063,7 +1063,7 @@ During testing and review sessions, several core interface discrepancies and sub
    - Updated power_menu_tag_pill string resource across:
      * frameworks/base/packages/SystemUI/res/values/shinkai_strings.xml
      * frameworks/base/packages/SystemUI/res/values-in/shinkai_strings.xml
-   - New value: "Material 3 Expressive • POCO F5".
+   - New value: "Material 3 Expressive • Redmi Note 13 5G".
 2. **Power Menu Drawables Refactored to Dynamic Monet Tokens**:
    - Replaced all hardcoded green hex colors with official Android Material You system palette resources (@android:color/system_*):
      * power_menu_tag_pill_bg.xml: Uses solid @android:color/system_accent1_900 with stroke @android:color/system_accent1_700.
@@ -1108,7 +1108,7 @@ During testing and review sessions, several core interface discrepancies and sub
      * Updated ro.wowo.edition=Majapahit Edition, ro.wowo.os.name=Palapa OS, ro.wowo.os.version=Majapahit for full backward compatibility.
    - Updated OTA target package filename in vendor/lineage/build/tasks/bacon.mk to PalapaOS-Majapahit-$(TARGET_DEVICE)-17.zip.
    - Updated power_menu_vip_tag in SystemUI strings (values & values-in) to "Palapa OS".
-   - Updated installer banner and script metadata in apply.sh to Shinkai Project / PalapaOS Redesign UI.
+   - Updated installer banner and script metadata in apply.sh to crDroid 13.0 / PalapaOS Redesign UI.
 2. **Default Wallpaper Replacement (palapa_os.jpg)**:
    - Converted palapa_os.jpg to clean 1080 x 2400 pixel PNG format utilizing high-precision Lanczos resampling (ImageOps.fit).
    - Deployed updated default_wallpaper.png across all system destinations:
@@ -1124,7 +1124,7 @@ During testing and review sessions, several core interface discrepancies and sub
      * bootanimation_720.zip
 4. **Android Version Info & About Phone Dashboard Updates**:
    - Deleted wowo_stat_edition_card (Kopdes edition card) in packages/apps/Settings/res/layout/shinkai_logo.xml, leaving a clean balanced two-card layout (Android Version and Device).
-   - Updated About Phone banner in about_phone_dashboard.xml from "Wowo OS 19jt" to "Palapa OS" and subtitle to "Majapahit Edition • Shinkai Project".
+   - Updated About Phone banner in about_phone_dashboard.xml from "Wowo OS 19jt" to "Palapa OS" and subtitle to "Majapahit Edition • crDroid 13.0".
    - Updated version row in shinkai_logo.xml from "Embegeh-1T" to "Majapahit".
    - Updated preference controllers AboutPhoneDashboardPreferenceController.kt, ShinkaiLogoPreference.kt, and ShinkaiVersionPreference.kt to dynamically reference Palapa OS and Majapahit Edition.
 5. **Palapa Satellite Logo Rendering & Integration**:
@@ -1180,9 +1180,9 @@ During testing and review sessions, several core interface discrepancies and sub
    - ShinkaiLogoPreference.kt: Bound all view lookups to R.id.palapa_* and string resources to R.string.palapa_*.
    - ShinkaiVersionPreference.kt: Pointed primary system property reading to KEY_PALAPA_EDITION (ro.palapa.edition) with a safe backwards-compatible fallback to KEY_LEGACY_EDITION (ro.wowo.edition).
    - AboutPhoneDashboardPreferenceController.kt: Updated runtime display logic to present Palapa OS and Majapahit Edition.
-   - Refactored copyright header notices across 58 UI controller files to Copyright (C) 2026 Palapa OS / Shinkai Project.
+   - Refactored copyright header notices across 58 UI controller files to Copyright (C) 2026 Palapa OS / crDroid 13.0.
 5. **Documentation and README.md Synchronization**:
-   - Synchronized README.md header and feature overview to Shinkai Project - PalapaOS Redesign UI (POCO F5 & Generic Android 17).
+   - Synchronized README.md header and feature overview to crDroid 13.0 - PalapaOS Redesign UI (Redmi Note 13 5G & Generic Android 17).
    - Synchronized all engineering and technical entries across changelogs.md, changelogs-id.md, and changelogs-en.md under strict zero emoji validation.
 ---
 
@@ -1190,13 +1190,13 @@ During testing and review sessions, several core interface discrepancies and sub
 
 ### 1. Requirements & Overview
 - **User Request**:
-  - Add and enable DT2W (Double Tap to Wake) and DT2S (Double Tap to Sleep) features for PalapaOS (POCO F5 / `marble`).
+  - Add and enable DT2W (Double Tap to Wake) and DT2S (Double Tap to Sleep) features for PalapaOS (Redmi Note 13 5G / `gold`).
   - Ensure end-to-end integration across touchscreen kernel drivers, Power HAL, AOSP framework, SystemUI, and Display Settings.
   - Ensure all changelog files strictly adhere to the zero-emoji requirement.
 
 ### 2. Subsystem Analysis & Hardware Architecture
-1. **POCO F5 (`marble`) Kernel & Sysfs Support**:
-   - Sysfs nodes `/sys/class/touch/touch_dev/gesture_double_tap_enabled` and `gesture_double_tap_state` are configured in `init.marble.rc` with system permissions.
+1. **Redmi Note 13 5G (`gold`) Kernel & Sysfs Support**:
+   - Sysfs nodes `/sys/class/touch/touch_dev/gesture_double_tap_enabled` and `gesture_double_tap_state` are configured in `init.gold.rc` with system permissions.
    - Vendor double tap sensor is monitored by `NonUiNotifier.cpp` using the sensor type `org.lineageos.sensor.double_tap`.
 2. **Double Tap to Wake (DT2W)**:
    - `PowerManagerService` dispatches `Mode::DOUBLE_TAP_TO_WAKE` to the Power HAL when `config_supportDoubleTapWake` is set to true.
@@ -1207,8 +1207,8 @@ During testing and review sessions, several core interface discrepancies and sub
    - `config_supportDoubleTapSleep` and `config_dt2sGestureEnabledByDefault` configure the feature out of the box.
 
 ### 3. Implementation Details & File Modifications
-1. **Device Tree & Framework Overlays (`device/xiaomi/marble`)**:
-   - `overlay/xiaomi/Frameworks/res/values/config.xml` & `overlay/marble/Frameworks/res/values/config.xml`:
+1. **Device Tree & Framework Overlays (`device/xiaomi/gold`)**:
+   - `overlay/xiaomi/Frameworks/res/values/config.xml` & `overlay/gold/Frameworks/res/values/config.xml`:
      * Added `<bool name="config_supportDoubleTapWake">true</bool>` to enable DT2W in the framework and Display Settings.
      * Added `<bool name="config_supportDoubleTapSleep">true</bool>` to declare system-level DT2S support.
      * Added `<bool name="config_dt2sGestureEnabledByDefault">true</bool>` to enable the DT2S gesture by default.

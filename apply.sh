@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# Shinkai Project / PalapaOS Redesign UI - Installer & Patcher
-# Copyright (C) 2026 Gustyx-Power / Shinkai Project
+# crDroid 13.0 / PalapaOS Redesign UI - Installer & Patcher
+# Copyright (C) 2026 Gustyx-Power / crDroid 13.0
 #
 
 set -e
@@ -18,7 +18,7 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo -e "${CYAN}${BOLD}====================================================${NC}"
-echo -e "${CYAN}${BOLD}   Shinkai Project - PalapaOS Redesign UI Patcher     ${NC}"
+echo -e "${CYAN}${BOLD}   crDroid 13.0 - PalapaOS Redesign UI Patcher     ${NC}"
 echo -e "${CYAN}${BOLD}====================================================${NC}"
 
 usage() {
@@ -27,10 +27,10 @@ usage() {
     echo -e ""
     echo -e "${BOLD}MODE Options:${NC}"
     echo -e "  ${GREEN}--ui-only${NC}     : Apply UI redesign only (Settings + SystemUI + Overlays)"
-    echo -e "                    ${YELLOW}(Recommended for any non-marble device porting)${NC}"
-    echo -e "  ${GREEN}--all${NC}         : Apply everything (UI + Device Tree marble + Build fixes)"
-    echo -e "                    ${YELLOW}(Specifically tailored for POCO F5 / marble)${NC}"
-    echo -e "  ${GREEN}--device-only${NC} : Apply POCO F5 marble device tree & RAM expansion fixes only"
+    echo -e "                    ${YELLOW}(Recommended for any non-gold device porting)${NC}"
+    echo -e "  ${GREEN}--all${NC}         : Apply everything (UI + Device Tree gold + Build fixes)"
+    echo -e "                    ${YELLOW}(Specifically tailored for Redmi Note 13 5G / gold)${NC}"
+    echo -e "  ${GREEN}--device-only${NC} : Apply Redmi Note 13 5G gold device tree & RAM expansion fixes only"
     echo -e ""
     echo -e "${BOLD}Examples:${NC}"
     echo -e "  $0 /home/user/shinkai --ui-only"
@@ -71,8 +71,8 @@ fi
 if [ -z "$MODE" ]; then
     echo -e "\n${BOLD}Choose installation mode:${NC}"
     echo -e "  ${CYAN}[1]${NC} UI Only (Settings + SystemUI + Overlays) - ${YELLOW}[For ANY device / Generic porting]${NC}"
-    echo -e "  ${CYAN}[2]${NC} Full Setup (UI + Marble Device Tree + Build Fix) - ${YELLOW}[POCO F5 marble only]${NC}"
-    echo -e "  ${CYAN}[3]${NC} Marble Device Tree Only (RAM Expansion Fix)     - ${YELLOW}[POCO F5 marble only]${NC}"
+    echo -e "  ${CYAN}[2]${NC} Full Setup (UI + Gold Device Tree + Build Fix) - ${YELLOW}[Redmi Note 13 5G gold only]${NC}"
+    echo -e "  ${CYAN}[3]${NC} Gold Device Tree Only (RAM Expansion Fix)     - ${YELLOW}[Redmi Note 13 5G gold only]${NC}"
     echo -ne "${BOLD}Your choice (1/2/3) [Default 1]: ${NC}"
     read -r CHOICE
     case "$CHOICE" in
@@ -107,10 +107,10 @@ apply_ui() {
 }
 
 apply_device() {
-    echo -e "\n${BLUE}[+] Applying Marble Device Tree & System Init (RAM Expansion FurLC fix, SELinux, Init RC)...${NC}"
-    mkdir -p "$TARGET_DIR/device/xiaomi/marble"
-    cp -rf "$SCRIPT_DIR/device/xiaomi/marble/"* "$TARGET_DIR/device/xiaomi/marble/"
-    echo -e "  ${GREEN}✓ device/xiaomi/marble/ successfully copied!${NC}"
+    echo -e "\n${BLUE}[+] Applying Gold Device Tree & System Init (RAM Expansion FurLC fix, SELinux, Init RC)...${NC}"
+    mkdir -p "$TARGET_DIR/device/xiaomi/gold"
+    cp -rf "$SCRIPT_DIR/device/xiaomi/gold/"* "$TARGET_DIR/device/xiaomi/gold/"
+    echo -e "  ${GREEN}✓ device/xiaomi/gold/ successfully copied!${NC}"
 
     if [ -f "$SCRIPT_DIR/system/core/rootdir/init.rc" ]; then
         mkdir -p "$TARGET_DIR/system/core/rootdir"
@@ -150,7 +150,7 @@ case "$MODE" in
         ;;
     --device-only)
         apply_device
-        echo -e "\n${GREEN}${BOLD}=== SUCCESS: Marble Device Tree Applied Successfully! ===${NC}"
+        echo -e "\n${GREEN}${BOLD}=== SUCCESS: Gold Device Tree Applied Successfully! ===${NC}"
         ;;
     --all)
         apply_ui
@@ -166,4 +166,4 @@ case "$MODE" in
         ;;
 esac
 
-echo -e "\n${CYAN}Done! Thank you for using Shinkai Project Redesign UI.${NC}\n"
+echo -e "\n${CYAN}Done! Thank you for using crDroid 13.0 Redesign UI.${NC}\n"
